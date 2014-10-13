@@ -16,6 +16,9 @@
 %left PLUS MINUS
 %left TIMES DIVIDE
 
+Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Rt | Ltoe
+            | Gtoe | Or | And | Not
+
 %start program
 %type <Ast.program> program
 

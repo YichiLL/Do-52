@@ -50,8 +50,12 @@ rule token = parse
 | "with" {WITH}
 | "new" {NEW}
 | "configure" {CONFIG}
-| ['A'-'Z''a'-'z'] ['a'-'z''A'-'Z''0'-'9''_']*  {ID}
-| ['0'-'9']+ {DIGIT}
-| '\"'[^'\"']* '\"' {LITERAL} 
+| ['A'-'Z''a'-'z'] ['a'-'z''A'-'Z''0'-'9''_']* as lxm {ID(lxm)}
+| ['0'-'9']+ as digit { DIGIT(digit) } 
+| '\"'[^'\"']* '\"' as lit {LITERAL (lit)} 
 | eof { EOF }
-| "//"  {COMMENT}
+| "//" {comment lexbuf}
+
+and comment = parse
+| '\n' {token lexbuf}
+| _ {comment lexbuf}  
