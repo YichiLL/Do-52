@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-type binop = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
-            | Gtoe | Or | And | Not
-=======
 type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
             | Gtoe | Or | And
 
 type un_op = Not
->>>>>>> FETCH_HEAD
 
 type expr =
       Number of int
