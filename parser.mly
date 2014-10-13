@@ -1,23 +1,28 @@
 %{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA
-%token PLUS MINUS TIMES DIVIDE ASSIGN
-%token EQ NEQ LT LEQ GT GEQ
-%token RETURN IF ELSE FOR WHILE INT
-%token <int> LITERAL
+%token COMMENT NEWLINE
+%token SEMI OPENPAREN CLOSEPAREN OPENBLOCK CLOSEBLOCK COMMA PREPEN APPEND
+%token ADD MINUS MULTIPLY DIVIDE ASSIGNMENT
+%token EQUAL NOTEQUAL LT LTOE GT GTOE
+%token RETURN IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER 
+%token HAS CALLED DO WITH NEW CONFIG 
+%token <string> LITERAL
+%token <int> NUMBER
 %token <string> ID
 %token EOF
 
-%nonassoc NOELSE
-%nonassoc ELSE
-%right ASSIGN
-%left EQ NEQ
-%left LT GT LEQ GEQ
-%left PLUS MINUS
-%left TIMES DIVIDE
-
-Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Rt | Ltoe
-            | Gtoe | Or | And | Not
+%left COMMENT NEWLINE
+%nonassoc IF ELSEIF ELSE 
+%right ASSIGNMENT
+%left EQUAL NOTEQUAL
+%left NOT AND OR
+%left LT GT
+%left GTOE LTOE
+%left PREPEN APPEND
+%left ADD MINUS
+%left MULTIPLY DIVIDE
+%left OPENPAREN CLOSEPAREN 
+%left OPENBLOCK CLOSEBLOCK
 
 %start program
 %type <Ast.program> program
@@ -30,7 +35,7 @@ program:
  | program fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+   ID OPENPAREN formals_opt CLOSEPAREN LBRACE vdecl_list stmt_list CLOSEBLOCK
      { { fname = $1;
 	 formals = $3;
 	 locals = List.rev $6;
@@ -58,12 +63,12 @@ stmt_list:
 stmt:
     expr SEMI { Expr($1) }
   | RETURN expr SEMI { Return($2) }
-  | LBRACE stmt_list RBRACE { Block(List.rev $2) }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
-  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN stmt
+  | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }
+  | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
+  | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
+  | FOR OPENPAREN expr_opt SEMI expr_opt SEMI expr_opt CLOSEPAREN stmt
      { For($3, $5, $7, $9) }
-  | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
+  | WHILE OPENPAREN expr CLOSEPAREN stmt { While($3, $5) }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -72,19 +77,19 @@ expr_opt:
 expr:
     LITERAL          { Literal($1) }
   | ID               { Id($1) }
-  | expr PLUS   expr { Binop($1, Add,   $3) }
+  | expr ADD   expr { Binop($1, Add,   $3) }
   | expr MINUS  expr { Binop($1, Sub,   $3) }
-  | expr TIMES  expr { Binop($1, Mult,  $3) }
+  | expr MULTIPLY  expr { Binop($1, Mult,  $3) }
   | expr DIVIDE expr { Binop($1, Div,   $3) }
-  | expr EQ     expr { Binop($1, Equal, $3) }
-  | expr NEQ    expr { Binop($1, Neq,   $3) }
+  | expr EQUAL     expr { Binop($1, Equal, $3) }
+  | expr NOTEQUAL  expr { Binop($1, Neq,   $3) }
   | expr LT     expr { Binop($1, Less,  $3) }
-  | expr LEQ    expr { Binop($1, Leq,   $3) }
+  | expr LTOE    expr { Binop($1, Leq,   $3) }
   | expr GT     expr { Binop($1, Greater,  $3) }
-  | expr GEQ    expr { Binop($1, Geq,   $3) }
-  | ID ASSIGN expr   { Assign($1, $3) }
-  | ID LPAREN actuals_opt RPAREN { Call($1, $3) }
-  | LPAREN expr RPAREN { $2 }
+  | expr GTOE    expr { Binop($1, Geq,   $3) }
+  | ID ASSIGNMENT expr   { Assignment($1, $3) }
+  | ID OPENPAREN actuals_opt CLOSEPAREN { Call($1, $3) }
+  | OPENPAREN expr CLOSEPAREN { $2 }
 
 actuals_opt:
     /* nothing */ { [] }
