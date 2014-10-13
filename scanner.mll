@@ -52,6 +52,6 @@ rule token = parse
 | "configure" {CONFIG}
 | ['A'-'Z''a'-'z'] ['a'-'z''A'-'Z''0'-'9''_']*  {ID}
 | ['0'-'9']+ {DIGIT}
-(* | "\"['\n''\t'[^"]]*\"" {LITERAL} (* might be problematic*) *)
+| '\"'[^'\"']* '\"' {LITERAL} 
 | eof { EOF }
 | "//"  {COMMENT}
