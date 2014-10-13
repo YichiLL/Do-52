@@ -1,4 +1,4 @@
-type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Rt | Ltoe
+type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
             | Gtoe | Or | And
 
 type un_op = Not
@@ -13,3 +13,12 @@ type expr =
     | Assign of string * expr
     | Call of string * expr list
 
+type stmt =
+      Block of stmt list
+    | Expr of expr
+    | If of expr * stmt * stmt
+    | For of expr * expr * expr * stmt
+    | While of expr * stmt
+    | Until of stmt * expr
+    | SimpLoop of stmt * expr
+    | Control of string                 (* e.g. break, continue *)
