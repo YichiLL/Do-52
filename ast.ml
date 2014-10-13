@@ -22,3 +22,14 @@ type stmt =
     | Until of stmt * expr
     | SimpLoop of stmt * expr
     | Control of string                 (* e.g. break, continue *)
+    | Decl of string * string * expr
+    | HasCalled of string * string * string   (* Type has Type called Id *)
+    | Config of string * expr
+
+type func_decl = {
+    fname : string;
+    formals : string list;
+    locals : string list;
+    body : stmt list;
+}
+
