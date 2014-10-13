@@ -4,7 +4,7 @@ Scanner generates tokens for the parser*)
 { open Parser }
 
 rule token = parse
-| ' ' {SPACE}
+| ' ' {token lexbuf}
 | '\t' {TAB}
 | '\n' {NEWLINE}
 | '+' {ADD}
@@ -24,17 +24,15 @@ rule token = parse
 | '_' {DOTOP}
 | ">>" {PREPEND}
 | "<<" {APPEND}
-| '"' {QUOTE}          (* might be problematic *)
-| '\\' {BACKSLASH}    (* might be problematic *)
 | "Number" {INT}
 | "String" {STRING}
-| "boolean" {BOOLEAN}
+| "Boolean" {BOOLEAN}
 | "Card" {CARD}
 | "Set" {SET}
 | "Player" {PLAYER}
 | "if" {IF}
 | "else" {ELSE}
-| "else if" {ELSEIF}
+| "elseif" {ELSEIF}
 | '{' {OPENBLOCK}
 | '}' {CLOSEBLOCK}
 | "while" {WHILE}
