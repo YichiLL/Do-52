@@ -37,9 +37,9 @@ program:
 fdecl:
    ID OPENPAREN formals_opt CLOSEPAREN LBRACE vdecl_list stmt_list CLOSEBLOCK
      { { fname = $1;
-	 formals = $3;
-	 locals = List.rev $6;
-	 body = List.rev $7 } }
+	       formals = $3;
+	       locals = List.rev $6;
+	       body = List.rev $7 } }
 
 formals_opt:
     /* nothing */ { [] }
