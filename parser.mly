@@ -81,10 +81,6 @@ vdecl:
 condecl:
   CONFIGURE ID ASSIGNMENT
 
-stmt_list:
-    /* nothing */  { [] }
-  | stmt_list stmt { $2 :: $1 }
-
 stmt:
     expr { Expr($1) }
   | RETURN expr { Return($2) }
@@ -93,6 +89,10 @@ stmt:
   | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | loop_block {$1}
   | do_block {$1}
+
+stmt_list:
+    /* nothing */  { [] }
+  | stmt_list stmt { $2 :: $1 }
 
 do_block:
   DO ID WITH expr_list{{ 
