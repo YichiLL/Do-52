@@ -1,7 +1,5 @@
 type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
-            | Gtoe | Or | And
-
-type un_op = Not
+            | Gtoe | Or | And | Not | Prepend | Append
 
 type expr =
       Number of int
@@ -16,7 +14,8 @@ type expr =
 type stmt =
       Block of stmt list
     | Expr of expr
-    | If of expr * stmt * stmt
+    | IfThenElse of expr * stmt * stmt
+    | ElseIF of expr * stmt
     | For of expr * expr * expr * stmt
     | While of expr * stmt
     | Until of stmt * expr
@@ -26,10 +25,11 @@ type stmt =
     | HasCalled of string * string * string   (* Type has Type called Id *)
     | Config of string * expr
 
+(*
 type func_decl = {
     fname : string;
     formals : string list;
     locals : string list;
     body : stmt list;
-}
+}*)
 
