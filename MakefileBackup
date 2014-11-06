@@ -1,0 +1,22 @@
+TARFILES = Makefile scanner.mll parser.mly ast.mli test.ml
+
+OBJS = parser.cmo scanner.cmo test.cmo
+
+calc : $(OBJS)
+	ocamlc -o test $(OBJS)
+
+scanner.ml : scanner.mll
+	ocamllex scanner.mll
+
+parser.ml parser.mli : parser.mly
+	ocamlyacc parser.mly
+
+%.cmo : %.ml %.cmi
+	ocamlc -c $<
+
+%.cmi : %.mli
+	ocamlc -c $<
+
+.PHONY : clean
+clean : 
+	rm -f test parser.ml parser.mli scanner.ml *.cmo *.cmi
