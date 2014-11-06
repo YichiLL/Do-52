@@ -29,10 +29,10 @@ rule token = parse
 | "Boolean" {BOOLEAN}
 | "Card" {CARD}
 | "Set" {SET}
+| ';' {SEMI}
 | "Player" {PLAYER}
 | "if" {IF}
 | "else" {ELSE}
-| "elseif" {ELSEIF}
 | '{' {OPENBLOCK}
 | '}' {CLOSEBLOCK}
 | "while" {WHILE}

@@ -26,6 +26,11 @@ type stmt =
     | HasCalled of string * string * string   (* Type has Type called Id *)
     | Config of string * expr
 
+type func_call = { 
+    fname : string;
+    formals : string list;
+}
+
 type func_decl = {
     fname : string;
     formals : string list;

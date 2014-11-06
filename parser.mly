@@ -4,7 +4,7 @@
 %token SEMI OPENPAREN CLOSEPAREN OPENBLOCK CLOSEBLOCK COMMA PREPEN APPEND
 %token ADD MINUS MULTIPLY DIVIDE ASSIGNMENT
 %token EQUAL NOTEQUAL LT LTOE GT GTOE
-%token RETURN IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER 
+%token RETURN IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER UNTIL BREAK CONTINUE
 %token HAS CALLED DO WITH NEW CONFIG 
 %token <string> LITERAL
 %token <int> NUMBER
@@ -12,7 +12,7 @@
 %token EOF
 
 %left COMMENT NEWLINE
-%nonassoc IF ELSEIF ELSE 
+%nonassoc IF ELSEIF ELSE NOELSE
 %right ASSIGNMENT
 %left EQUAL NOTEQUAL
 %left NOT AND OR
@@ -35,11 +35,33 @@ program:
  | program fdecl { fst $1, ($2 :: snd $1) }
 
 fdecl:
-   ID OPENPAREN formals_opt CLOSEPAREN LBRACE vdecl_list stmt_list CLOSEBLOCK
-     { { fname = $1;
-	       formals = $3;
-	       locals = List.rev $6;
-	       body = List.rev $7 } }
+   ID WITH arg_list ASSIGNMENT vdecl_list stmt_list 
+   { { 
+      fname = $1;
+      formals = $3;
+      locals = List.rev $5;
+      body = List.rev $6
+    } } 
+| ID ASSIGNMENT vdecl_list stmt_list 
+  { {
+     fname = $1;
+     formals = [];
+     locals = List.rev $3;
+     body = List.rev $4
+  } }
+
+arg_opt:
+  /* nothing */  { [] }
+  | arg_list { List.rev $1}
+
+arg_list: 
+  arg { [$1] }
+  | arg_list AND arg { $3 :: $1} 
+
+arg: 
+ INT ID { [ $2 ] }
+ | STRING ID { [ $2 ] }
+ | BOOLEAN ID { [ $2 ] } 
 
 formals_opt:
     /* nothing */ { [] }
@@ -54,21 +76,45 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   INT ID SEMI { $2 }
+  INT ID { $2 }
+
+condecl:
+  CONFIGURE ID ASSIGNMENT
 
 stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
 stmt:
-    expr SEMI { Expr($1) }
-  | RETURN expr SEMI { Return($2) }
+    expr { Expr($1) }
+  | RETURN expr { Return($2) }
   | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }
   | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | FOR OPENPAREN expr_opt SEMI expr_opt SEMI expr_opt CLOSEPAREN stmt
+  | loop_block {$1}
+  | do_block {$1}
+
+do_block:
+  DO ID WITH expr_list{{ 
+                    fname = $2;
+                    formals = List.rev $4
+                  }}
+  | DO ID {{
+            fname = $2;
+            formal = [] 
+          }}
+
+loop_block:
+  FOR OPENPAREN expr_opt SEMI expr_opt SEMI expr_opt CLOSEPAREN stmt
      { For($3, $5, $7, $9) }
   | WHILE OPENPAREN expr CLOSEPAREN stmt { While($3, $5) }
+  | OPENBLOCK stmt CLOSEBLOCK MULTIPLY NUMBER { SimpLoop( $2, $5) }
+  | OPENBLOCK stmt CLOSEBLOCK UNTIL expr { Until( $2, $5 ) }
+
+
+expr_list: 
+  expr { [$1] }
+  | expr_list AND expr { $3 :: $1 }
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -89,7 +135,9 @@ expr:
   | expr GTOE    expr { Binop($1, Geq,   $3) }
   | ID ASSIGNMENT expr   { Assignment($1, $3) }
   | ID OPENPAREN actuals_opt CLOSEPAREN { Call($1, $3) }
-  | OPENPAREN expr CLOSEPAREN { $2 }
+  | OPENPAREN expr CLOSEPAREN { $2 } 
+  | BREAK { Noexpr }
+  | CONTINUE { Noexpr }
 
 actuals_opt:
     /* nothing */ { [] }
