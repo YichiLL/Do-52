@@ -82,12 +82,21 @@ condecl:
   CONFIGURE ID ASSIGNMENT
 
 stmt:
+<<<<<<< HEAD
     expr { Expr($1) }  
     | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }  
     | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
     | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
     | loop_block {$1}
     | do_block {$1}
+=======
+    expr { Expr($1) }
+  | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }
+  | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
+  | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
+  | loop_block {$1}
+  | do_block {$1}
+>>>>>>> e4cc283955d70a540e138bbecc138151277d0979
 
 stmt_list:
     /* nothing */  { [] }
