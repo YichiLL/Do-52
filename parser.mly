@@ -4,7 +4,7 @@
 %token SEMI OPENPAREN CLOSEPAREN OPENBLOCK CLOSEBLOCK COMMA PREPEN APPEND
 %token ADD MINUS MULTIPLY DIVIDE ASSIGNMENT
 %token EQUAL NOTEQUAL LT LTOE GT GTOE
-%token RETURN IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER UNTIL BREAK CONTINUE
+%token IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER UNTIL BREAK CONTINUE
 %token HAS CALLED DO WITH NEW CONFIG 
 %token <string> LITERAL
 %token <int> NUMBER
@@ -82,13 +82,12 @@ condecl:
   CONFIGURE ID ASSIGNMENT
 
 stmt:
-    expr { Expr($1) }
-  | RETURN expr { Return($2) }
-  | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }
-  | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
-  | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | loop_block {$1}
-  | do_block {$1}
+    expr { Expr($1) }  
+    | OPENBLOCK stmt_list CLOSEBLOCK { Block(List.rev $2) }  
+    | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
+    | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
+    | loop_block {$1}
+    | do_block {$1}
 
 stmt_list:
     /* nothing */  { [] }
