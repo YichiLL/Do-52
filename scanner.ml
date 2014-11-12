@@ -1992,7 +1992,7 @@ let
 # 1993 "scanner.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
 # 52 "scanner.mll"
-                       ( NUMBER(number) )
+                       ( NUMBER(int_of_string(number)) )
 # 1997 "scanner.ml"
 
   | 46 ->
@@ -2036,3 +2036,4 @@ and __ocaml_lex_comment_rec lexbuf __ocaml_lex_state =
       __ocaml_lex_comment_rec lexbuf __ocaml_lex_state
 
 ;;
+

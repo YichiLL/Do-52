@@ -49,7 +49,7 @@ rule token = parse
 | "new" {NEW}
 | "configure" {CONFIG}
 | ['A'-'Z''a'-'z'] ['a'-'z''A'-'Z''0'-'9''_']* as lxm {ID(lxm)}
-| ['0'-'9']+ as number { NUMBER(number) } 
+| ['0'-'9']+ as number { NUMBER(int_of_string(number)) } 
 | '\"'[^'\"']* '\"' as lit {LITERAL (lit)} 
 | eof { EOF }
 | "//" {comment lexbuf}
