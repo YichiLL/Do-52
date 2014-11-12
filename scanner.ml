@@ -1937,12 +1937,12 @@ and __ocaml_lex_token_rec lexbuf __ocaml_lex_state =
 
   | 36 ->
 # 43 "scanner.mll"
-      (OPENPARENT)
+      (OPENPAREN)
 # 1942 "scanner.ml"
 
   | 37 ->
 # 44 "scanner.mll"
-      (CLOSEPARENT)
+      (CLOSEPAREN)
 # 1947 "scanner.ml"
 
   | 38 ->

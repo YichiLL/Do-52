@@ -40,8 +40,8 @@ rule token = parse
 | "until" {UNTIL}
 | "break" {BREAK}
 | "continue" {CONTINUE}
-| '(' {OPENPARENT}
-| ')' {CLOSEPARENT}
+| '(' {OPENPAREN}
+| ')' {CLOSEPAREN}
 | "has" {HAS}
 | "called" {CALLED}
 | "do" {DO}

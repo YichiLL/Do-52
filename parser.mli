@@ -1,6 +1,13 @@
 type token =
   | COMMENT
   | NEWLINE
+  | TAB
+  | OR
+  | AND
+  | NOT
+  | DOTOP
+  | PREPEND
+  | APREND
   | SEMI
   | OPENPAREN
   | CLOSEPAREN
