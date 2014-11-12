@@ -943,4 +943,4 @@ let yytables =
     Parsing.names_const=yynames_const;
     Parsing.names_block=yynames_block }
 let program (lexfun : Lexing.lexbuf -> token) (lexbuf : Lexing.lexbuf) =
-   (Parsing.yyparse yytables 1 lexfun lexbuf : Ast.program)
+   (Parsing.yyparse yytables 1 lexfun lexbuf : Ast.program) 
