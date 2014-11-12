@@ -38,3 +38,5 @@ type func_decl = {
     body : stmt list;
 }
 
+type program = string list * func_decl list (* added here for testing, we should change this. *)
+

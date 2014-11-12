@@ -79,7 +79,7 @@ vdecl:
   INT ID { $2 }
 
 condecl:
-  CONFIGURE ID ASSIGNMENT
+  CONFIG ID ASSIGNMENT expr {Config($2,$4)}
 
 stmt:
 <<<<<<< HEAD
