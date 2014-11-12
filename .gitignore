@@ -1,2 +1,5 @@
 *.cmi
 *.cmo
+*.mli
+scanner.ml
+parser.ml
