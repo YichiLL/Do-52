@@ -18,8 +18,7 @@ type stmt =
     | Until of stmt * expr
     | SimpLoop of stmt * expr
     | Control of string                 (* e.g. break, continue *)
-    | FuncCall of func_call
-    | Call of string * expr list
+    | Call of func_call
     | Assign of string * expr
 
 (* Record for a function call *)
