@@ -35,6 +35,9 @@ program:
  | program vdecl { ($2 :: fst $1), snd $1 }
  | program fdecl { fst $1, ($2 :: snd $1) }
 
+identifier:
+ID  {Identifier($1)}
+
 fdecl:
    ID WITH arg_list ASSIGNMENT vdecl_list stmt_list 
    { { 
