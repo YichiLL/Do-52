@@ -6,8 +6,6 @@ type un_op = Not
 type identifier = 
     Identifier of string
 
-type 
-
 type expr =
       Number of int
     | String of string
