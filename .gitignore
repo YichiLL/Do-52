@@ -3,3 +3,5 @@
 *.mli
 scanner.ml
 parser.ml
+*.automaton
+*.conflicts
