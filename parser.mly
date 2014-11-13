@@ -35,9 +35,6 @@ program:
  | program vdecl { ($2 :: fst $1), snd $1 }
  | program fdecl { fst $1, ($2 :: snd $1) }
 
-identifier:
-ID  {Identifier($1)}
-
 fdecl:
    ID WITH arg_list ASSIGNMENT vdecl_list stmt_list 
    { { 
@@ -63,9 +60,9 @@ arg_list:
   | arg_list AND arg { $3 :: $1} 
 
 arg: 
- INT ID { [ $2 ] }
- | STRING ID { [ $2 ] }
- | BOOLEAN ID { [ $2 ] } 
+ INT ID { $2  }
+ | STRING ID { $2 }
+ | BOOLEAN ID { $2 } 
 
 formals_opt:
     /* nothing */ { [] }
@@ -99,14 +96,8 @@ stmt_list:
   | stmt_list stmt { $2 :: $1 }
 
 do_block:
-  DO ID WITH expr_list{{ 
-                    fname = $2;
-                    formals = List.rev $4
-                  }}
-  | DO ID {{
-            fname = $2;
-            formal = [] 
-          }}
+  DO ID WITH expr_list{FuncCall ($2, $4)}
+  | DO ID {FuncCall ($2, [])}
 
 loop_block:
   FOR OPENPAREN expr_opt SEMI expr_opt SEMI expr_opt CLOSEPAREN stmt
@@ -117,7 +108,7 @@ loop_block:
 
 
 expr_list: 
-  expr { [$1] }
+  expr {$1}
   | expr_list AND expr { $3 :: $1 }
 
 expr_opt:
