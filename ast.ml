@@ -3,6 +3,11 @@ type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
 
 type un_op = Not
 
+type identifier = 
+    Identifier of string
+
+type 
+
 type expr =
       Number of int
     | String of string
