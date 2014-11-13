@@ -95,12 +95,12 @@ stmt_list:
 
 do_block:
   DO ID WITH expr_list{{ 
-    fname : $2;
-    formals : $4;
+    fname = $2;
+    formals = $4
 }}
   | DO ID {{ 
-    fname : $2;
-    formals : [];
+    fname = $2;
+    formals = []
 }}
 
 loop_block:

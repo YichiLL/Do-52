@@ -9,6 +9,11 @@ type expr =
     | Unop of op * expr
     | Binop of expr * op * expr
 
+type func_call = { 
+    fname : string;
+    formals : expr list;
+}
+
 type stmt =
       Block of stmt list
     | If of expr * stmt
@@ -22,10 +27,7 @@ type stmt =
     | Assign of string * expr
 
 (* Record for a function call *)
-type func_call = { 
-    fname : string;
-    formals : expr list;
-}
+
 
 (* Record for a function declaration *)
 type func_decl = {
