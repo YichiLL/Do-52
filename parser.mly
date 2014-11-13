@@ -15,11 +15,9 @@
 %left COMMENT NEWLINE
 %nonassoc IF ELSEIF ELSE NOELSE
 %right ASSIGNMENT
-%left EQUAL NOTEQUAL
-%left NOT AND OR
-%left LT GT
-%left GTOE LTOE
 %left PREPEN APPEND
+%left EQUAL NOTEQUAL LT GT GTOE LTOE
+%left NOT AND OR
 %left ADD MINUS
 %left MULTIPLY DIVIDE
 %left OPENPAREN CLOSEPAREN 
@@ -88,7 +86,7 @@ stmt:
   | IF OPENPAREN expr CLOSEPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF OPENPAREN expr CLOSEPAREN stmt ELSE stmt    { If($3, $5, $7) }
   | loop_block {$1}
-  | do_block {$1}
+  | do_block {Call($1)}
 
 
 stmt_list:
@@ -96,8 +94,14 @@ stmt_list:
   | stmt_list stmt { $2 :: $1 }
 
 do_block:
-  DO ID WITH expr_list{FuncCall ($2, $4)}
-  | DO ID {FuncCall ($2, [])}
+  DO ID WITH expr_list{{ 
+    fname : $2;
+    formals : $4;
+}}
+  | DO ID {{ 
+    fname : $2;
+    formals : [];
+}}
 
 loop_block:
   FOR OPENPAREN expr_opt SEMI expr_opt SEMI expr_opt CLOSEPAREN stmt
