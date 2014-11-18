@@ -7,8 +7,8 @@
 %token EQUAL NOTEQUAL LT LTOE GT GTOE
 %token IF ELSE FOR WHILE INT STRING BOOLEAN CARD SET PLAYER UNTIL BREAK CONTINUE
 %token HAS CALLED DO WITH NEW CONFIG 
-%token <string> LITERAL
-%token <int> NUMBER
+%token <string> STRING_LITERAL
+%token <int> NUMBER_LITERAL
 %token <string> ID
 %token EOF
 
@@ -32,7 +32,9 @@ program:
     expr { $1 }
 
 expr:
-    NUMBER { Number($1) }
+      NUMBER_LITERAL { Number($1) }
+    | expr ADD expr { Binop($1, Add, $3) }
+    | expr MINUS expr { Binop($1, Minus, $3) }
 
 %%
 
