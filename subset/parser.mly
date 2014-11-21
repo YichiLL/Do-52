@@ -6,6 +6,7 @@
 %token ADD MINUS TIMES DIVIDE
 %token LT LTOE GT GTOE EQUAL NOTEQUAL
 %token OPENPAREN CLOSEPAREN 
+%token NEWLINE
 
 
 %left EQUAL NOTEQUAL
@@ -21,7 +22,12 @@
 %%
 
 program: 
-    expr { $1 }
+| /*nothing*/ { [] }
+| program stmt {$2 :: $1}
+
+stmt:
+expr NEWLINE { Expr($1) }
+|expr EOF {Expr($1)}
 
 expr:
       NUMBER_LITERAL { Number($1) }

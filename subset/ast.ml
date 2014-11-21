@@ -1,5 +1,5 @@
 type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
-            | Gtoe | Or | And | Unop
+            | Gtoe | Or | And | Unop 
 
 type expr =
       Number of int
@@ -9,6 +9,8 @@ type expr =
     | Unop of op * expr
     | Binop of expr * op * expr
 
+type stmt =
+Expr of expr
 (*
 type stmt =
       Block of stmt list
@@ -38,7 +40,7 @@ type func_decl = {
 *)
 
 (* Missing at the moment: configure, variable decl, type adding *)
-type program = expr
+type program = stmt list
 
 (* STUFF TO ADD LATER:
     | Decl of string * string * expr

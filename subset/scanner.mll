@@ -5,7 +5,7 @@ Scanner generates tokens for the parser*)
 
 rule token = parse
 | ' ' { token lexbuf }
-| '\n' { token lexbuf }
+| '\n' { NEWLINE }
 | '+' { ADD }
 | '-' { MINUS }
 | '*' { TIMES }
