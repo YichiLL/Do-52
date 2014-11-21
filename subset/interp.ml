@@ -15,6 +15,8 @@ let rec eval = function
             | Ltoe -> if v1 <= v2 then 1 else 0
             | Gt -> if v1 > v2 then 1 else 0
             | Gtoe -> if v1 >= v2 then 1 else 0
+            | Equal -> if v1 == v2 then 1 else 0
+            | Notequal -> if v1 != v2 then 1 else 0
             end
 
 let _ =

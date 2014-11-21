@@ -4,8 +4,9 @@
 %token <string> STRING_LITERAL
 %token <int> NUMBER_LITERAL
 %token ADD MINUS TIMES DIVIDE
-%token LT LTOE GT GTOE
+%token LT LTOE GT GTOE EQUAL NOTEQUAL
 
+%left EQUAL NOTEQUAL
 %left LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
@@ -29,6 +30,8 @@ expr:
     | expr LTOE expr { Binop($1, Ltoe, $3) }
     | expr GT expr { Binop($1, Gt, $3) }
     | expr GTOE expr { Binop($1, Gtoe, $3) }
+    | expr EQUAL expr { Binop($1, Equal, $3) }
+    | expr NOTEQUAL expr { Binop($1, Notequal, $3) }
 
 %%
 
