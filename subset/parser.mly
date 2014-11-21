@@ -5,11 +5,14 @@
 %token <int> NUMBER_LITERAL
 %token ADD MINUS TIMES DIVIDE
 %token LT LTOE GT GTOE EQUAL NOTEQUAL
+%token OPENPAREN CLOSEPAREN 
+
 
 %left EQUAL NOTEQUAL
 %left LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
+
 
 
 %start program
@@ -32,6 +35,7 @@ expr:
     | expr GTOE expr { Binop($1, Gtoe, $3) }
     | expr EQUAL expr { Binop($1, Equal, $3) }
     | expr NOTEQUAL expr { Binop($1, Notequal, $3) }
+    | OPENPAREN expr CLOSEPAREN { $2 }
 
 %%
 

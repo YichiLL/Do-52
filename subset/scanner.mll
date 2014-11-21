@@ -16,6 +16,8 @@ rule token = parse
 | ">=" { GTOE }
 | '=' { EQUAL }
 | "!=" { NOTEQUAL}
+| '(' { OPENPAREN }
+| ')' { CLOSEPAREN }
 | ['0'-'9']+ as number { NUMBER_LITERAL(int_of_string(number)) } 
 | '\"'[^'\"']* '\"' as lit { STRING_LITERAL(lit) } 
 | eof { EOF }
