@@ -8,6 +8,12 @@ rule token = parse
 | '\n' { token lexbuf }
 | '+' { ADD }
 | '-' { MINUS }
+| '*' { TIMES }
+| '/' { DIVIDE }
+| '<' { LT }
+| '>' { GT }
+| "<=" { LTOE }
+| ">=" { GTOE }
 | ['0'-'9']+ as number { NUMBER_LITERAL(int_of_string(number)) } 
 | '\"'[^'\"']* '\"' as lit { STRING_LITERAL(lit) } 
 | eof { EOF }

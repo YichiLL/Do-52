@@ -9,6 +9,12 @@ let rec eval = function
             begin match op with
             | Add -> v1 + v2
             | Minus -> v1 - v2
+            | Multiply -> v1 * v2
+            | Divide -> v1/v2
+            | Lt -> if v1 < v2 then 1 else 0
+            | Ltoe -> if v1 <= v2 then 1 else 0
+            | Gt -> if v1 > v2 then 1 else 0
+            | Gtoe -> if v1 >= v2 then 1 else 0
             end
 
 let _ =
