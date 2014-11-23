@@ -6,14 +6,19 @@
  * a type. ast.ml defines all of those types, i.e. every type that will appear
  * in our tree. 
  *
- * NOTE: In this file a type cannot be used before it has been declared. *)
+ * NOTE: In this file a type cannot be used before it has been declared.
+ * NOTE: If you change anything about a type, please update the matching pretty
+ * print function below. *)
 
-(* Standard operations of any arity *)
-type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
+(* ========================================================================= *)
+(*                          Abstract Syntax Tree                             *)
+(* ========================================================================= *)
+(* Standard operations of any arity. *)
+type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
             | Gtoe | Or | And | Not 
 
 type expr =
-      Number of int
+    | Number of int
     | String of string
     | Boolean of bool
     | Id of string
@@ -27,7 +32,60 @@ type func_call = {
 }
 
 type stmt =
-      Expr of expr
+    | Expr of expr
     | Call of func_call
 
 type program = stmt list
+
+(* ========================================================================= *)
+(*                             Pretty Printing                               *)
+(* ========================================================================= *)
+(* The printed tree has a (<type>, val) tuple for each node in the AST. *)
+let string_of_op = function
+    | Add -> "+"
+    | Minus -> "-"
+    | Multiply -> "*"
+    | Divide -> "/"
+    | Equal -> "="
+    | NotEqual -> "!="
+    | Lt -> "<"
+    | Gt -> ">"
+    | Ltoe -> "<="
+    | Gtoe -> ">="
+    | Or -> "|"
+    | And -> "&"
+    | Not -> "!"
+
+let rec string_of_expr expr = 
+    let value = 
+        match expr with
+        | Number num -> "<Number> " ^ string_of_int num
+        | String str -> "<String> " ^ str
+        | Boolean boolean -> 
+                "<Boolean> " ^
+                if boolean then 
+                    "true" 
+                else 
+                    "false"
+        | Id id -> "<Id> " ^ id
+        | Unop(op, e) -> "<Unop> " ^ string_of_op op ^ "(<Expr> " ^
+                         string_of_expr e ^ ")"
+        | Binop(e1, op, e2) -> "<Binop> (<Expr> " ^ string_of_expr e1 ^ ") " ^
+                                string_of_op op ^ " (<Expr> " ^ 
+                                string_of_expr e2 ^ ")"
+    in "(<Expr> " ^ value ^ ")"
+
+let string_of_stmt stmt =
+    let value =
+        match stmt with
+        | Expr e -> string_of_expr e
+        | Call call -> "(<Call> ???)"
+    in 
+        "(<Stmt> " ^ value ^ ")"
+
+let string_of_program program =
+    let rec prgm_s = function
+        | [] -> ""
+        | stmt :: l -> "\t" ^ string_of_stmt stmt ^ "\n" 
+    in
+        "(<Prgm>\n" ^ prgm_s program ^ ")"

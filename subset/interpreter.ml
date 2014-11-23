@@ -21,7 +21,7 @@ let rec eval2 = function
             | Gt -> if v1 > v2 then 1 else 0
             | Gtoe -> if v1 >= v2 then 1 else 0
             | Equal -> if v1 == v2 then 1 else 0
-            | Notequal -> if v1 != v2 then 1 else 0
+            | NotEqual -> if v1 != v2 then 1 else 0
             end
 
 let rec eval1 = function

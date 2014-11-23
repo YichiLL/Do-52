@@ -1,11 +1,11 @@
-# makefile for do interpreter
+# a simple "make" command builds the interpreter
+# "make printer" builds the printer
 
-exec = interpreter
 CFLAGS = -c
-OBJ = scanner.cmo parser.cmo interpreter.cmo
+OBJ = scanner.cmo parser.cmo
 
-$(exec) : $(OBJ)
-	ocamlc -o $@ $(OBJ)
+interpreter : $(OBJ) interpreter.cmo
+	ocamlc -o $@ $(OBJ) interpreter.cmo
 
 interpreter.cmo : interpreter.ml ast.cmi
 	ocamlc $(CFLAGS) interpreter.ml
@@ -28,8 +28,15 @@ parser.ml parser.mli: parser.mly
 scanner.ml : scanner.mll
 	ocamllex $^
 
+.PHONY : printer
+printer : $(OBJ) printer.cmo
+	ocamlc -o $@ $(OBJ) printer.cmo
+
+printer.cmo : printer.ml ast.cmi 
+	ocamlc $(CFLAGS) printer.ml
+
 .PHONY : clean
 clean:
-	rm $(exec) *.cmi *.cmo scanner.ml parser.ml parser.mli
+	rm interpreter printer *.cmi *.cmo scanner.ml parser.ml parser.mli
 
 

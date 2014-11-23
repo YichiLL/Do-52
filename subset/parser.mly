@@ -46,7 +46,7 @@ expr:
     | expr GT expr                  { Binop($1, Gt, $3) }
     | expr GTOE expr                { Binop($1, Gtoe, $3) }
     | expr EQUAL expr               { Binop($1, Equal, $3) }
-    | expr NOTEQUAL expr            { Binop($1, Notequal, $3) }
+    | expr NOTEQUAL expr            { Binop($1, NotEqual, $3) }
     | OPENPAREN expr CLOSEPAREN     { $2 }
 
 %%
