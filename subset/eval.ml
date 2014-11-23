@@ -1,3 +1,8 @@
+(* eval.ml takes a Do program as input and evaluates its result. In all
+ * cases the result will be nothing, since Do is an entirely procedural
+ * language. But as the program is evaluated information might be output
+ * to stdout *)
+
 open Ast
 
 (* let vars = Array.create 10 0 *)

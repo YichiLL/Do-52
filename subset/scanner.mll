@@ -1,5 +1,5 @@
-(*Scanner.mll
-Scanner generates tokens for the parser*)
+(* scanner.mll groups characters read from input into tokens that are then
+ * passed to the parser *)
 
 { open Parser }
 

@@ -1,3 +1,11 @@
+(* ast.ml defines a set of disjoint unions or algebraic types that appear
+ * in our parse tree. The parser is responsible for assembling a series
+ * of tokens into our tree, and ultimately specifies the complete grammar
+ * for our language. But the AST can be thought of as specifying the higher-
+ * level structure of our grammar, once all tokens have been parsed into
+ * a type. ast.ml defines all of those types, i.e. every type that will appear
+ * in our tree. *)
+
 type op = Add | Minus | Multiply | Divide | Equal | Notequal | Lt | Gt | Ltoe
             | Gtoe | Or | And | Unop 
 
@@ -10,7 +18,7 @@ type expr =
     | Binop of expr * op * expr
 
 type stmt =
-Expr of expr
+      Expr of expr
 
 (*
 type stmt =
