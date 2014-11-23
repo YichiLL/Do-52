@@ -1,14 +1,14 @@
-# makefile for do evaluator / executor
+# makefile for do interpreter
 
-exec = eval
+exec = interpreter
 CFLAGS = -c
-OBJ = scanner.cmo parser.cmo eval.cmo
+OBJ = scanner.cmo parser.cmo interpreter.cmo
 
 $(exec) : $(OBJ)
 	ocamlc -o $@ $(OBJ)
 
-eval.cmo : eval.ml ast.cmi
-	ocamlc $(CFLAGS) eval.ml
+interpreter.cmo : interpreter.ml ast.cmi
+	ocamlc $(CFLAGS) interpreter.ml
 
 scanner.cmo : scanner.ml parser.cmi
 	ocamlc $(CFLAGS) scanner.ml

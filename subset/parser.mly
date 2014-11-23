@@ -1,22 +1,26 @@
+%{ 
 (* parser.mly takes a sequence of tokens produced by the scanner and assembles
  * them into an abstract syntax tree. Each pattern-action rule takes some
  * pattern in the thus-far-assembled input and createse a "higher" type out
  * of it. *)
 
-%{ open Ast %}
+open Ast 
+%}
 
 %token EOF
-%token <string> STRING_LITERAL
-%token <int> NUMBER_LITERAL
-%token ADD MINUS TIMES DIVIDE
-%token LT LTOE GT GTOE EQUAL NOTEQUAL
-%token OPENPAREN CLOSEPAREN 
 %token NEWLINE
+%token <string> STRING_LITERAL ID
+%token <int> NUMBER_LITERAL
+%token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL
+%token OPENPAREN CLOSEPAREN 
+%token DO WITH
 
+/* Lowest Precedence */
 %left EQUAL NOTEQUAL
 %left LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
+/* Highest Precedence */
 
 %start program
 %type <Ast.program> program

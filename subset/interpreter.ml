@@ -1,13 +1,11 @@
-(* eval.ml takes a Do program as input and evaluates its result. In all
- * cases the result will be nothing, since Do is an entirely procedural
- * language. But as the program is evaluated information might be output
- * to stdout *)
+(* interpreter.ml is a simple interpreter tha evalutates single-line
+ * expressions or statements in do. It does not support every feature in the
+ * language--for example, you cannot declare a function in the interpreter.
+ * But it is useful for testing small parts of the language. *)
 
 open Ast
 
 (* let vars = Array.create 10 0 *)
-
-
 
 let rec eval2 = function
     | Number(x) -> x
