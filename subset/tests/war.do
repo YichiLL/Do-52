@@ -13,8 +13,8 @@ setup:
 
 
 round:
-	do turn with player: player1
-	do turn with player: player2
+	do turn with player1
+	do turn with player2
 	do output with "Player 1 played: " + player1_table_top 
 	do output with "Player 2 played: " + player2_table_top 
 	do evaluate
@@ -23,10 +23,10 @@ turn with Player player:
 	do output with player + "'s turn."
 	if (player_hand_size = 0)
 		if (player = player1) 
-			do output player + " has lost. Player2 wins!"
+			do output with player + " has lost. Player2 wins!"
 			do quit 
 		else
-			do output player + " has lost. Player1 wins!"
+			do output with player + " has lost. Player1 wins!"
 			do quit
 
 	do output with "Play card?" 
