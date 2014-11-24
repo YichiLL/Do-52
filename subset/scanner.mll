@@ -43,3 +43,5 @@ rule token = parse
 (* IDs can be any letter followed by a combination of numbers and letters,
  * but no underscores *)
 | ['A'-'Z''a'-'z']['A'-'Z''a'-'z''0'-'9']* as id       { ID(id) }
+(* Comments *)
+| "//"[^'\n']*'\n'              { token lexbuf }
