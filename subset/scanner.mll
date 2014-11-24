@@ -24,6 +24,7 @@ rule token = parse
 (* Functions *)
 | "do"                      { DO }
 | "with"                    { WITH }
+| "and"                     { AND }
 
 (* Grouping and Blocks *)
 | '('                       { OPENPAREN }

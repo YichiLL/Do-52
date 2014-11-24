@@ -28,7 +28,7 @@ type expr =
 (* Record for a function call *)
 type func_call = { 
     fname : string;
-    formals : expr list;
+    args : expr list;
 }
 
 type stmt =
@@ -76,11 +76,18 @@ let rec string_of_expr expr =
     in 
         "(<Expr> " ^ value ^ ")"
 
+let string_of_call call =
+    let concat a b = 
+        a ^ ", " ^ string_of_expr b
+    in
+        "(<Call> name:" ^ call.fname ^ " args:[" ^ 
+        List.fold_left concat "" call.args ^ "])"
+        
 let string_of_stmt stmt =
     let value =
         match stmt with
         | Expr e -> string_of_expr e
-        | Call call -> "(<Call> ???)"
+        | Call call -> string_of_call call
     in 
         "(<Stmt> " ^ value ^ ")"
 

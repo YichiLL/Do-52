@@ -5,15 +5,16 @@
  * of it. *)
 
 open Ast 
+
 %}
 
 %token EOF
 %token NEWLINE
+%token DO WITH AND
+%token OPENPAREN CLOSEPAREN 
 %token <string> STRING_LITERAL ID
 %token <int> NUMBER_LITERAL
 %token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL
-%token OPENPAREN CLOSEPAREN 
-%token DO WITH
 
 /* Lowest Precedence */
 %left EQUAL NOTEQUAL
@@ -28,15 +29,16 @@ open Ast
 %%
 
 program: 
-      /*nothing*/                   { [] }
+    | /*nothing*/                   { [] }
     | program stmt                  { $2 :: $1 }
 
 stmt:
-      expr NEWLINE                  { Expr($1) }
+    | expr NEWLINE                  { Expr($1) }
     | expr EOF                      { Expr($1) }
+    | DO ID WITH args_list          { Call({ fname = $2; args = $4 }) }
 
 expr:
-      NUMBER_LITERAL                { Number($1) }
+    | NUMBER_LITERAL                { Number($1) }
     | expr ADD expr                 { Binop($1, Add, $3) }
     | expr MINUS expr               { Binop($1, Minus, $3) }
     | expr TIMES expr               { Binop($1, Multiply, $3) }
@@ -48,6 +50,14 @@ expr:
     | expr EQUAL expr               { Binop($1, Equal, $3) }
     | expr NOTEQUAL expr            { Binop($1, NotEqual, $3) }
     | OPENPAREN expr CLOSEPAREN     { $2 }
+
+args_optional:
+    | /* nothing */                 { [] }
+    | args_list                     { List.rev $1 }
+
+args_list:
+    expr                            { [$1] }
+    | args_list AND expr            { $3 :: $1 }
 
 %%
 
