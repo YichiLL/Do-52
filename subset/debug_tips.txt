@@ -1,0 +1,11 @@
+We haven't written any error handling functions. But you can set the bash
+environment variable OCAMLRUNPARAM to inclue "p" which will make ocamllex and
+ocamlyacc verbose.
+
+e.g. to turn on
+$ export OCAMLRUNPARAM="p"
+
+e.g. to turn off
+$ export OCAMLRUNPARAM=""
+
+This is really useful when you're getting parse errors but have no idea why.
