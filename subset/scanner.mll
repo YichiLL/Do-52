@@ -31,10 +31,10 @@ rule token = parse
 | ')'                       { CLOSEPAREN }
 
 (* Literals *)
-| ['0'-'9']+ as number      { NUMBER_LITERAL(int_of_string(number)) } 
-| '\"'[^'\"']* '\"' as lit  { STRING_LITERAL(lit) } 
+| ['0'-'9']+ as num         { NUMBER_LITERAL(int_of_string(num)) } 
+| '\"'[^'\"']* '\"' as str  { STRING_LITERAL(str) } 
 
 (* Miscellaneous *)
 (* IDs can be any letter followed by a combination of numbers and letters,
  * but no underscores *)
-| ['A'-'Z''a'-'z']['A'-'Z''a'-'z''0'-'9']* as lxm       { ID(lxm) }
+| ['A'-'Z''a'-'z']['A'-'Z''a'-'z''0'-'9']* as id       { ID(id) }

@@ -29,12 +29,13 @@ open Ast
 %%
 
 program: 
-    | /*nothing*/                   { [] }
+    | /* nothing */                 { [] }
     | program stmt                  { $2 :: $1 }
 
 stmt:
-    | expr NEWLINE                  { Expr($1) }
-    | expr EOF                      { Expr($1) }
+    | stmt NEWLINE                  { $1 }
+    | expr                          { Expr($1) }
+    | ID                            { Id($1) }
     | DO ID                         { Call({ fname = $2; args = [] }) }
     | DO ID WITH args_list          { Call({ fname = $2; 
                                              args = List.rev $4 }) }

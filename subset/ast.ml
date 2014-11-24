@@ -21,7 +21,6 @@ type expr =
     | Number of int
     | String of string
     | Boolean of bool
-    | Id of string
     | Unop of op * expr
     | Binop of expr * op * expr
 
@@ -34,6 +33,7 @@ type func_call = {
 type stmt =
     | Expr of expr
     | Call of func_call
+    | Id of string
 
 type program = stmt list
 
@@ -69,7 +69,6 @@ let rec string_of_expr expr =
                     "false"
             in
                 "(<Boolean> " ^ b ^ ")"
-        | Id id -> "(<Id> " ^ id ^ ")"
         | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ string_of_expr e ^ ")"
         | Binop(e1, op, e2) -> "(<Binop> " ^ string_of_expr e1 ^ " " ^
                                 string_of_op op ^ " " ^ string_of_expr e2 ^ ")"
@@ -88,6 +87,7 @@ let string_of_stmt stmt =
         match stmt with
         | Expr e -> string_of_expr e
         | Call call -> string_of_call call
+        | Id id -> "(<Id> " ^ id ^ ")"
     in 
         "(<Stmt> " ^ value ^ ")"
 
