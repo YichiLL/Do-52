@@ -12,15 +12,19 @@ open Ast
 %token NEWLINE
 %token DO WITH AND
 %token OPENPAREN CLOSEPAREN 
+%token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
 %token <int> NUMBER_LITERAL
 %token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL
+%token NOT DISJ CONJ
 
 /* Lowest Precedence */
+%left DISJ CONJ
 %left EQUAL NOTEQUAL
 %left LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
+%right NOT
 /* Highest Precedence */
 
 %start program
@@ -44,6 +48,7 @@ stmt:
 
 expr:
     | NUMBER_LITERAL                { Number($1) }
+    | BOOL_LITERAL                  { Boolean($1) }
     | expr ADD expr                 { Binop($1, Add, $3) }
     | expr MINUS expr               { Binop($1, Minus, $3) }
     | expr TIMES expr               { Binop($1, Multiply, $3) }
@@ -54,6 +59,9 @@ expr:
     | expr GTOE expr                { Binop($1, Gtoe, $3) }
     | expr EQUAL expr               { Binop($1, Equal, $3) }
     | expr NOTEQUAL expr            { Binop($1, NotEqual, $3) }
+    | expr DISJ expr                { Binop($1, Disj, $3) }
+    | expr CONJ expr                { Binop($1, Conj, $3) }
+    | NOT expr                      { Unop(Not, $2) }
     | OPENPAREN expr CLOSEPAREN     { $2 }
 
 args_list:

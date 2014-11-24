@@ -15,7 +15,7 @@
 (* ========================================================================= *)
 (* Standard operations of any arity. *)
 type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
-            | Gtoe | Or | And | Not 
+            | Gtoe | Disj | Conj | Not 
 
 type expr =
     | Number of int
@@ -51,8 +51,8 @@ let string_of_op = function
     | Gt -> ">"
     | Ltoe -> "<="
     | Gtoe -> ">="
-    | Or -> "|"
-    | And -> "&"
+    | Disj -> "|"
+    | Conj -> "&"
     | Not -> "!"
 
 let rec string_of_expr expr = 
