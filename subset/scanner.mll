@@ -24,6 +24,9 @@ rule token = parse
 | "&"                           { CONJ }   (* i.e. conjunct *)
 | "!"                           { NOT }
 
+(* Variables *)
+| "new"                         { NEW }
+
 (* Functions *)
 | "do"                          { DO }
 | "with"                        { WITH }
@@ -45,3 +48,4 @@ rule token = parse
 | ['A'-'Z''a'-'z']['A'-'Z''a'-'z''0'-'9']* as id       { ID(id) }
 (* Comments *)
 | "//"[^'\n']*'\n'              { token lexbuf }
+| ":"                           { COLON }

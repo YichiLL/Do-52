@@ -21,6 +21,7 @@ type expr =
     | Number of int
     | String of string
     | Boolean of bool
+    | Id of string
     | Unop of op * expr
     | Binop of expr * op * expr
 
@@ -30,8 +31,18 @@ type func_call = {
     args : expr list;
 }
 
+(* Record for variable declaration.
+ * Here we're using "_type" because "type" is reserved in OCaml *)
+type var_decl = {
+    id : string;
+    _type : string;
+    value : expr
+}
+
 type stmt =
     | Expr of expr
+    | Assign of string * expr
+    | VarDecl of var_decl
     | Call of func_call
 
 type program = stmt list
@@ -68,6 +79,7 @@ let rec string_of_expr expr =
                     "false"
             in
                 "(<Boolean> " ^ b ^ ")"
+        | Id id -> "(<Id> " ^ id ^ ")"
         | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ string_of_expr e ^ ")"
         | Binop(e1, op, e2) -> "(<Binop> " ^ string_of_expr e1 ^ " " ^
                                 string_of_op op ^ " " ^ string_of_expr e2 ^ ")"
@@ -87,13 +99,17 @@ let string_of_call call =
     and concat a b = 
         a ^ ", " ^ string_of_expr b
     in
-        "(<Call> name:" ^ call.fname ^ " args:[" ^ 
+        "(<Call> func:" ^ call.fname ^ " args:[" ^ 
         List.fold_left concat first_arg_s rest_args ^ "])"
-        
+
 let string_of_stmt stmt =
     let value =
         match stmt with
         | Expr e -> string_of_expr e
+        | Assign(id, e) -> "(<Assign> var:" ^ id ^ " expr:" ^ string_of_expr e
+                            ^ ")"
+        | VarDecl(var) -> "(<VarDecl> var:" ^ var.id ^ " type:" ^ var._type ^
+                          " value:" ^ string_of_expr var.value ^ ")"
         | Call call -> string_of_call call
     in 
         "(<Stmt> " ^ value ^ ")"

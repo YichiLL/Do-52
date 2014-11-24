@@ -11,6 +11,7 @@ open Ast
 %token EOF
 %token NEWLINE
 %token DO WITH AND
+%token NEW COLON
 %token OPENPAREN CLOSEPAREN 
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
@@ -42,6 +43,10 @@ program_rev:
 stmt:
     | stmt NEWLINE                  { $1 }
     | expr                          { Expr($1) }
+    | NEW ID ID COLON expr          { VarDecl({ id = $3;
+                                                _type = $2;
+                                                value = $5 }) }
+    | ID COLON expr                 { Assign($1, $3) }
     | DO ID                         { Call({ fname = $2; args = [] }) }
     | DO ID WITH args_list          { Call({ fname = $2; 
                                              args = List.rev $4 }) }
@@ -49,6 +54,7 @@ stmt:
 expr:
     | NUMBER_LITERAL                { Number($1) }
     | BOOL_LITERAL                  { Boolean($1) }
+    | ID                            { Id($1) } 
     | expr ADD expr                 { Binop($1, Add, $3) }
     | expr MINUS expr               { Binop($1, Minus, $3) }
     | expr TIMES expr               { Binop($1, Multiply, $3) }
@@ -65,7 +71,7 @@ expr:
     | OPENPAREN expr CLOSEPAREN     { $2 }
 
 args_list:
-    expr                            { [$1] }
+    | expr                          { [$1] }
     | args_list AND expr            { $3 :: $1 }
 
 %%
