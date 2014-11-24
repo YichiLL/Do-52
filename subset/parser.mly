@@ -35,7 +35,9 @@ program:
 stmt:
     | expr NEWLINE                  { Expr($1) }
     | expr EOF                      { Expr($1) }
-    | DO ID WITH args_list          { Call({ fname = $2; args = $4 }) }
+    | DO ID                         { Call({ fname = $2; args = [] }) }
+    | DO ID WITH args_list          { Call({ fname = $2; 
+                                             args = List.rev $4 }) }
 
 expr:
     | NUMBER_LITERAL                { Number($1) }
@@ -50,10 +52,6 @@ expr:
     | expr EQUAL expr               { Binop($1, Equal, $3) }
     | expr NOTEQUAL expr            { Binop($1, NotEqual, $3) }
     | OPENPAREN expr CLOSEPAREN     { $2 }
-
-args_optional:
-    | /* nothing */                 { [] }
-    | args_list                     { List.rev $1 }
 
 args_list:
     expr                            { [$1] }
