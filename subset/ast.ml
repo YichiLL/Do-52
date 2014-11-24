@@ -33,7 +33,6 @@ type func_call = {
 type stmt =
     | Expr of expr
     | Call of func_call
-    | Id of string
 
 type program = stmt list
 
@@ -87,13 +86,12 @@ let string_of_stmt stmt =
         match stmt with
         | Expr e -> string_of_expr e
         | Call call -> string_of_call call
-        | Id id -> "(<Id> " ^ id ^ ")"
     in 
         "(<Stmt> " ^ value ^ ")"
 
 let string_of_program program =
     let rec prgm_s = function
         | [] -> ""
-        | stmt :: l -> "\t" ^ string_of_stmt stmt ^ "\n" 
+        | stmt :: l -> "\t" ^ string_of_stmt stmt ^ "\n" ^ prgm_s l
     in
         "(<Prgm>\n" ^ prgm_s program ^ ")\n"

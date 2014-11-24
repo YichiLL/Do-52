@@ -28,14 +28,16 @@ open Ast
 
 %%
 
-program: 
+program:
+    | program_rev                   { List.rev $1 }
+
+program_rev: 
     | /* nothing */                 { [] }
     | program stmt                  { $2 :: $1 }
 
 stmt:
     | stmt NEWLINE                  { $1 }
     | expr                          { Expr($1) }
-    | ID                            { Id($1) }
     | DO ID                         { Call({ fname = $2; args = [] }) }
     | DO ID WITH args_list          { Call({ fname = $2; 
                                              args = List.rev $4 }) }
