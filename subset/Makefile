@@ -22,6 +22,9 @@ parser.cmi : parser.mli ast.cmi
 ast.cmi : ast.ml
 	ocamlc $(CFLAGS) $^
 
+ast.cmo : ast.ml
+	ocamlc $(CFLAGS) $^
+
 parser.ml parser.mli: parser.mly
 	ocamlyacc $^
 
@@ -30,9 +33,9 @@ scanner.ml : scanner.mll
 
 .PHONY : printer
 printer : $(OBJ) printer.cmo
-	ocamlc -o $@ $(OBJ) printer.cmo
+	ocamlc -o $@ ast.cmo $(OBJ) printer.cmo
 
-printer.cmo : printer.ml ast.cmi 
+printer.cmo : printer.ml ast.cmo
 	ocamlc $(CFLAGS) printer.ml
 
 .PHONY : clean
