@@ -39,6 +39,9 @@ type var_decl = {
     value : expr
 }
 
+(* For loops can do nothing but assign in the intialize and update sections *)
+type update = string * expr
+
 type stmt =
     | Expr of expr
     | Assign of string * expr
@@ -46,6 +49,7 @@ type stmt =
     | Call of func_call
     | If of expr * stmt list * stmt list
     | While of expr * stmt list
+    | For of update * expr * update * stmt list
 
 type program = stmt list
 
@@ -93,32 +97,35 @@ let string_of_call call =
     let args_s = 
         String.concat ", " (List.map (fun arg -> string_of_expr arg) call.args)
     in
-        "(<Call> func:" ^ call.fname ^ " args:[" ^ args_s ^ "])"
+        "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])"
 
 let rec string_of_stmt stmt =
     let value =
         match stmt with
         | Expr e -> string_of_expr e
-        | Assign(id, e) -> "(<Assign> var:" ^ id ^ " expr:" ^ string_of_expr e
+        | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
                             ^ ")"
-        | VarDecl(var) -> "(<VarDecl> var:" ^ var.id ^ " type:" ^ var._type ^
+        | VarDecl(var) -> "(<VarDecl> id:" ^ var.id ^ " type:" ^ var._type ^
                           " value:" ^ string_of_expr var.value ^ ")"
         | Call call -> string_of_call call
         | If(e, tb, fb) -> 
-            let string_of_block block =
-                String.concat ",\n  " (List.map string_of_stmt block)  
-            in 
                 "(<If> p:" ^ string_of_expr e ^ " t-block:[\n  " ^ 
-                string_of_block tb ^ "] f-block:[\n  " ^ 
-                string_of_block fb ^ "])"
+                string_of_block tb ^ "\n] f-block:[\n  " ^ 
+                string_of_block fb ^ "\n])"
         | While(e, b) ->
-                let string_of_block block =
-                    String.concat ",\n  " (List.map string_of_stmt block)
-                in
-                    "(<While> p:" ^ string_of_expr e ^ " loop:[\n  " ^
-                    string_of_block b ^ "])"
+                "(<While> p:" ^ string_of_expr e ^ " loop:[\n  " ^
+                string_of_block b ^ "\n])"
+        | For(a, e, u, b) ->
+                let (id_a, e_a) = a in
+                let (id_u, e_u) = u in
+                "(<For> assign:" ^ string_of_stmt (Assign(id_a, e_a)) ^ " p:" ^ 
+                string_of_expr e ^ " update:" ^ 
+                string_of_stmt (Assign(id_u, e_u)) ^ " loop:[\n  " ^ 
+                string_of_block b ^ "\n])"
     in 
         "(<Stmt> " ^ value ^ ")"
+and string_of_block block =
+    String.concat ",\n  " (List.map string_of_stmt block)
 
 let string_of_program program =
     let value = 

@@ -65,6 +65,7 @@ rule token = parse
 | "if"                          { IF }
 | "else"                        { ELSE } 
 | "while"                       { WHILE }
+| "for"                         { FOR }
 
 (* Literals *)
 | ['0'-'9']+ as num             { NUMBER_LITERAL(int_of_string(num)) } 
@@ -79,6 +80,4 @@ rule token = parse
 (* Comments *)
 | "//"[^'\n']*'\n'              { token lexbuf }
 | ":"                           { COLON }
-
-{
-}
+| ";"                           { SEMI }
