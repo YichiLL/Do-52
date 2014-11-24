@@ -21,7 +21,7 @@ open Ast
 /* Lowest Precedence */
 %left DISJ CONJ
 %left EQUAL NOTEQUAL
-%left LT LTOE GT GTOE
+%nonassoc LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
 %right NOT
