@@ -74,12 +74,21 @@ let rec string_of_expr expr =
     in 
         "(<Expr> " ^ value ^ ")"
 
+(* e.g. (<Call> name:foo args:[expr, expr]) *)
 let string_of_call call =
-    let concat a b = 
+    let first_arg_s = 
+        match call.args with
+        | [] -> ""
+        | hd :: tl -> string_of_expr hd
+    and rest_args =
+        match call.args with
+        | [] -> []
+        | hd :: tl -> tl
+    and concat a b = 
         a ^ ", " ^ string_of_expr b
     in
         "(<Call> name:" ^ call.fname ^ " args:[" ^ 
-        List.fold_left concat "" call.args ^ "])"
+        List.fold_left concat first_arg_s rest_args ^ "])"
         
 let string_of_stmt stmt =
     let value =
@@ -92,6 +101,6 @@ let string_of_stmt stmt =
 let string_of_program program =
     let rec prgm_s = function
         | [] -> ""
-        | stmt :: l -> "\t" ^ string_of_stmt stmt ^ "\n" ^ prgm_s l
+        | stmt :: l -> "  " ^ string_of_stmt stmt ^ "\n" ^ prgm_s l
     in
         "(<Prgm>\n" ^ prgm_s program ^ ")\n"
