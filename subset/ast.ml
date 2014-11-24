@@ -70,11 +70,9 @@ let rec string_of_expr expr =
             in
                 "(<Boolean> " ^ b ^ ")"
         | Id id -> "(<Id> " ^ id ^ ")"
-        | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ "(<Expr> " ^
-                         string_of_expr e ^ "))"
-        | Binop(e1, op, e2) -> "(<Binop> (<Expr> " ^ string_of_expr e1 ^ ") " ^
-                                string_of_op op ^ " (<Expr> " ^ 
-                                string_of_expr e2 ^ "))"
+        | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ string_of_expr e ^ ")"
+        | Binop(e1, op, e2) -> "(<Binop> " ^ string_of_expr e1 ^ " " ^
+                                string_of_op op ^ " " ^ string_of_expr e2 ^ ")"
     in 
         "(<Expr> " ^ value ^ ")"
 
