@@ -59,21 +59,24 @@ let string_of_op = function
 let rec string_of_expr expr = 
     let value = 
         match expr with
-        | Number num -> "<Number> " ^ string_of_int num
-        | String str -> "<String> " ^ str
+        | Number num -> "(<Number> " ^ string_of_int num ^ ")"
+        | String str -> "(<String> " ^ str ^ ")"
         | Boolean boolean -> 
-                "<Boolean> " ^
-                if boolean then 
-                    "true" 
-                else 
+            let b =
+                if boolean then
+                    "true"
+                else
                     "false"
-        | Id id -> "<Id> " ^ id
-        | Unop(op, e) -> "<Unop> " ^ string_of_op op ^ "(<Expr> " ^
-                         string_of_expr e ^ ")"
-        | Binop(e1, op, e2) -> "<Binop> (<Expr> " ^ string_of_expr e1 ^ ") " ^
+            in
+                "(<Boolean> " ^ b ^ ")"
+        | Id id -> "(<Id> " ^ id ^ ")"
+        | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ "(<Expr> " ^
+                         string_of_expr e ^ "))"
+        | Binop(e1, op, e2) -> "(<Binop> (<Expr> " ^ string_of_expr e1 ^ ") " ^
                                 string_of_op op ^ " (<Expr> " ^ 
-                                string_of_expr e2 ^ ")"
-    in "(<Expr> " ^ value ^ ")"
+                                string_of_expr e2 ^ "))"
+    in 
+        "(<Expr> " ^ value ^ ")"
 
 let string_of_stmt stmt =
     let value =
@@ -88,4 +91,4 @@ let string_of_program program =
         | [] -> ""
         | stmt :: l -> "\t" ^ string_of_stmt stmt ^ "\n" 
     in
-        "(<Prgm>\n" ^ prgm_s program ^ ")"
+        "(<Prgm>\n" ^ prgm_s program ^ ")\n"
