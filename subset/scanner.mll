@@ -1,12 +1,39 @@
 (* scanner.mll groups characters read from input into tokens that are then
  * passed to the parser *)
 
-{ open Parser }
+{ 
+    open Parser
+    open Indent
+    open Printf
+
+    (* Persistent reference cell counter for the current indent depth. *)
+    let cur_depth = ref 0
+
+    (* This function returns INDENT or DEDENT tokens whenever we change depth.
+     * DEDENT means we've reached the end of a block. INDENT means we've
+     * entered one. In OCaml ";" has lower precedence than "if", hence all
+     * the begins and ends. *)
+    let eval_indent str =
+        let depth = 
+            Indent.depth_count (Indent.explode str)
+        in
+            if depth < !cur_depth then begin
+                cur_depth := depth;
+                DEDENT 
+            end
+            else if depth == !cur_depth then
+                NEWLINE 
+            else begin
+                cur_depth := depth; 
+                INDENT 
+            end
+}
 
 rule token = parse
 (* White Space *)
 | ' '                           { token lexbuf }
 | '\n'                          { NEWLINE }
+| '\n'[' ''\t']* as str         { eval_indent str }
 | eof                           { EOF }
 
 (* Operators *)
@@ -32,9 +59,11 @@ rule token = parse
 | "with"                        { WITH }
 | "and"                         { AND }
 
-(* Grouping and Blocks *)
+(* Control Flow *)
 | '('                           { OPENPAREN }
 | ')'                           { CLOSEPAREN }
+| "if"                          { IF }
+| "else"                        { ELSE } 
 
 (* Literals *)
 | ['0'-'9']+ as num             { NUMBER_LITERAL(int_of_string(num)) } 
@@ -49,3 +78,6 @@ rule token = parse
 (* Comments *)
 | "//"[^'\n']*'\n'              { token lexbuf }
 | ":"                           { COLON }
+
+{
+}

@@ -2,7 +2,7 @@
 # "make printer" builds the printer
 
 CFLAGS = -c
-OBJ = scanner.cmo parser.cmo
+OBJ = indent.cmo scanner.cmo parser.cmo
 
 interpreter : $(OBJ) interpreter.cmo
 	ocamlc -o $@ $(OBJ) interpreter.cmo
@@ -10,7 +10,10 @@ interpreter : $(OBJ) interpreter.cmo
 interpreter.cmo : interpreter.ml ast.cmi
 	ocamlc $(CFLAGS) interpreter.ml
 
-scanner.cmo : scanner.ml parser.cmi
+indent.cmo : indent.ml
+	ocamlc $(CFLAGS) indent.ml
+
+scanner.cmo : scanner.ml parser.cmi indent.cmi
 	ocamlc $(CFLAGS) scanner.ml
 
 parser.cmo : parser.ml parser.cmi

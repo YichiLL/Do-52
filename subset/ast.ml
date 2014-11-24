@@ -44,6 +44,7 @@ type stmt =
     | Assign of string * expr
     | VarDecl of var_decl
     | Call of func_call
+    | If of expr * stmt list * stmt list
 
 type program = stmt list
 
@@ -88,21 +89,12 @@ let rec string_of_expr expr =
 
 (* e.g. (<Call> name:foo args:[expr, expr]) *)
 let string_of_call call =
-    let first_arg_s = 
-        match call.args with
-        | [] -> ""
-        | hd :: tl -> string_of_expr hd
-    and rest_args =
-        match call.args with
-        | [] -> []
-        | hd :: tl -> tl
-    and concat a b = 
-        a ^ ", " ^ string_of_expr b
+    let args_s = 
+        String.concat ", " (List.map (fun arg -> string_of_expr arg) call.args)
     in
-        "(<Call> func:" ^ call.fname ^ " args:[" ^ 
-        List.fold_left concat first_arg_s rest_args ^ "])"
+        "(<Call> func:" ^ call.fname ^ " args:[" ^ args_s ^ "])"
 
-let string_of_stmt stmt =
+let rec string_of_stmt stmt =
     let value =
         match stmt with
         | Expr e -> string_of_expr e
@@ -111,12 +103,17 @@ let string_of_stmt stmt =
         | VarDecl(var) -> "(<VarDecl> var:" ^ var.id ^ " type:" ^ var._type ^
                           " value:" ^ string_of_expr var.value ^ ")"
         | Call call -> string_of_call call
+        | If(e, tb, fb) -> 
+            let string_of_block block =
+                String.concat ",\n" (List.map string_of_stmt block)  
+            in 
+                "(<If> p:" ^ string_of_expr e ^ " t-block:[" ^ 
+                string_of_block tb ^ "] f-block:[" ^ string_of_block fb ^ "])"
     in 
         "(<Stmt> " ^ value ^ ")"
 
 let string_of_program program =
-    let rec prgm_s = function
-        | [] -> ""
-        | stmt :: l -> "  " ^ string_of_stmt stmt ^ "\n" ^ prgm_s l
+    let value = 
+        String.concat "\n  " (List.map string_of_stmt program)
     in
-        "(<Prgm>\n" ^ prgm_s program ^ ")\n"
+        "(<Prgm>\n  " ^ value ^ "\n)\n"
