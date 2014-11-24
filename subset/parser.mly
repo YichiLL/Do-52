@@ -12,7 +12,7 @@ open Ast
 %token NEWLINE INDENT DEDENT
 %token DO WITH AND
 %token NEW COLON
-%token IF ELSE
+%token IF ELSE WHILE
 %token OPENPAREN CLOSEPAREN 
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
@@ -53,6 +53,7 @@ stmt:
                                                      args = List.rev $4 }) }
     | IF expr COLON block                   { If($2, $4, []) }
     | IF expr COLON block ELSE COLON block  { If($2, $4, $7) }
+    | WHILE expr COLON block                { While($2, $4) }
 
 block:
     | INDENT stmt_list DEDENT               { $2 }

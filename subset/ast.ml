@@ -45,6 +45,7 @@ type stmt =
     | VarDecl of var_decl
     | Call of func_call
     | If of expr * stmt list * stmt list
+    | While of expr * stmt list
 
 type program = stmt list
 
@@ -105,15 +106,22 @@ let rec string_of_stmt stmt =
         | Call call -> string_of_call call
         | If(e, tb, fb) -> 
             let string_of_block block =
-                String.concat ",\n" (List.map string_of_stmt block)  
+                String.concat ",\n  " (List.map string_of_stmt block)  
             in 
-                "(<If> p:" ^ string_of_expr e ^ " t-block:[" ^ 
-                string_of_block tb ^ "] f-block:[" ^ string_of_block fb ^ "])"
+                "(<If> p:" ^ string_of_expr e ^ " t-block:[\n  " ^ 
+                string_of_block tb ^ "] f-block:[\n  " ^ 
+                string_of_block fb ^ "])"
+        | While(e, b) ->
+                let string_of_block block =
+                    String.concat ",\n  " (List.map string_of_stmt block)
+                in
+                    "(<While> p:" ^ string_of_expr e ^ " loop:[\n  " ^
+                    string_of_block b ^ "])"
     in 
         "(<Stmt> " ^ value ^ ")"
 
 let string_of_program program =
     let value = 
-        String.concat "\n  " (List.map string_of_stmt program)
+        String.concat "\n" (List.map string_of_stmt program)
     in
-        "(<Prgm>\n  " ^ value ^ "\n)\n"
+        "(<Prgm>\n" ^ value ^ "\n)\n"

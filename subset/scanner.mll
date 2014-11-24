@@ -64,6 +64,7 @@ rule token = parse
 | ')'                           { CLOSEPAREN }
 | "if"                          { IF }
 | "else"                        { ELSE } 
+| "while"                       { WHILE }
 
 (* Literals *)
 | ['0'-'9']+ as num             { NUMBER_LITERAL(int_of_string(num)) } 
