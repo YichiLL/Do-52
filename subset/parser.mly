@@ -37,7 +37,7 @@ program:
 
 program_rev: 
     | /* nothing */                 { [] }
-    | program stmt                  { $2 :: $1 }
+    | program_rev stmt              { $2 :: $1 }
 
 stmt:
     | stmt NEWLINE                  { $1 }
