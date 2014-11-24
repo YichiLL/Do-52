@@ -44,5 +44,4 @@ type program = func_decl list
     | Decl of string * string * expr
     | HasCalled of string * string * string   (* Type has Type called Id *)
     | Config of string * expr
-
 *)
