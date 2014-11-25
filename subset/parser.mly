@@ -35,7 +35,11 @@ open Ast
 %%
 
 program:
-    | stmt_list                             { List.rev $1 }
+	| func_list                     	{ List.rev $1 }
+
+func_list:
+    | /* nothing */                         { [] }
+    | func_list func                        { $2 :: $1 }
 
 stmt_list:
     | /* nothing */                         { [] }
@@ -63,6 +67,17 @@ update:
 block:
     | INDENT stmt_list DEDENT               { $2 }
     | INDENT stmt_list EOF                  { $2 }
+
+/*for now, function is a stmt_list */
+func:
+ID COLON block {
+	{
+		fname = $1;
+		formals = [];
+		locals = [];
+		body = List.rev $3
+	}
+}
 
 expr:
     | NUMBER_LITERAL                        { Number($1) }

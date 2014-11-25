@@ -39,6 +39,9 @@ type var_decl = {
     value : expr
 }
 
+
+
+
 (* For loops can do nothing but assign in the intialize and update sections *)
 type update = string * expr
 
@@ -51,7 +54,13 @@ type stmt =
     | While of expr * stmt list
     | For of update * expr * update * stmt list
 
-type program = stmt list
+type func_decl = {
+    fname : string; (* Name of the function *)
+    formals : var_decl list; (* Arguments to the function *)
+    locals : var_decl list; (*WE WILL ADD THIS LATER, IT'S COMPLICATED *)
+    body : stmt list;
+}
+type program = func_decl list
 
 (* ========================================================================= *)
 (*                             Pretty Printing                               *)
@@ -99,6 +108,7 @@ let string_of_call call =
     in
         "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])"
 
+
 let rec string_of_stmt stmt =
     let value =
         match stmt with
@@ -127,8 +137,18 @@ let rec string_of_stmt stmt =
 and string_of_block block =
     String.concat ",\n  " (List.map string_of_stmt block)
 
+let string_of_function func = 
+    let fbody = 
+        String.concat "\n" (List.map string_of_stmt func.body)
+    
+    in
+        "(<Func> fname:" ^ func.fname ^ "\n"
+       (*  ^ "(<formals>" ^ fformals ^ ")"
+        ^ "(<locals>" ^ flocals ^ ")"  *)
+        ^ "(<body>" ^ fbody ^ "))\n"
+
 let string_of_program program =
     let value = 
-        String.concat "\n" (List.map string_of_stmt program)
+        String.concat "\n" (List.map string_of_function program)
     in
         "(<Prgm>\n" ^ value ^ "\n)\n"
