@@ -39,8 +39,10 @@ type var_decl = {
     value : expr
 }
 
-
-
+type config_decl = {
+    config_id : string;
+    config_value : expr
+}
 
 (* For loops can do nothing but assign in the intialize and update sections *)
 type update = string * expr
@@ -49,17 +51,22 @@ type stmt =
     | Expr of expr
     | Assign of string * expr
     | VarDecl of var_decl
+    | ConfigDecl of config_decl
     | Call of func_call
     | If of expr * stmt list * stmt list
     | While of expr * stmt list
     | For of update * expr * update * stmt list
+    | Break
+    | Continue
 
 type func_decl = {
     fname : string; (* Name of the function *)
     formals : var_decl list; (* Arguments to the function *)
-    locals : var_decl list; (*WE WILL ADD THIS LATER, IT'S COMPLICATED *)
+    locals : var_decl list; (* WE WILL ADD THIS LATER, IT'S COMPLICATED *)
     body : stmt list;
 }
+
+
 type program = func_decl list
 
 (* ========================================================================= *)
@@ -102,11 +109,12 @@ let rec string_of_expr expr =
         "(<Expr> " ^ value ^ ")"
 
 (* e.g. (<Call> name:foo args:[expr, expr]) *)
-let string_of_call call =
+ let string_of_call call =
     let args_s = 
         String.concat ", " (List.map (fun arg -> string_of_expr arg) call.args)
     in
-        "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])"
+        "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])" 
+(* Above line has the following error: Error: This expression has type func_call but an expression was expected of type func_decl , probably caused by the field label "fname" is duplicated in both type func_call and type func_decl *)
 
 
 let rec string_of_stmt stmt =
@@ -125,6 +133,8 @@ let rec string_of_stmt stmt =
         | While(e, b) ->
                 "(<While> p:" ^ string_of_expr e ^ " loop:[\n  " ^
                 string_of_block b ^ "\n])"
+        | Break -> "Break"
+        | Continue -> "Continue"
         | For(a, e, u, b) ->
                 let (id_a, e_a) = a in
                 let (id_u, e_u) = u in
@@ -136,6 +146,8 @@ let rec string_of_stmt stmt =
         "(<Stmt> " ^ value ^ ")"
 and string_of_block block =
     String.concat ",\n  " (List.map string_of_stmt block)
+
+        
 
 let string_of_function func = 
     let fbody = 

@@ -53,6 +53,7 @@ rule token = parse
 
 (* Variables *)
 | "new"                         { NEW }
+| "configure"                   { CONFIGURE }
 
 (* Functions *)
 | "do"                          { DO }
@@ -66,6 +67,8 @@ rule token = parse
 | "else"                        { ELSE } 
 | "while"                       { WHILE }
 | "for"                         { FOR }
+| "break"                       { BREAK }
+| "continue"                    { CONTINUE }
 
 (* Literals *)
 | ['0'-'9']+ as num             { NUMBER_LITERAL(int_of_string(num)) } 
@@ -81,3 +84,4 @@ rule token = parse
 | "//"[^'\n']*'\n'              { token lexbuf }
 | ":"                           { COLON }
 | ";"                           { SEMI }
+

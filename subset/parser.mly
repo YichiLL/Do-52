@@ -11,8 +11,8 @@ open Ast
 %token EOF
 %token NEWLINE INDENT DEDENT
 %token DO WITH AND
-%token NEW COLON 
-%token IF ELSE WHILE FOR SEMI
+%token NEW COLON CONFIGURE
+%token IF ELSE WHILE FOR SEMI BREAK CONTINUE
 %token OPENPAREN CLOSEPAREN 
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
@@ -51,6 +51,8 @@ stmt:
     | NEW ID ID COLON expr                  { VarDecl({ id = $3;
                                                          _type = $2;
                                                          value = $5 }) }
+    | CONFIGURE ID COLON expr               { ConfigDecl({ config_id = $2; 
+                                                           config_value = $4 }) }                                                                  
     | ID COLON expr                         { Assign($1, $3) }
     | DO ID                                 { Call({ fname = $2; args = [] }) }
     | DO ID WITH args_list                  { Call({ fname = $2; 
@@ -60,6 +62,8 @@ stmt:
     | WHILE expr COLON block                { While($2, $4) }
     | FOR update SEMI expr SEMI update 
         COLON block                         { For($2, $4, $6, $8) }
+    | BREAK                                 { Break }
+    | CONTINUE                              { Continue }
 
 update:
     | ID COLON expr                         { ($1, $3) }
@@ -82,6 +86,7 @@ ID COLON block {
 expr:
     | NUMBER_LITERAL                        { Number($1) }
     | BOOL_LITERAL                          { Boolean($1) }
+    | STRING_LITERAL                        { String($1) }
     | ID                                    { Id($1) } 
     | expr ADD expr                         { Binop($1, Add, $3) }
     | expr MINUS expr                       { Binop($1, Minus, $3) }

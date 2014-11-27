@@ -9,6 +9,7 @@ open Ast
 
 let rec eval2 = function
     | Number(x) -> x
+    | String(s) -> s
     | Binop(e1, op, e2) ->
             let v1 = eval2 e1 and v2 = eval2 e2 in
             begin match op with
@@ -26,6 +27,12 @@ let rec eval2 = function
 
 let rec eval1 = function
 | Expr (e) -> eval2 e  
+| Break -> true
+| Continue -> true
+(* should ConfigDecl be here? if so, how should this be pushed to eval2 function?  
+ConfigDecl({ config_id = $2; 
+                config_value = $4 }) 
+*)
 
 let rec reverse l=
 match l with
