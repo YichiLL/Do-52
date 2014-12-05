@@ -32,7 +32,6 @@
 rule token = parse
 (* White Space *)
 | ' '                           { token lexbuf }
-| '\n'                          { NEWLINE }
 | '\n'[' ''\t']* as str         { eval_indent str }
 | eof                           { EOF }
 

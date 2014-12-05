@@ -36,22 +36,33 @@ type func_call = {
 type var_decl = {
     id : string;
     _type : string;
-    value : expr
+    value : expr;
 }
 
+(* Record for a configuration declaration, i.e. assignment to environment 
+ * variable. *)
 type config_decl = {
     config_id : string;
-    config_value : expr
+    config_val : expr;
 }
 
-(* For loops can do nothing but assign in the intialize and update sections *)
-type update = string * expr
-
-type stmt =
-    | Expr of expr
+(* An "update" is a kind of statement that you can put in the initial 
+ * assignment and update sections of a for-loop:
+ *
+ *      for (update; condition; update) ...
+ *
+ * An update can only be a variable declaration or an assignment. You can't
+ * have other kinds of statements--like if statements or while loops—-in a
+ * for-loop header. *)
+type update = 
     | Assign of string * expr
     | VarDecl of var_decl
-    | ConfigDecl of config_decl
+
+(* None of our statements are also expressions. They do not evaluate to
+ * anything; they only have side-effects. *)
+type stmt =
+    | Expr of expr
+    | Update of update (* Ensures Assigns and VarDecls are statements *)
     | Call of func_call
     | If of expr * stmt list * stmt list
     | While of expr * stmt list
@@ -59,14 +70,21 @@ type stmt =
     | Break
     | Continue
 
+(* A formal argument has a type and an ID, but no assigned value. *)
+type formal = {
+    id : string;
+    _type : string;
+}
+
+(* Record for a function declaration. *)
 type func_decl = {
-    fname : string; (* Name of the function *)
-    formals : var_decl list; (* Arguments to the function *)
-    locals : var_decl list; (* WE WILL ADD THIS LATER, IT'S COMPLICATED *)
+    fname : string;
+    formals : formal list;
     body : stmt list;
 }
 
-
+(* A program consists of a series of variable declarations followed by a series
+ * of function declarations. *)
 type program = func_decl list
 
 (* ========================================================================= *)
@@ -114,50 +132,49 @@ let rec string_of_expr expr =
         String.concat ", " (List.map (fun arg -> string_of_expr arg) call.args)
     in
         "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])" 
-(* Above line has the following error: Error: This expression has type func_call but an expression was expected of type func_decl , probably caused by the field label "fname" is duplicated in both type func_call and type func_decl *)
 
+let rec string_of_update update =
+    let value = 
+        match update with
+        | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
+                            ^ ")"
+        | VarDecl(var) -> "(<VarDecl> id:" ^ var.id ^ " type:" ^ var._type ^
+                          " value:" ^ string_of_expr var.value ^ ")"
+    in
+        "(<Update> " ^ value ^ ")" 
 
 let rec string_of_stmt stmt =
     let value =
         match stmt with
         | Expr e -> string_of_expr e
-        | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
-                            ^ ")"
-        | VarDecl(var) -> "(<VarDecl> id:" ^ var.id ^ " type:" ^ var._type ^
-                          " value:" ^ string_of_expr var.value ^ ")"
         | Call call -> string_of_call call
-        | If(e, tb, fb) -> 
+        | Update(update) -> string_of_update update
+        | If(e, tb, fb) ->  (* expr, true-block, false-block *)
                 "(<If> p:" ^ string_of_expr e ^ " t-block:[\n  " ^ 
                 string_of_block tb ^ "\n] f-block:[\n  " ^ 
                 string_of_block fb ^ "\n])"
-        | While(e, b) ->
+        | While(e, b) ->  (* expr, block *)
                 "(<While> p:" ^ string_of_expr e ^ " loop:[\n  " ^
                 string_of_block b ^ "\n])"
-        | Break -> "Break"
-        | Continue -> "Continue"
-        | For(a, e, u, b) ->
-                let (id_a, e_a) = a in
-                let (id_u, e_u) = u in
-                "(<For> assign:" ^ string_of_stmt (Assign(id_a, e_a)) ^ " p:" ^ 
+        | Break -> "(<Break>)"
+        | Continue -> "(<Continue>)"
+        | For(a, e, u, b) ->  (* assign, expr, update, block *)
+                "(<For> assign:" ^ string_of_update a ^  " p:" ^ 
                 string_of_expr e ^ " update:" ^ 
-                string_of_stmt (Assign(id_u, e_u)) ^ " loop:[\n  " ^ 
+                string_of_update u ^ " loop:[\n  " ^ 
                 string_of_block b ^ "\n])"
     in 
         "(<Stmt> " ^ value ^ ")"
 and string_of_block block =
     String.concat ",\n  " (List.map string_of_stmt block)
 
-        
-
 let string_of_function func = 
-    let fbody = 
-        String.concat "\n" (List.map string_of_stmt func.body)
-    
+    let formals_s =
+        String.concat ", " (List.map (fun formal -> formal._type ^ 
+                                " " ^ formal.id) func.formals)
     in
-        "(<Func> fname:" ^ func.fname ^ "\n"
-       (*  ^ "(<formals>" ^ fformals ^ ")"
-        ^ "(<locals>" ^ flocals ^ ")"  *)
-        ^ "(<body>" ^ fbody ^ "))\n"
+        "(<Func> fname:" ^ func.fname ^ " formals:[" ^ formals_s 
+        ^ "] body:\n  " ^ string_of_block func.body ^ "\n)"
 
 let string_of_program program =
     let value = 

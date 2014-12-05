@@ -35,11 +35,15 @@ open Ast
 %%
 
 program:
-	| func_list                     	{ List.rev $1 }
+	| func_list                            	{ List.rev $1 }
 
 func_list:
     | /* nothing */                         { [] }
     | func_list func                        { $2 :: $1 }
+    | func_list NEWLINE                     { $1 }
+
+block:
+    | INDENT stmt_list DEDENT               { List.rev $2 }
 
 stmt_list:
     | /* nothing */                         { [] }
@@ -47,15 +51,9 @@ stmt_list:
 
 stmt:
     | stmt NEWLINE                          { $1 }
-    | expr                                  { Expr($1) }
-    | NEW ID ID COLON expr                  { VarDecl({ id = $3;
-                                                         _type = $2;
-                                                         value = $5 }) }
-    | CONFIGURE ID COLON expr               { ConfigDecl({ config_id = $2; 
-                                                           config_value = $4 }) }                                                                  
-    | ID COLON expr                         { Assign($1, $3) }
+    | update                                { Update($1) }
     | DO ID                                 { Call({ fname = $2; args = [] }) }
-    | DO ID WITH args_list                  { Call({ fname = $2; 
+    | DO ID WITH arg_list                   { Call({ fname = $2; 
                                                      args = List.rev $4 }) }
     | IF expr COLON block                   { If($2, $4, []) }
     | IF expr COLON block ELSE COLON block  { If($2, $4, $7) }
@@ -66,22 +64,28 @@ stmt:
     | CONTINUE                              { Continue }
 
 update:
-    | ID COLON expr                         { ($1, $3) }
+    | NEW ID ID COLON expr                  { VarDecl({ id = $3;
+                                                        _type = $2;
+                                                        value = $5 }) }
+    | ID COLON expr                         { Assign($1, $3) }
 
-block:
-    | INDENT stmt_list DEDENT               { $2 }
-    | INDENT stmt_list EOF                  { $2 }
+arg_list:
+    | expr                                  { [$1] }
+    | arg_list AND expr                     { $3 :: $1 }
 
-/*for now, function is a stmt_list */
 func:
-ID COLON block {
-	{
-		fname = $1;
-		formals = [];
-		locals = [];
-		body = List.rev $3
-	}
-}
+    | ID COLON block                        { { fname = $1;
+                                                formals = [];
+                                                body = $3; } }
+    | ID WITH formal_list COLON block       { { fname = $1;
+                                                formals = List.rev $3;
+                                                body = $5; } }
+formal_list:
+    | formal                                { [$1] }
+    | formal_list AND formal                { $3 :: $1 }
+
+formal:
+    | ID ID                                 { { id = $2; _type = $1 } }
 
 expr:
     | NUMBER_LITERAL                        { Number($1) }
@@ -102,10 +106,6 @@ expr:
     | expr CONJ expr                        { Binop($1, Conj, $3) }
     | NOT expr                              { Unop(Not, $2) }
     | OPENPAREN expr CLOSEPAREN             { $2 }
-
-args_list:
-    | expr                                  { [$1] }
-    | args_list AND expr                    { $3 :: $1 }
 
 %%
 
