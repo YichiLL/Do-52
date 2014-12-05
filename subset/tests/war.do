@@ -11,7 +11,6 @@ setup:
 	{ player1_hand << deck_top } * (deck_size / 2) 	// loop
 	{ player2_hand << deck_top } * (deck_size / 2)	// loop
 
-
 round:
 	do turn with player1
 	do turn with player2
@@ -57,4 +56,3 @@ evaluate:
 		
 		// recursive call
 		do evaluate
-		

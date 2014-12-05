@@ -42,8 +42,8 @@ type var_decl = {
 (* Record for a configuration declaration, i.e. assignment to environment 
  * variable. *)
 type config_decl = {
-    config_id : string;
-    config_val : expr;
+    id : string;
+    value : expr;
 }
 
 (* An "update" is a kind of statement that you can put in the initial 
@@ -85,7 +85,11 @@ type func_decl = {
 
 (* A program consists of a series of variable declarations followed by a series
  * of function declarations. *)
-type program = func_decl list
+type program = {
+    configs : config_decl list;
+    vars : update list;
+    funcs: func_decl list;
+}
 
 (* ========================================================================= *)
 (*                             Pretty Printing                               *)
@@ -176,8 +180,18 @@ let string_of_function func =
         "(<Func> fname:" ^ func.fname ^ " formals:[" ^ formals_s 
         ^ "] body:\n  " ^ string_of_block func.body ^ "\n)"
 
+let string_of_config (config : config_decl) =
+    "(<Configure> id:" ^ config.id ^ " value:" ^ 
+    string_of_expr config.value ^ ")"
+
 let string_of_program program =
-    let value = 
-        String.concat "\n" (List.map string_of_function program)
+    let append_nl s1 s2 =
+        s1 ^ s2 ^ "\n"
+    in let configs_s = 
+        List.fold_left append_nl "" (List.map string_of_config program.configs)
+    in let vars_s = 
+        List.fold_left append_nl "" (List.map string_of_update program.vars)
+    in let funcs_s = 
+        List.fold_left append_nl "" (List.map string_of_function program.funcs)
     in
-        "(<Prgm>\n" ^ value ^ "\n)\n"
+        "(<Prgm>\n" ^ configs_s ^ vars_s ^ funcs_s ^ ")"

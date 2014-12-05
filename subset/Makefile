@@ -44,6 +44,7 @@ printer.cmo : printer.ml ast.cmo
 
 .PHONY : clean
 clean:
-	rm interpreter printer *.cmi *.cmo scanner.ml parser.ml parser.mli
+	rm interpreter printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output
+	
 
 

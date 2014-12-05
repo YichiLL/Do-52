@@ -13,7 +13,7 @@ open Ast
 %token DO WITH AND
 %token NEW COLON CONFIGURE
 %token IF ELSE WHILE FOR SEMI BREAK CONTINUE
-%token OPENPAREN CLOSEPAREN 
+%token OPENPAREN CLOSEPAREN
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
 %token <int> NUMBER_LITERAL
@@ -35,12 +35,50 @@ open Ast
 %%
 
 program:
-	| func_list                            	{ List.rev $1 }
+    | config_list vdecl_list func_list      { { configs = List.rev $1;
+                                                vars = List.rev $2;
+                                                funcs = List.rev $3; } }
+    | config_list func_list                 { { configs = List.rev $1;
+                                                vars = [];
+                                                funcs = List.rev $2; } }
+
+config_list:
+    | /* nothing */                         { [] }
+    | config_list config                    { $2 :: $1 }
+    | config_list NEWLINE                   { $1 }
+
+config:
+    | CONFIGURE ID COLON expr               { { id = $2; value = $4 } }
+
+vdecl_list:
+    | vdecl                                 { [$1] }
+    | vdecl_list vdecl                      { $2 :: $1 } 
+    | vdecl_list NEWLINE                    { $1 }
+
+vdecl:
+    | NEW ID ID COLON expr                  { VarDecl({ id = $3;
+                                                        _type = $2;
+                                                        value = $5 }) }
 
 func_list:
-    | /* nothing */                         { [] }
+    | func                                  { [$1] }
     | func_list func                        { $2 :: $1 }
     | func_list NEWLINE                     { $1 }
+
+func:
+    | ID COLON block                        { { fname = $1;
+                                                formals = [];
+                                                body = $3; } }
+    | ID WITH formal_list COLON block       { { fname = $1;
+                                                formals = List.rev $3;
+                                                body = $5; } }
+
+formal_list:
+    | formal                                { [$1] }
+    | formal_list AND formal                { $3 :: $1 }
+
+formal:
+    | ID ID                                 { { id = $2; _type = $1 } }
 
 block:
     | INDENT stmt_list DEDENT               { List.rev $2 }
@@ -63,29 +101,13 @@ stmt:
     | BREAK                                 { Break }
     | CONTINUE                              { Continue }
 
-update:
-    | NEW ID ID COLON expr                  { VarDecl({ id = $3;
-                                                        _type = $2;
-                                                        value = $5 }) }
-    | ID COLON expr                         { Assign($1, $3) }
-
 arg_list:
     | expr                                  { [$1] }
     | arg_list AND expr                     { $3 :: $1 }
 
-func:
-    | ID COLON block                        { { fname = $1;
-                                                formals = [];
-                                                body = $3; } }
-    | ID WITH formal_list COLON block       { { fname = $1;
-                                                formals = List.rev $3;
-                                                body = $5; } }
-formal_list:
-    | formal                                { [$1] }
-    | formal_list AND formal                { $3 :: $1 }
-
-formal:
-    | ID ID                                 { { id = $2; _type = $1 } }
+update:
+    | vdecl                                 { $1 }
+    | ID COLON expr                         { Assign($1, $3) }
 
 expr:
     | NUMBER_LITERAL                        { Number($1) }
