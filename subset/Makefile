@@ -2,6 +2,7 @@
 # "make printer" builds the printer
 
 CFLAGS = -c
+YACCFLAGS = -v
 OBJ = indent.cmo scanner.cmo parser.cmo
 
 interpreter : $(OBJ) interpreter.cmo
@@ -29,7 +30,7 @@ ast.cmo : ast.ml
 	ocamlc $(CFLAGS) $^
 
 parser.ml parser.mli: parser.mly
-	ocamlyacc $^
+	ocamlyacc $(YACCFLAGS) $^
 
 scanner.ml : scanner.mll
 	ocamllex $^

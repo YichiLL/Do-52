@@ -9,3 +9,7 @@ e.g. to turn off
 $ export OCAMLRUNPARAM=""
 
 This is really useful when you're getting parse errors but have no idea why.
+
+Running ocamlyacc with the -v flag (see our Makefile) can help if you're
+getting shift/reduce conflicts. This outputs a file called parser.output
+that has information about states and conflicts.
