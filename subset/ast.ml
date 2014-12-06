@@ -194,4 +194,4 @@ let string_of_program program =
     in let funcs_s = 
         List.fold_left append_nl "" (List.map string_of_function program.funcs)
     in
-        "(<Prgm>\n" ^ configs_s ^ vars_s ^ funcs_s ^ ")"
+        "(<Prgm>\n" ^ configs_s ^ vars_s ^ funcs_s ^ ")\n"
