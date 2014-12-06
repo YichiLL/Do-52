@@ -71,6 +71,7 @@ type stmt =
     | For of update * expr * update * stmt list
     | Break
     | Continue
+    | TimesLoop of stmt * expr
     | Prepend of expr * expr * draw_source
     | Append of expr * expr * draw_source
 
@@ -171,6 +172,9 @@ let rec string_of_stmt stmt =
                 string_of_expr e ^ " update:" ^ 
                 string_of_update u ^ " loop:[\n  " ^ 
                 string_of_block b ^ "\n])"
+        | TimesLoop(stmt, expr) ->
+                "(<TimesLoop> statement:" ^ string_of_stmt stmt ^ " times:" ^
+                string_of_expr expr ^ ")"
         | Prepend(e1, e2, draw_source) ->
                 let op = 
                     match draw_source with

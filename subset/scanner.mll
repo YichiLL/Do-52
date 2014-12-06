@@ -67,6 +67,8 @@ rule token = parse
 (* Control Flow *)
 | '('                           { OPENPAREN }
 | ')'                           { CLOSEPAREN }
+| '{'                           { OPENBRACE }
+| '}'                           { CLOSEBRACE }
 | "if"                          { IF }
 | "else"                        { ELSE } 
 | "while"                       { WHILE }

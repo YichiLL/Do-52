@@ -13,7 +13,7 @@ open Ast
 %token DO WITH AND
 %token NEW COLON CONFIGURE
 %token IF ELSE WHILE FOR SEMI BREAK CONTINUE
-%token OPENPAREN CLOSEPAREN
+%token OPENPAREN CLOSEPAREN OPENBRACE CLOSEBRACE
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
 %token <int> NUMBER_LITERAL
@@ -102,6 +102,7 @@ stmt:
         COLON block                         { For($2, $4, $6, $8) }
     | BREAK                                 { Break }
     | CONTINUE                              { Continue }
+    | OPENBRACE stmt CLOSEBRACE TIMES expr  { TimesLoop($2, $5) }
     | expr PREPEND_TOP expr                 { Prepend($1, $3, Top) }
     | expr PREPEND_BOTTOM expr              { Prepend($1, $3, Bottom) }
     | expr APPEND_TOP expr                  { Append($1, $3, Top) }
