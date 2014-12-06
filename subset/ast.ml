@@ -64,7 +64,6 @@ type draw_source = Top | Bottom
 (* None of our statements are also expressions. They do not evaluate to
  * anything; they only have side-effects. *)
 type stmt =
-    | Expr of expr
     | Update of update (* Ensures Assigns and VarDecls are statements *)
     | Call of func_call
     | If of expr * stmt list * stmt list
@@ -156,7 +155,6 @@ let rec string_of_update update =
 let rec string_of_stmt stmt =
     let value =
         match stmt with
-        | Expr e -> string_of_expr e
         | Call call -> string_of_call call
         | Update(update) -> string_of_update update
         | If(e, tb, fb) ->  (* expr, true-block, false-block *)
