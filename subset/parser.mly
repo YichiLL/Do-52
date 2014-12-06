@@ -17,8 +17,9 @@ open Ast
 %token <bool> BOOL_LITERAL
 %token <string> STRING_LITERAL ID
 %token <int> NUMBER_LITERAL
-%token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL
+%token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL DOT
 %token NOT DISJ CONJ
+%token PREPEND_TOP PREPEND_BOTTOM APPEND_TOP APPEND_BOTTOM
 
 /* Lowest Precedence */
 %left DISJ CONJ
@@ -27,6 +28,7 @@ open Ast
 %left ADD MINUS
 %left TIMES DIVIDE
 %right NOT
+%left DOT
 /* Highest Precedence */
 
 %start program
@@ -100,6 +102,10 @@ stmt:
         COLON block                         { For($2, $4, $6, $8) }
     | BREAK                                 { Break }
     | CONTINUE                              { Continue }
+    | expr PREPEND_TOP expr                 { Prepend($1, $3, Top) }
+    | expr PREPEND_BOTTOM expr              { Prepend($1, $3, Bottom) }
+    | expr APPEND_TOP expr                  { Append($1, $3, Top) }
+    | expr APPEND_BOTTOM expr               { Append($1, $3, Bottom) }
 
 arg_list:
     | expr                                  { [$1] }
@@ -126,6 +132,7 @@ expr:
     | expr NOTEQUAL expr                    { Binop($1, NotEqual, $3) }
     | expr DISJ expr                        { Binop($1, Disj, $3) }
     | expr CONJ expr                        { Binop($1, Conj, $3) }
+    | expr DOT expr                         { Binop($1, Dot, $3) }
     | NOT expr                              { Unop(Not, $2) }
     | OPENPAREN expr CLOSEPAREN             { $2 }
 

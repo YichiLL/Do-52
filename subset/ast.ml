@@ -15,7 +15,7 @@
 (* ========================================================================= *)
 (* Standard operations of any arity. *)
 type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
-            | Gtoe | Disj | Conj | Not 
+            | Gtoe | Disj | Conj | Not | Dot
 
 type expr =
     | Number of int
@@ -58,6 +58,9 @@ type update =
     | Assign of string * expr
     | VarDecl of var_decl
 
+(* Whether a card is drawn form the top or bottom of a deck. *)
+type draw_source = Top | Bottom
+
 (* None of our statements are also expressions. They do not evaluate to
  * anything; they only have side-effects. *)
 type stmt =
@@ -69,6 +72,8 @@ type stmt =
     | For of update * expr * update * stmt list
     | Break
     | Continue
+    | Prepend of expr * expr * draw_source
+    | Append of expr * expr * draw_source
 
 (* A formal argument has a type and an ID, but no assigned value. *)
 type formal = {
@@ -108,6 +113,7 @@ let string_of_op = function
     | Gtoe -> ">="
     | Disj -> "|"
     | Conj -> "&"
+    | Dot -> "."
     | Not -> "!"
 
 let rec string_of_expr expr = 
@@ -167,6 +173,22 @@ let rec string_of_stmt stmt =
                 string_of_expr e ^ " update:" ^ 
                 string_of_update u ^ " loop:[\n  " ^ 
                 string_of_block b ^ "\n])"
+        | Prepend(e1, e2, draw_source) ->
+                let op = 
+                    match draw_source with
+                    | Top -> "t>"
+                    | Bottom -> "b>"
+                in
+                    "(<Prepend> " ^ string_of_expr e1 ^ " " ^ op ^ " " ^
+                    string_of_expr e2 ^ ")"
+        | Append(e1, e2, draw_source) ->
+                let op =
+                    match draw_source with
+                    | Top -> "<t"
+                    | Bottom -> "<b"
+                in
+                    "(<Append> " ^ string_of_expr e1 ^ " " ^ op ^ " " ^
+                    string_of_expr e2 ^ ")"
     in 
         "(<Stmt> " ^ value ^ ")"
 and string_of_block block =

@@ -48,7 +48,12 @@ rule token = parse
 | "!="                          { NOTEQUAL}
 | "|"                           { DISJ }   (* i.e. disjunct *)
 | "&"                           { CONJ }   (* i.e. conjunct *)
+| "."                           { DOT }
 | "!"                           { NOT }
+| "t>"                          { PREPEND_TOP }
+| "b>"                          { PREPEND_BOTTOM }
+| "<t"                          { APPEND_TOP }
+| "<b"                          { APPEND_BOTTOM }
 
 (* Variables *)
 | "new"                         { NEW }
