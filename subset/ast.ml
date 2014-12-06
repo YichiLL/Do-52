@@ -25,11 +25,23 @@ type expr =
     | Unop of op * expr
     | Binop of expr * op * expr
 
-(* Record for a function call *)
-type func_call = { 
-    fname : string;
-    args : expr list;
+(* Record for a configuration declaration, i.e. assignment to environment 
+ * variable. *)
+type config_decl = {
+    id : string;
+    value : expr;
 }
+
+(* Record for a field declaration.
+ * e.g. Table has Set called discard *)
+type field_decl = {
+    expanded_type : string;
+    field_type : string;
+    id : string;
+}
+
+(* The header for a program consists of configure and field declarations. *)
+type header = config_decl list * field_decl list
 
 (* Record for variable declaration.
  * Here we're using "_type" because "type" is reserved in OCaml *)
@@ -39,11 +51,10 @@ type var_decl = {
     value : expr;
 }
 
-(* Record for a configuration declaration, i.e. assignment to environment 
- * variable. *)
-type config_decl = {
-    id : string;
-    value : expr;
+(* Record for a function call *)
+type func_call = { 
+    fname : string;
+    args : expr list;
 }
 
 (* An "update" is a kind of statement that you can put in the initial 
@@ -92,6 +103,7 @@ type func_decl = {
  * of function declarations. *)
 type program = {
     configs : config_decl list;
+    field_decls: field_decl list;
     vars : update list;
     funcs: func_decl list;
 }
@@ -208,14 +220,21 @@ let string_of_config (config : config_decl) =
     "(<Configure> id:" ^ config.id ^ " value:" ^ 
     string_of_expr config.value ^ ")"
 
+let string_of_field_decl field_decl =
+    "(<FieldDecl> expanded_type:" ^ field_decl.expanded_type ^ " field_type:" ^
+    field_decl.field_type ^ " id:" ^ field_decl.id ^ ")"
+
 let string_of_program program =
     let append_nl s1 s2 =
         s1 ^ s2 ^ "\n"
     in let configs_s = 
         List.fold_left append_nl "" (List.map string_of_config program.configs)
+    in let field_decls_s =
+        List.fold_left append_nl "" 
+            (List.map string_of_field_decl program.field_decls)
     in let vars_s = 
         List.fold_left append_nl "" (List.map string_of_update program.vars)
     in let funcs_s = 
         List.fold_left append_nl "" (List.map string_of_function program.funcs)
     in
-        "(<Prgm>\n" ^ configs_s ^ vars_s ^ funcs_s ^ ")\n"
+        "(<Prgm>\n" ^ configs_s ^ field_decls_s ^ vars_s ^ funcs_s ^ ")\n"

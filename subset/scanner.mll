@@ -58,6 +58,8 @@ rule token = parse
 (* Variables *)
 | "new"                         { NEW }
 | "configure"                   { CONFIGURE }
+| "has"                         { HAS }
+| "called"                      { CALLED }
 
 (* Functions *)
 | "do"                          { DO }
@@ -82,12 +84,17 @@ rule token = parse
 | "true"                        { BOOL_LITERAL(true) }
 | "false"                       { BOOL_LITERAL(false) }
 
-(* Miscellaneous *)
-(* IDs can be any letter followed by a combination of numbers and letters,
- * but no underscores *)
-| ['A'-'Z''a'-'z']['A'-'Z''a'-'z''0'-'9']* as id       { ID(id) }
+(* -------------- Miscellaneous ------------ *)
+(* IDs can be any lowercase letter followed by a combination of numbers,
+ * letters, or underscores. *)
+| ['a'-'z']['A'-'Z''a'-'z''0'-'9''_']* as id       { ID(id) }
+
+(* Type IDs can be an uppecase letter followed by a combination of letters. *)
+| ['A'-'Z']['A'-'Z''a'-'z']* as _type              { TYPE(_type) }
+
 (* Comments *)
 | "//"[^'\n']*'\n'              { token lexbuf }
+
+(* Punctuation *)
 | ":"                           { COLON }
 | ";"                           { SEMI }
-

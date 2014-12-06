@@ -15,11 +15,12 @@ open Ast
 %token IF ELSE WHILE FOR SEMI BREAK CONTINUE
 %token OPENPAREN CLOSEPAREN OPENBRACE CLOSEBRACE
 %token <bool> BOOL_LITERAL
-%token <string> STRING_LITERAL ID
+%token <string> STRING_LITERAL ID TYPE
 %token <int> NUMBER_LITERAL
 %token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL DOT
 %token NOT DISJ CONJ
 %token PREPEND_TOP PREPEND_BOTTOM APPEND_TOP APPEND_BOTTOM
+%token HAS CALLED
 
 /* Lowest Precedence */
 %left DISJ CONJ
@@ -37,12 +38,18 @@ open Ast
 %%
 
 program:
-    | config_list vdecl_list func_list      { { configs = List.rev $1;
+    | header vdecl_list func_list           { { configs = List.rev (fst $1);
+                                                field_decls = List.rev (snd $1);
                                                 vars = List.rev $2;
                                                 funcs = List.rev $3; } }
-    | config_list func_list                 { { configs = List.rev $1;
+    | header func_list                      { { configs = List.rev (fst $1);
+                                                field_decls = List.rev (snd $1);
                                                 vars = [];
                                                 funcs = List.rev $2; } }
+
+header:
+    | config_list                           { ($1, []) }
+    | config_list field_decl_list           { ($1, $2) }
 
 config_list:
     | /* nothing */                         { [] }
@@ -52,13 +59,23 @@ config_list:
 config:
     | CONFIGURE ID COLON expr               { { id = $2; value = $4 } }
 
+field_decl_list:
+    | field_decl                            { [$1] }
+    | field_decl_list field_decl            { $2 :: $1 }
+    | field_decl_list NEWLINE               { $1 }
+
+field_decl:
+    | TYPE HAS TYPE CALLED ID               { { expanded_type = $1;
+                                                field_type = $3;
+                                                id = $5; } }
+
 vdecl_list:
     | vdecl                                 { [$1] }
     | vdecl_list vdecl                      { $2 :: $1 } 
     | vdecl_list NEWLINE                    { $1 }
 
 vdecl:
-    | NEW ID ID COLON expr                  { VarDecl({ id = $3;
+    | NEW TYPE ID COLON expr                { VarDecl({ id = $3;
                                                         _type = $2;
                                                         value = $5 }) }
 
@@ -80,7 +97,7 @@ formal_list:
     | formal_list AND formal                { $3 :: $1 }
 
 formal:
-    | ID ID                                 { { id = $2; _type = $1 } }
+    | TYPE ID                               { { id = $2; _type = $1 } }
 
 block:
     | INDENT stmt_list DEDENT               { List.rev $2 }
