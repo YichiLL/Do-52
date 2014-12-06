@@ -1,0 +1,6 @@
+This file documents legal but bizarre constructs in our language and how 
+they are evaluated.
+
+The nested times loop:
+	{ { x : x + 1 } * 4 } * 2
+x is incremented 8 times.
