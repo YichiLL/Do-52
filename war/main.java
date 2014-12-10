@@ -1,4 +1,3 @@
-package war;
 
 public class main {
 

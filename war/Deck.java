@@ -1,4 +1,3 @@
-package war;
 
 public class Deck {
 	static final int ASCENDING = 0;

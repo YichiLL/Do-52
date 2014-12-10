@@ -1,5 +1,3 @@
-package war;
-
 public class Card {
 	static final int SPADE = 0;
 	static final int HEART = 1;
