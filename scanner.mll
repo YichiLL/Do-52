@@ -12,14 +12,23 @@
     (* This function returns INDENT or DEDENT tokens whenever we change depth.
      * DEDENT means we've reached the end of a block. INDENT means we've
      * entered one. In OCaml ";" has lower precedence than "if", hence all
-     * the begins and ends. *)
+     * the begins and ends. 
+     *
+     * If we dedent more than 1 level, we need to produce a token that holds
+     * the number of levels we have dedented. This gets turned into multiple
+     * dedent tokens later. *)
     let eval_indent str =
         let depth = 
             Indent.depth_count 0 (Indent.explode str)
         in
             if depth < !cur_depth then begin
+                let diff = !cur_depth - depth in
                 cur_depth := depth;
-                DEDENT 
+
+                if diff > 1 then
+                    DEDENT_MULT(diff)
+                else
+                    DEDENT
             end
             else if depth == !cur_depth then
                 NEWLINE 

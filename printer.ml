@@ -7,7 +7,7 @@ open Ast
 
 let print_tree lexbuf = 
     let program = 
-        Parser.program Scanner.token lexbuf
+        Parser.program Cache.process lexbuf
     in
         print_string (string_of_program program)
 
