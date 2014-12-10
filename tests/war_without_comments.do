@@ -1,15 +1,13 @@
-// war in do
 configure playerCount: 2 
 configure acesHigh: false
 
-Player has Set called table // makes player.table available
+Player has Set called table
 
 new Number warCount: 0
 
 setup:
-	// deal cards
-	{ player1.hand <t deck } * (deck.size / 2) 	// loop
-	{ player2.hand <t deck } * (deck.size / 2)	// loop
+	{ player1.hand <t deck } * (deck.size / 2)
+	{ player2.hand <t deck } * (deck.size / 2)
 
 round:
 	do turn with player1
@@ -49,10 +47,8 @@ evaluate:
 		do output with "It's a tie. That means WAR!"
 		warCount: warCount + 1
 		
-		// if a set runs out of cards >> and << don't do anything
 		{ player1.hand t> player1.table } * 4
 		{ player2.hand t> player2.table } * 4
 		do output with "Player 1 and 2 put down 4 cards."
 		
-		// recursive call
 		do evaluate

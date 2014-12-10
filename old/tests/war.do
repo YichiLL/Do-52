@@ -2,9 +2,9 @@
 configure playerCount: 2 
 configure acesHigh: false
 
-Player has Set called table // makes player.table available
-
 new Number warCount: 0
+
+Player has Set called table 	// makes player.table available
 
 setup:
 	// deal cards
