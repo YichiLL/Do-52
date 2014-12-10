@@ -1,0 +1,48 @@
+==============================================
+A program in do must be ordered as follows:
+
+configure statements
+
+field declarations
+
+global variable declarations
+
+procedures
+
+==============================================
+A configure statement looks like this:
+
+configure players: 2
+
+You don't need to worry about type.
+
+==============================================
+A field declaration looks like this:
+
+Player has Set called table
+
+The type being extended comes first, then the
+type of the new field, then the id for the
+field.
+
+==============================================
+A variable is declared as follows:
+
+new Number n : 42
+
+But assigned like this:
+
+n : 1
+
+==============================================
+A procedure is declared like this:
+
+foo with Number a and Boolean b
+
+==============================================
+A procedure is called as follows:
+
+do foo with a
+do foo with a and b
+
+The "with" is always necessary.
