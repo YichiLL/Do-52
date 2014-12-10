@@ -46,3 +46,19 @@ do foo with a
 do foo with a and b
 
 The "with" is always necessary.
+
+==============================================
+Control statements are mostly python-style.
+
+if isCat:
+	do foo
+else:
+	do bar
+
+while x < 6:
+	do baz
+
+For loops are different though:
+
+for x : 1; x < 6; x : x + 2:
+	do foo
