@@ -15,7 +15,7 @@
      * the begins and ends. *)
     let eval_indent str =
         let depth = 
-            Indent.depth_count (Indent.explode str)
+            Indent.depth_count 0 (Indent.explode str)
         in
             if depth < !cur_depth then begin
                 cur_depth := depth;
@@ -32,7 +32,7 @@
 rule token = parse
 (* White Space *)
 | ' '                           { token lexbuf }
-| '\n'[' ''\t']* as str         { eval_indent str }
+| ('\n'[' ''\t']*)+ as str      { eval_indent str }
 | eof                           { EOF }
 
 (* Operators *)
