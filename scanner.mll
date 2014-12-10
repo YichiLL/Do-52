@@ -39,9 +39,9 @@
 }
 
 rule token = parse
-(* White Space *)
-| ' '                           { token lexbuf }
-| ('\n'[' ''\t']*)+ as str      { eval_indent str }
+(* White Space and Comments *)
+| [' ''\t']                     { token lexbuf }
+| ('\n'[' ''\t']*("//"[^'\n']*)*)+ as str { eval_indent str }
 | eof                           { EOF }
 
 (* Operators *)
@@ -101,8 +101,8 @@ rule token = parse
 (* Type IDs can be an uppecase letter followed by a combination of letters. *)
 | ['A'-'Z']['A'-'Z''a'-'z']* as _type              { TYPE(_type) }
 
-(* Comments *)
-| "//"[^'\n']*'\n'              { token lexbuf }
+(* This triggered if comment starts a program. *)
+| "//"[^'\n']*                  { token lexbuf }
 
 (* Punctuation *)
 | ":"                           { COLON }

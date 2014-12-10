@@ -27,7 +27,9 @@ turn with Player player:
 			do quit
 
 	do output with "Play card?" 
-	do input with new String in 
+
+	new String in : ""
+	do input with in
 	if in = "y":
 		player.hand t> player.table
 	else:
@@ -39,16 +41,17 @@ evaluate:
 		do output with "Player 1's card is higher."
 		{ player1.hand <t player1.table } * player1.table.size
 		{ player1.hand <t player2.table } * player2.table.size
-	else if player1.table < player2.table:
-		do output with "Player 2's card is higher."
-		{ player2.hand <t player1.table } * player1.table.size
-		{ player2.hand <t player2.table } * player2.table.size
 	else:
-		do output with "It's a tie. That means WAR!"
-		warCount: warCount + 1
-		
-		{ player1.hand t> player1.table } * 4
-		{ player2.hand t> player2.table } * 4
-		do output with "Player 1 and 2 put down 4 cards."
-		
-		do evaluate
+		if player1.table < player2.table:
+			do output with "Player 2's card is higher."
+			{ player2.hand <t player1.table } * player1.table.size
+			{ player2.hand <t player2.table } * player2.table.size
+		else:
+			do output with "It's a tie. That means WAR!"
+			warCount: warCount + 1
+			
+			{ player1.hand t> player1.table } * 4
+			{ player2.hand t> player2.table } * 4
+			do output with "Player 1 and 2 put down 4 cards."
+			
+			do evaluate
