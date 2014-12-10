@@ -1,59 +1,100 @@
-(*Scanner.mll
-Scanner generates tokens for the parser*)
+(* scanner.mll groups characters read from input into tokens that are then
+ * passed to the parser *)
 
-{ open Parser }
+{ 
+    open Parser
+    open Indent
+    open Printf
+
+    (* Persistent reference cell counter for the current indent depth. *)
+    let cur_depth = ref 0
+
+    (* This function returns INDENT or DEDENT tokens whenever we change depth.
+     * DEDENT means we've reached the end of a block. INDENT means we've
+     * entered one. In OCaml ";" has lower precedence than "if", hence all
+     * the begins and ends. *)
+    let eval_indent str =
+        let depth = 
+            Indent.depth_count (Indent.explode str)
+        in
+            if depth < !cur_depth then begin
+                cur_depth := depth;
+                DEDENT 
+            end
+            else if depth == !cur_depth then
+                NEWLINE 
+            else begin
+                cur_depth := depth; 
+                INDENT 
+            end
+}
 
 rule token = parse
-| ' ' {token lexbuf}
-| '\t' {TAB}
-| '\n' {NEWLINE}
-| '+' {ADD}
-| '-' {MINUS}
-| '*' {MULTIPLY}
-| '/' {DIVIDE}
-| '=' {EQUAL}
-| "!=" {NOTEQUAL}
-| '<' {LT}
-| '>' {GT}
-| "<=" {LTOE}
-| ">=" {GTOE}
-| '|' {OR}
-| '&' {AND}
-| '!' {NOT}
-| ':' {ASSIGNMENT}
-| '_' {DOTOP}
-| ">>" {PREPEND}
-| "<<" {APPEND}
-| "Number" {INT}
-| "String" {STRING}
-| "Boolean" {BOOLEAN}
-| "Card" {CARD}
-| "Set" {SET}
-| ';' {SEMI}
-| "Player" {PLAYER}
-| "if" {IF}
-| "else" {ELSE}
-| '{' {OPENBLOCK}
-| '}' {CLOSEBLOCK}
-| "while" {WHILE}
-| "for" {FOR}
-| "until" {UNTIL}
-| "break" {BREAK}
-| "continue" {CONTINUE}
-| '(' {OPENPAREN}
-| ')' {CLOSEPAREN}
-| "has" {HAS}
-| "called" {CALLED}
-| "do" {DO}
-| "with" {WITH}
-| "new" {NEW}
-| "configure" {CONFIG}
-| ['A'-'Z''a'-'z'] ['a'-'z''A'-'Z''0'-'9''_']* as lxm {ID(lxm)}
-| ['0'-'9']+ as number { NUMBER(int_of_string(number)) } 
-| '\"'[^'\"']* '\"' as lit {LITERAL (lit)} 
-| eof { EOF }
-| "//" {comment lexbuf}
+(* White Space *)
+| ' '                           { token lexbuf }
+| '\n'[' ''\t']* as str         { eval_indent str }
+| eof                           { EOF }
 
-and comment = parse
-| '\n' {token lexbuf}
-| _ {comment lexbuf}  
+(* Operators *)
+| '+'                           { ADD }
+| '-'                           { MINUS }
+| '*'                           { TIMES }
+| '/'                           { DIVIDE }
+| '<'                           { LT }
+| '>'                           { GT }
+| "<="                          { LTOE }
+| ">="                          { GTOE }
+| '='                           { EQUAL }
+| "!="                          { NOTEQUAL}
+| "|"                           { DISJ }   (* i.e. disjunct *)
+| "&"                           { CONJ }   (* i.e. conjunct *)
+| "."                           { DOT }
+| "!"                           { NOT }
+| "t>"                          { PREPEND_TOP }
+| "b>"                          { PREPEND_BOTTOM }
+| "<t"                          { APPEND_TOP }
+| "<b"                          { APPEND_BOTTOM }
+
+(* Variables *)
+| "new"                         { NEW }
+| "configure"                   { CONFIGURE }
+| "has"                         { HAS }
+| "called"                      { CALLED }
+
+(* Functions *)
+| "do"                          { DO }
+| "with"                        { WITH }
+| "and"                         { AND }
+
+(* Control Flow *)
+| '('                           { OPENPAREN }
+| ')'                           { CLOSEPAREN }
+| '{'                           { OPENBRACE }
+| '}'                           { CLOSEBRACE }
+| "if"                          { IF }
+| "else"                        { ELSE } 
+| "while"                       { WHILE }
+| "for"                         { FOR }
+| "break"                       { BREAK }
+| "continue"                    { CONTINUE }
+
+(* Literals *)
+| ['0'-'9']+ as num             { NUMBER_LITERAL(int_of_string(num)) } 
+| '\"'[^'\"']* '\"' as str      { STRING_LITERAL(str) } 
+| "true"                        { BOOL_LITERAL(true) }
+| "false"                       { BOOL_LITERAL(false) }
+
+(* -------------- Miscellaneous ------------ *)
+(* IDs can be any lowercase letter followed by a combination of numbers,
+ * letters, or underscores. *)
+| ['a'-'z']['A'-'Z''a'-'z''0'-'9''_']* as id       { ID(id) }
+
+(* Type IDs can be an uppecase letter followed by a combination of letters. *)
+| ['A'-'Z']['A'-'Z''a'-'z']* as _type              { TYPE(_type) }
+
+(* Comments *)
+| "//"[^'\n']*'\n'              { token lexbuf }
+
+(* Punctuation *)
+| ":"                           { COLON }
+| ";"                           { SEMI }
