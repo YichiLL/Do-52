@@ -10,6 +10,8 @@ CLASSES = \
         Card.java \
 	Set.java\
         Deck.java \
+	Player.java\
+	MyPlayer.java \
         main.java 
 
 MAIN= main
