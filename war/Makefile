@@ -8,6 +8,7 @@ JVM = java
 
 CLASSES = \
         Card.java \
+	Set.java\
         Deck.java \
         main.java 
 
