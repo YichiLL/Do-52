@@ -28,16 +28,16 @@ type expr =
 (* Record for a configuration declaration, i.e. assignment to environment 
  * variable. *)
 type config_decl = {
-    config_id : string;
-    config_value : expr;
+    id : string;
+    value : expr;
 }
 
 (* Record for a field declaration.
  * e.g. Table has Set called discard *)
 type field_decl = {
     expanded_type : string;
-    field_type : string;
-    field_id : string;
+    _type : string;
+    id : string;
 }
 
 (* The header for a program consists of configure and field declarations. *)
@@ -46,9 +46,9 @@ type header = config_decl list * field_decl list
 (* Record for variable declaration.
  * Here we're using "_type" because "type" is reserved in OCaml *)
 type var_decl = {
-    var_decl_id : string;
-    var_decl_type : string;
-    var_decl_value : expr;
+    id : string;
+    _type : string;
+    value : expr;
 }
 
 (* Record for a function call *)
@@ -88,13 +88,13 @@ type stmt =
 
 (* A formal argument has a type and an ID, but no assigned value. *)
 type formal = {
-    formal_id : string;
-    formal_type : string;
+    id : string;
+    _type : string;
 }
 
 (* Record for a function declaration. *)
 type func_decl = {
-    decl_name : string;
+    fname : string;
     formals : formal list;
     body : stmt list;
 }
@@ -160,8 +160,8 @@ let string_of_update update =
         match update with
         | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
                             ^ ")"
-        | VarDecl(var) -> "(<VarDecl> id:" ^ var.var_decl_id ^ " type:" ^ var.var_decl_type ^
-                          " value:" ^ string_of_expr var.var_decl_value ^ ")"
+        | VarDecl(var) -> "(<VarDecl> id:" ^ var.id ^ " type:" ^ var._type ^
+                          " value:" ^ string_of_expr var.value ^ ")"
     in
         "(<Update> " ^ value ^ ")" 
 
@@ -210,19 +210,19 @@ and string_of_block block =
 
 let string_of_function func = 
     let formals_s =
-        String.concat ", " (List.map (fun formal -> formal.formal_type ^ 
-                                " " ^ formal.formal_id) func.formals)
+        String.concat ", " (List.map (fun formal -> formal._type ^ 
+                                " " ^ formal.id) func.formals)
     in
-        "(<Func> fname:" ^ func.decl_name ^ " formals:[" ^ formals_s 
+        "(<Func> fname:" ^ func.fname ^ " formals:[" ^ formals_s 
         ^ "] body:\n  " ^ string_of_block func.body ^ "\n)"
 
 let string_of_config (config : config_decl) =
-    "(<Configure> id:" ^ config.config_id ^ " value:" ^ 
-    string_of_expr config.config_value ^ ")"
+    "(<Configure> id:" ^ config.id ^ " value:" ^ 
+    string_of_expr config.value ^ ")"
 
 let string_of_field_decl field_decl =
-    "(<FieldDecl> expanded_type:" ^ field_decl.expanded_type ^ " field_type:" ^
-    field_decl.field_type ^ " id:" ^ field_decl.field_id ^ ")"
+    "(<FieldDecl> expanded_type:" ^ field_decl.expanded_type ^ " _type:" ^
+    field_decl._type ^ " id:" ^ field_decl.id ^ ")"
 
 let string_of_program program =
     let append_nl s1 s2 =
