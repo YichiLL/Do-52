@@ -50,4 +50,4 @@ printer.cmo : printer.ml ast.cmo cache.cmo
 
 .PHONY : clean
 clean:
-	rm compile printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output
+	rm compile printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output *.java
