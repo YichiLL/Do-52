@@ -17,6 +17,8 @@
 type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
             | Gtoe | Disj | Conj | Not | Dot
 
+type datatype = Boolean | Number | String | Set | Player | Card
+
 type expr =
     | Number of int            (* Literal *)
     | String of string         (* Literal *)
