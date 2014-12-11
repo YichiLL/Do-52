@@ -3,7 +3,7 @@
 
 CFLAGS = -c
 YACCFLAGS = -v
-OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo
+OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo semantic.cmo
 
 compile : $(OBJ) compile.cmo
 	ocamlc -o $@ $(OBJ) compile.cmo
@@ -16,6 +16,9 @@ indent.cmo : indent.ml
 
 cache.cmo : cache.ml scanner.ml parser.ml
 	ocamlc $(CFLAGS) cache.ml
+
+semantic.cmo : semantic.ml
+	ocamlc $(CFLAGS) semantic.ml
 
 scanner.cmo : scanner.ml parser.cmi indent.cmi
 	ocamlc $(CFLAGS) scanner.ml
@@ -48,6 +51,3 @@ printer.cmo : printer.ml ast.cmo cache.cmo
 .PHONY : clean
 clean:
 	rm compile printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output
-	
-
-
