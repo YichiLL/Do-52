@@ -6,6 +6,10 @@ public class main {
 		//checking for deck
 		Deck deck = new Deck(2, Deck.DESCENDING);
 		System.out.println(deck);
+		//testing for shuffle function
+		System.out.println("--------------------------\nAfter Shuffle\n");
+		deck.shuffle();
+		System.out.println(deck);
 		
 	}
 
