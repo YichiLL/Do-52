@@ -1,15 +1,15 @@
-# a simple "make" command builds the interpreter
+# a simple "make" command builds the compiler
 # "make printer" builds the printer
 
 CFLAGS = -c
 YACCFLAGS = -v
-OBJ = indent.cmo scanner.cmo parser.cmo cache.cmo
+OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo
 
-interpreter : $(OBJ) interpreter.cmo
-	ocamlc -o $@ $(OBJ) interpreter.cmo
+compile : $(OBJ) compile.cmo
+	ocamlc -o $@ $(OBJ) compile.cmo
 
-interpreter.cmo : interpreter.ml ast.cmi
-	ocamlc $(CFLAGS) interpreter.ml
+compile.cmo : compile.ml ast.cmi
+	ocamlc $(CFLAGS) $<
 
 indent.cmo : indent.ml
 	ocamlc $(CFLAGS) indent.ml
@@ -40,14 +40,14 @@ scanner.ml : scanner.mll
 
 .PHONY : printer
 printer : $(OBJ) printer.cmo
-	ocamlc -o $@ ast.cmo $(OBJ) printer.cmo
+	ocamlc -o $@ $(OBJ) printer.cmo
 
 printer.cmo : printer.ml ast.cmo cache.cmo
 	ocamlc $(CFLAGS) printer.ml
 
 .PHONY : clean
 clean:
-	rm interpreter printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output
+	rm compile printer *.cmi *.cmo scanner.ml parser.ml parser.mli *.output
 	
 
 
