@@ -1,4 +1,5 @@
-configure players : 4
+configure playerCount: 1
+configure acesHigh: false
 
-round:
+setup:
 	do output with "Hello!"

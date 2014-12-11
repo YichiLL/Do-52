@@ -1,2 +1,5 @@
-evaluate:
-	do output 4 <= 5
+configure playerCount: 1
+configure acesHigh: false
+
+setup:
+	do output with (4 <= 5)

@@ -1,2 +1,5 @@
-evaluate:
-	do output 5 != 6 = 7
+configure playerCount: 1
+configure acesHigh: false
+
+setup:
+	do output with (5 != 6 = 7)

@@ -5,3 +5,4 @@ scanner.ml
 parser.ml
 *.automaton
 *.conflicts
+testall.log

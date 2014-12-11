@@ -1,6 +1,6 @@
-Player has Set called table
-Set has Number called importance
+configure playerCount: 1
+configure acesHigh: false
 
-round:
+setup:
 	player1.table : 456
 	do output with player1.table

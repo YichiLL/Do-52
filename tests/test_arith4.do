@@ -1,3 +1,6 @@
-evaluate:
+configure playerCount: 1
+configure acesHigh: false
+
+setup:
 	new Number n : 4 / 2
-	do output n
+	do output with n

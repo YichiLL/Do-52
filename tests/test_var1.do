@@ -1,3 +1,6 @@
-evaluate:
+configure playerCount: 1
+configure acesHigh: false
+
+setup:
 	new Number x : 5
-	do output x
+	do output with x

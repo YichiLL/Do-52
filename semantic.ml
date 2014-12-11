@@ -13,3 +13,20 @@ let check_func_name name = function
 
 (* this function checks whether a function's name already exists in env *)
 let func_exist_in_env func env = List.exists (check_func_name func.decl_name) env.funcs
+
+let string_of_op = function
+    | Add -> "+"
+    | Minus -> "-"
+    | Multiply -> "*"
+    | Divide -> "/"
+    | Equal -> "="
+    | NotEqual -> "!="
+    | Lt -> "<"
+    | Gt -> ">"
+    | Ltoe -> "<="
+    | Gtoe -> ">="
+    | Disj -> "|"
+    | Conj -> "&"
+    | Dot -> "."
+    | Not -> "!"
+

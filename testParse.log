@@ -1,0 +1,188 @@
+testParse.sh: line 153: CheckFail: command not found
+
+###### Testing test_arith1
+./printer tests/test_arith1.do > tests/test_arith1.out
+###### SUCCESS
+
+###### Testing test_arith2
+./printer tests/test_arith2.do > tests/test_arith2.out
+###### SUCCESS
+
+###### Testing test_arith3
+./printer tests/test_arith3.do > tests/test_arith3.out
+###### SUCCESS
+
+###### Testing test_arith4
+./printer tests/test_arith4.do > tests/test_arith4.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_arith5
+./printer tests/test_arith5.do > tests/test_arith5.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_arith6
+./printer tests/test_arith6.do > tests/test_arith6.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_arith7
+./printer tests/test_arith7.do > tests/test_arith7.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_comments
+./printer tests/test_comments.do > tests/test_comments.out
+###### SUCCESS
+
+###### Testing test_configure
+./printer tests/test_configure.do > tests/test_configure.out
+###### SUCCESS
+
+###### Testing testt_op.do
+./printer tests/test_dot_op.do > tests/testt_op.do.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_field_decls
+./printer tests/test_field_decls.do > tests/test_field_decls.out
+###### SUCCESS
+
+###### Testing test_for
+./printer tests/test_for.do > tests/test_for.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_function_call1
+./printer tests/test_function_call1.do > tests/test_function_call1.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_function_call2
+./printer tests/test_function_call2.do > tests/test_function_call2.out
+###### SUCCESS
+
+###### Testing test_function_call3
+./printer tests/test_function_call3.do > tests/test_function_call3.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_if
+./printer tests/test_if.do > tests/test_if.out
+###### SUCCESS
+
+###### Testing test_if1
+./printer tests/test_if1.do > tests/test_if1.out
+###### SUCCESS
+
+###### Testing test_if2
+./printer tests/test_if2.do > tests/test_if2.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic1
+./printer tests/test_logic1.do > tests/test_logic1.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic10
+./printer tests/test_logic10.do > tests/test_logic10.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic11
+./printer tests/test_logic11.do > tests/test_logic11.out
+###### SUCCESS
+
+###### Testing test_logic12
+./printer tests/test_logic12.do > tests/test_logic12.out
+###### SUCCESS
+
+###### Testing test_logic13
+./printer tests/test_logic13.do > tests/test_logic13.out
+###### SUCCESS
+
+###### Testing test_logic14
+./printer tests/test_logic14.do > tests/test_logic14.out
+###### SUCCESS
+
+###### Testing test_logic15
+./printer tests/test_logic15.do > tests/test_logic15.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic16
+./printer tests/test_logic16.do > tests/test_logic16.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic17
+./printer tests/test_logic17.do > tests/test_logic17.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic2
+./printer tests/test_logic2.do > tests/test_logic2.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic3
+./printer tests/test_logic3.do > tests/test_logic3.out
+###### SUCCESS
+
+###### Testing test_logic4
+./printer tests/test_logic4.do > tests/test_logic4.out
+###### SUCCESS
+
+###### Testing test_logic5
+./printer tests/test_logic5.do > tests/test_logic5.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic6
+./printer tests/test_logic6.do > tests/test_logic6.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic7
+./printer tests/test_logic7.do > tests/test_logic7.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic8
+./printer tests/test_logic8.do > tests/test_logic8.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_logic9
+./printer tests/test_logic9.do > tests/test_logic9.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_timesloop
+./printer tests/test_timesloop.do > tests/test_timesloop.out
+###### SUCCESS
+
+###### Testing test_var1
+./printer tests/test_var1.do > tests/test_var1.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_var2
+./printer tests/test_var2.do > tests/test_var2.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_var3
+./printer tests/test_var3.do > tests/test_var3.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_vdecls
+./printer tests/test_vdecls.do > tests/test_vdecls.out
+###### SUCCESS
+
+###### Testing test_while
+./printer tests/test_while.do > tests/test_while.out
+###### SUCCESS

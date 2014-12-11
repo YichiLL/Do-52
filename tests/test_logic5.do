@@ -1,3 +1,6 @@
-evaluate:
+configure playerCount: 1
+configure acesHigh: false
+
+setup:
 	new	boolean b : true | true
-	do output b
+	do output with b
