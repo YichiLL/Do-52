@@ -1,6 +1,7 @@
 // war in do
-configure playerCount: 2 
-configure acesHigh: false
+configure numberOfPlayers: 2 
+configure highestCard: Ace
+configure ascend: true
 
 Player has Set called table // makes player.table available
 
