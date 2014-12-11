@@ -18,9 +18,9 @@ type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
             | Gtoe | Disj | Conj | Not | Dot
 
 type expr =
-    | Number of int
-    | String of string
-    | Boolean of bool
+    | Number of int            (* Literal *)
+    | String of string         (* Literal *)
+    | Boolean of bool          (* Literal *)
     | Id of string
     | Unop of op * expr
     | Binop of expr * op * expr
@@ -155,7 +155,7 @@ let rec string_of_expr expr =
     in
         "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])" 
 
-let rec string_of_update update =
+let string_of_update update =
     let value = 
         match update with
         | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
