@@ -58,7 +58,7 @@ config_list:
     | config_list NEWLINE                   { $1 }
 
 config:
-    | CONFIGURE ID COLON expr               { { id = $2; value = $4 } }
+    | CONFIGURE ID COLON expr               { { config_id = $2; config_value = $4 } }
 
 field_decl_list:
     | field_decl                            { [$1] }
@@ -68,7 +68,7 @@ field_decl_list:
 field_decl:
     | TYPE HAS TYPE CALLED ID               { { expanded_type = $1;
                                                 field_type = $3;
-                                                id = $5; } }
+                                                field_id = $5; } }
 
 vdecl_list:
     | vdecl                                 { [$1] }
@@ -76,9 +76,9 @@ vdecl_list:
     | vdecl_list NEWLINE                    { $1 }
 
 vdecl:
-    | NEW TYPE ID COLON expr                { VarDecl({ id = $3;
-                                                        _type = $2;
-                                                        value = $5 }) }
+    | NEW TYPE ID COLON expr                { VarDecl({ var_decl_id = $3;
+                                                        var_decl_type = $2;
+                                                        var_decl_value = $5 }) }
 
 func_list:
     | func                                  { [$1] }
@@ -86,10 +86,10 @@ func_list:
     | func_list NEWLINE                     { $1 }
 
 func:
-    | ID COLON block                        { { fname = $1;
+    | ID COLON block                        { { decl_name = $1;
                                                 formals = [];
                                                 body = $3; } }
-    | ID WITH formal_list COLON block       { { fname = $1;
+    | ID WITH formal_list COLON block       { { decl_name = $1;
                                                 formals = List.rev $3;
                                                 body = $5; } }
 
@@ -98,7 +98,7 @@ formal_list:
     | formal_list AND formal                { $3 :: $1 }
 
 formal:
-    | TYPE ID                               { { id = $2; _type = $1 } }
+    | TYPE ID                               { { formal_id = $2; formal_type = $1 } }
 
 block:
     | INDENT stmt_list DEDENT               { List.rev $2 }
