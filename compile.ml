@@ -111,6 +111,7 @@ let java_of_call call =
     match call.fname with
     | "output" -> output_call call
     | "input" -> input_call call
+    | "quit" -> "System.exit(0);\n"
     | _ -> normal_call call
 (* ; not appended here, see java_of_stmt *)
 let java_of_update = function
