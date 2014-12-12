@@ -29,6 +29,12 @@ parser.cmo : parser.ml parser.cmi
 parser.cmi : parser.mli ast.cmi
 	ocamlc $(CFLAGS) parser.mli
 
+sast.cmi : sast.ml
+	ocamlc $(CFLAGS) $^
+
+sast.cmo: sast.ml
+	ocamlc $(CFLAGS) $^
+
 ast.cmi : ast.ml
 	ocamlc $(CFLAGS) $^
 
