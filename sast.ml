@@ -1,14 +1,19 @@
 (* sast.ml contains our semantically analyzed abstract syntax tree. Basically,
- * it is our ast but with type information attached. *)
+ * it is our ast but with type information attached. 
+ *
+ * Many of the AST types have to redeclared here even if they haven't
+ * changed. If they incorporate a type that has itself changed, the whole
+ * type has to reclared so that the new version is incorporated rather than
+ * the old version. *)
 open Ast
 
-type datatype = Boolean | Number | String | Set | Player | Card
+type datatype = Boolean | Number | String | Card | Set | Player
 
 type simple_expr =
     | Number of int
     | String of string
     | Boolean of bool
-    | Id of string
+    | Var of var
     | Unop of op * expr
     | Binop of expr * op * expr
 
@@ -40,7 +45,7 @@ type func_call = {
 }
 
 type update =
-    | Assign of string * expr
+    | Assign of var * expr
     | VarDecl of var_decl
 
 type stmt =
