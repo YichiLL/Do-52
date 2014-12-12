@@ -28,9 +28,24 @@ let java_of_op = function
     | Gtoe -> ">="
     | Disj -> "||"
     | Conj -> "&&"
-    | Dot -> "."
+    (*| Dot -> "."*)
     | Not -> "!"
 
+let java_of_objects var =  
+    if Str.string_match (Str.regexp "player[0-9]+")  var 0 then 
+    "player.get(" ^ (String.sub var 6 ((String.length var) - 6 )) ^ ")"
+    else
+    match var with
+    | "size" -> "size()"
+    | "top" -> "peek()"
+    | _ -> var
+
+
+
+let java_of_var var =
+    match var with
+    |SimpleId(str) -> str
+    |DotId(str_list) -> String.concat "." (List.map (fun arg -> java_of_objects arg) str_list)
 
 let rec java_of_expr = function
     | Number num -> string_of_int num
@@ -40,7 +55,7 @@ let rec java_of_expr = function
             "true"
         else
             "false"
-    | Id id -> id
+    | Var var -> java_of_var var
     | Unop(op, e) -> java_of_op op ^ java_of_expr e
     | Binop(e1, op, e2) -> "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
                            java_of_expr e2 ^ ")"
@@ -89,7 +104,7 @@ let java_of_call call =
     | _ -> normal_call call
 (* ; not appended here, see java_of_stmt *)
 let java_of_update = function
-    | Assign(id, e) -> id ^ " = " ^ java_of_expr e ^ ";"
+    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
     | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
                       java_of_expr var.var_decl_value ^ ";"
