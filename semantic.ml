@@ -21,7 +21,33 @@ let check_func_name name = function
 env.funcs *)
 
 type symbol_table = {
-    configs: Sast.config_decl list;
+    (* configs: Sast.config_decl list; *)
     vars: Sast.var_decl list;
-    funs: Sast.func_decl list;
+    funcs: Sast.func_decl list;
+    (* parent: symbol_table options *)
 }
+
+type env = {
+objects : symbol_table option
+}
+(*
+let find_variable_name_global(scope : env.objects) name =
+  let global_table = 
+   { vars: []; funcs: [] }
+   in 
+   { 
+    if List.fold_left List.find (fun (v_name,_) -> name = v_name) scope.funcs.formals then List.append ()
+
+
+ try 
+    List.find (fun (v_name,_) -> name = v_name) scope.vars
+ with Not_found ->
+      match scope.parent with 
+    raise(Failure("Variable Not Found"))
+*)
+let find_variable_type (scope : env.objects) dtype = 
+ try 
+    List.find (fun (_,v_type) -> dtype = v_type) scope.vars
+ with Not_found -> 
+    raise(Failure("Variable Type Error"))
+
