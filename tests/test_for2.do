@@ -7,5 +7,6 @@ setup:
 	{ player1.hand <t deck } * (deck.size / 2)
 
 round:
-	if (2 > 1):
-		do output with true
+	new Number x : 4
+	for x : 0; x < 4; x : x - 1:
+		do foo with x

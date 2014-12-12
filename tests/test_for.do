@@ -1,4 +1,12 @@
-new Number x : 4
+configure playerCount: 1
+configure acesHigh: false
 
-for x : 0; x < 4; x : x + 1:
-	do foo with x
+Player has Set called table
+
+setup:
+	{ player1.hand <t deck } * (deck.size / 2)
+
+round:
+	new Number x : 4
+	for x : 0; x < 4; x : x + 1:
+		do foo with x

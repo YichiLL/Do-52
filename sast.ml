@@ -1,5 +1,5 @@
 (* sast.ml contains our semantically analyzed abstract syntax tree. Basically,
- * it is our ast but with type information attached.  *)
+ * it is our ast but with type information attached. *)
 open Ast
 
 type datatype = Boolean | Number | String | Set | Player | Card

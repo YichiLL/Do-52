@@ -12,8 +12,9 @@ open Ast
 *  made-up "pretty" syntax. 
 *
 *  The resulting program will be ugly because we don't have information about
-*  spacing or indentation in the AST. But that's okay, because Java ignores
-*  whitespace. *)
+*  spacing or indentation in the AST. We could maybe keep track of depth and
+*  space things that way, but it's not really worth it because nobody is meant
+*  to see the java code and java ignores whitespace anyway. *)
 let java_of_op = function
     | Add -> "+"
     | Minus -> "-"
@@ -30,9 +31,10 @@ let java_of_op = function
     | Dot -> "."
     | Not -> "!"
 
+
 let rec java_of_expr = function
     | Number num -> string_of_int num
-    | String str -> "\"" ^ str ^ "\""
+    | String str -> str
     | Boolean boolean ->
         if boolean then
             "true"
@@ -53,12 +55,38 @@ let java_of_type _type =
     | _ -> raise (UnknownType ("Type " ^ _type ^ " is not a valid type."))
 
 (* ; not appended here, see java_of_stmt *)
-let java_of_call call =
+(*let rec output_expr = function
+
+
+    | Number num -> string_of_int num
+    | String str -> "\"" ^ str ^ "\""
+    | Id id -> id
+    | Binop(e1, Add, e2) -> "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                           java_of_expr e2 ^ ")"
+    | _ -> raise (UnknownType ("Argument for output is not valid"))
+*)
+
+let output_call call=
+    match call.args with
+    | [a]-> "System.out.println(" ^ (java_of_expr a) ^ ");"
+    | _ -> raise (UnknownType "Argument for input call not valid.")
+    
+let input_call call=
+    match call.args with
+    | [a]-> (java_of_expr a) ^ " = scanner.nextLine();"
+    | _ -> raise (UnknownType "Argument for input call not valid.")
+
+let normal_call call =
     let args_java =
         String.concat ", " (List.map (fun arg -> java_of_expr arg) call.args)
     in
         call.fname ^ "(" ^ args_java ^ ");"
 
+let java_of_call call =
+    match call.fname with
+    | "output" -> output_call call
+    | "input" -> input_call call
+    | _ -> normal_call call
 (* ; not appended here, see java_of_stmt *)
 let java_of_update = function
     | Assign(id, e) -> id ^ " = " ^ java_of_expr e ^ ";"
@@ -116,12 +144,31 @@ let java_of_function func =
         access ^ " void " ^ func.decl_name ^ "(" ^ formals ^ ")\n" ^
         java_of_block func.body 
 
-(* Semantic check assures us that config_value is either a number or bool *)
-let java_of_config config = 
+let normal_config config = 
     match config.config_value with
     | Number(n) -> config.config_id ^ " = " ^ string_of_int n ^ ";"
     | Boolean(b) -> config.config_id ^ " = " ^ string_of_bool b ^ ";"
     | _ -> raise (UnknownType "Invalid type used for configure statement.")
+
+let interpret_card_name name =
+    match name with
+    | "\"Ace\"" -> 0
+    | "\"Jack\"" -> 10
+    | "\"Queen\""-> 11
+    | "\"King\""-> 12
+    | _ -> raise (UnknownType "Invalid card name")
+
+let interpret_card_number config =
+    match config.config_value with
+    |Number(n) -> config.config_id ^ " = " ^ string_of_int (n-1) ^ ";"
+    |String(str) -> config.config_id ^ " = " ^ string_of_int (interpret_card_name str) ^" ;"
+    |_ -> raise (UnknownType "Invalid type used for configure maxCard statement.")
+(* Semantic check assures us that config_value is either a number or bool *)
+let java_of_config config =
+    match config.config_id with
+    |"maxCard" -> interpret_card_number config
+    | _ -> normal_config config
+
 
 let java_of_field_decl field_decl =
     field_decl.field_type ^ " " ^ field_decl.field_id ^ ";"
@@ -157,6 +204,7 @@ let java_of_game program =
         "import java.util.ArrayList;\n\n" ^
         "public class Game {\n" ^
         "ArrayList<MyPlayer> players;\n" ^
+        "Scanner scanner;\n" ^
         "Set deck;\n" ^
         "int numberOfPlayer = 4;\n" ^
         "int maxCard = 12;\n" ^
@@ -164,6 +212,7 @@ let java_of_game program =
         instance_vars ^ "\n" ^
         "public Game() {\n" ^
         config_vars ^
+        "scanner = new Scanner(System.in);\n" ^
         "deck = new Deck(maxCard, ascend);\n" ^
         "players = new ArrayList<MyPlayer>();\n" ^
         "for(int i = 0; i < numberOfPlayers; i++) {\n" ^
