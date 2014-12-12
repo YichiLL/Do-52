@@ -12,8 +12,9 @@ open Ast
 *  made-up "pretty" syntax. 
 *
 *  The resulting program will be ugly because we don't have information about
-*  spacing or indentation in the AST. But that's okay, because Java ignores
-*  whitespace. *)
+*  spacing or indentation in the AST. We could maybe keep track of depth and
+*  space things that way, but it's not really worth it because nobody is meant
+*  to see the java code and java ignores whitespace anyway. *)
 let java_of_op = function
     | Add -> "+"
     | Minus -> "-"
