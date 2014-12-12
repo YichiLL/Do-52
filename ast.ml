@@ -41,7 +41,7 @@ type config_decl = {
 (* Record for a field declaration.
  * e.g. Table has Set called discard *)
 type field_decl = {
-    expanded_type : string;
+    parent_type : string;
     field_type : string;
     field_id : string;
 }
@@ -231,7 +231,7 @@ let string_of_config (config : config_decl) =
     string_of_expr config.config_value ^ ")"
 
 let string_of_field_decl field_decl =
-    "(<FieldDecl> expanded_type:" ^ field_decl.expanded_type ^ " field_type:" ^
+    "(<FieldDecl> parent_type:" ^ field_decl.parent_type ^ " field_type:" ^
     field_decl.field_type ^ " id:" ^ field_decl.field_id ^ ")"
 
 (* List.fold_left here instead of String.concat so we can get a \n at the end

@@ -26,7 +26,7 @@ type config_decl = {
 }
 
 type field_decl = {
-    expanded_type : datatype;
+    parent_type : datatype;
     field_type : datatype;
     field_id : string;
 }

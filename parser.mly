@@ -69,7 +69,7 @@ field_decl_list:
     | field_decl_list NEWLINE               { $1 }
 
 field_decl:
-    | TYPE HAS TYPE CALLED ID               { { expanded_type = $1;
+    | TYPE HAS TYPE CALLED ID               { { parent_type = $1;
                                                 field_type = $3;
                                                 field_id = $5; } }
 

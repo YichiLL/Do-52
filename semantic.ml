@@ -1,53 +1,95 @@
-(* semantic.ml creates an sast from our ast. If you want, you can think of it
- * as yet another pretty print, but instead of turning the ast into a
- * printable string, it turns it into a sast, which is very similar to the ast,
- * but it has type information. semantic.ml also raises errors as it does this
- * "printing" to the sast, making sure that nothing is mismatched or not yet
- * declared. *)
+(* semantic.ml creates an sast from our ast. It basically resolves each item
+ * in the tree to a type and raises errors if there is a type mismatch
+ * or unknown ID reference. *)
+open Ast
+open Sast
 
-(* this program modifies checks the semantics of Ast *)
-
-(* env has a field called funcs which is a list of function declarations *)
-(*type env = { 
-mutable funcs: func_decl list; 
-}*)
-
-(* check whether a user assigns a string type to a function name *)
-let check_func_name name = function
-| func -> func.decl_name = name
-
-(* this function checks whether a function's name already exists in env *)
-(*let func_exist_in_env func env = List.exists (check_func_name func.decl_name)
-env.funcs *)
-
+(* --------------------------- Context ------------------------------------- *)
+(* A symbol_table maps ids -> var_decls and allows us to verify that a variable
+ * has been declared and that it is the right type. *)
 type symbol_table = {
-    (* configs: Sast.config_decl list; *)
+    parent : symbol_table option;
     vars: Sast.var_decl list;
-    funcs: Sast.func_decl list;
-    (* parent: symbol_table options *)
 }
 
-type env = {
-objects : symbol_table option
+(* An environment represents the current context for a particular node in our
+ * tree. *)
+type environment = {
+    scope : symbol_table;
+    fields: Sast.field_decl list;
+    can_break : bool; (* If a break statement makes sense. *)
+    can_continue: bool; (* If a continue statement makes sense. *)
 }
-(*
-let find_variable_name_global(scope : env.objects) name =
-  let global_table = 
-   { vars: []; funcs: [] }
-   in 
-   { 
-    if List.fold_left List.find (fun (v_name,_) -> name = v_name) scope.funcs.formals then List.append ()
 
+(* -------------------------- Exceptions ----------------------------------- *)
+exception UndeclaredID of string
+exception MismatchedType of string
+exception WrongType of string
 
- try 
-    List.find (fun (v_name,_) -> name = v_name) scope.vars
- with Not_found ->
-      match scope.parent with 
-    raise(Failure("Variable Not Found"))
-*)
-let find_variable_type (scope : env.objects) dtype = 
- try 
-    List.find (fun (_,v_type) -> dtype = v_type) scope.vars
- with Not_found -> 
-    raise(Failure("Variable Type Error"))
+(* ------------------------ Helper Functions ------------------------------- *)
+(* Looks for a var in the current scope. If it isn't there, checks the next
+ * scope. If we've reach global scope and we still haven't found the var, throw
+ * an error. *)
+let rec find_var scope id =
+    try
+        List.find (fun vdecl -> id = vdecl.var_decl_id) scope.vars
+    with Not_found ->
+        match scope.parent with
+        | Some(parent) -> find_var parent id
+        | _ -> raise Not_found
+
+(* Checks if a type has a field called id by looking through the fields
+ * available in the current program. *)
+let find_field env (_type, id) =
+    List.find (fun field_decl -> 
+                ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
+                    env.fields
+
+(* ========================================================================= *)
+(*                          Semantic Analysis                                *)
+(* ========================================================================= *)
+(* Recursively checks each ID in a DotId node after the first.
+ * We need to check each ID to verify it's a valid field
+ * in the type of the previous ID. *)
+let rec check_field env last_type id_ls =
+    match id_ls with
+    | id :: ls ->
+        let id = List.hd id_ls
+        in let field_decl =
+            try
+                find_field env (last_type, id)
+            with Not_found ->
+                raise (UndeclaredID("Undeclared identifier: " ^ id))
+        in
+            check_field env field_decl.field_type ls
+    | [] -> last_type
+
+(* Takes a node of type var in our AST and checks to make sure it refers
+ * to something in the current scope. Then returns a node of type simple_expr
+ * in our SAST, basically a normal var with attached type information retrieved
+ * from the current scope or environment. *)
+let check_var env = function
+    | Ast.SimpleId(id) -> 
+        let vdecl =
+            try 
+                find_var env.scope id
+            with Not_found -> 
+                raise (UndeclaredID("Undeclared identifier: " ^ id))
+        in
+            Sast.Var(id, vdecl.var_decl_type)
+    | Ast.DotId(id_list) ->
+        (* Check if the first id is a valid var, then check if subsequent ids
+         * are valid fields. Final type is type of last field. *)
+        let first_id = List.hd id_list
+        in let vdecl = 
+            try
+                find_var env.scope first_id
+            with Not_found -> 
+                raise (UndeclaredID("Undeclared identifier: " ^ first_id))
+        in let final_id =
+            String.concat "." id_list
+        in
+            Sast.Var(final_id, 
+                      check_field env vdecl.var_decl_type (List.tl id_list))
+
 
