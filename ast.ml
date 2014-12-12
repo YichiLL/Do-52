@@ -169,9 +169,9 @@ let string_of_update update =
         match update with
         | Assign(var, e) -> "(<Assign> var:" ^ string_of_var var ^ " expr:" 
                             ^ string_of_expr e ^ ")"
-        | VarDecl(var_d) -> "(<VarDecl> id:" ^ var_d.var_decl_id ^ " type:" 
-                            ^ var_d.var_decl_type ^ " value:" ^ 
-                            string_of_expr var_d.var_decl_value ^ ")"
+        | VarDecl(var_d) -> "(<VarDecl> id:" ^ var_d.id ^ " type:" 
+                            ^ var_d._type ^ " value:" ^ 
+                            string_of_expr var_d.value ^ ")"
     in
         "(<Update> " ^ value ^ ")" 
 
