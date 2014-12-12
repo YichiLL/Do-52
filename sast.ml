@@ -13,7 +13,7 @@ type simple_expr =
     | Number of int
     | String of string
     | Boolean of bool
-    | Var of var
+    | Var of string * datatype
     | Unop of op * expr
     | Binop of expr * op * expr
 
