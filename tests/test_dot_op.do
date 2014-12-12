@@ -1,6 +1,5 @@
-Player has Set called table
-Set has Number called importance
+Player has Boolean called isCat
 
 round:
-	player1.table : 456
-	do output with player1.table
+	player1.isCat : false
+	do output with player1.isCat

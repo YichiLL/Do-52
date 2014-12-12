@@ -6,6 +6,10 @@
 
 open Ast 
 
+(* Splits an id with dots in it into a list of ids *)
+let split_dot_id dot_id = 
+    Str.split (Str.regexp "[.]") dot_id
+
 %}
 
 %token EOF
@@ -16,9 +20,9 @@ open Ast
 %token IF ELSE WHILE FOR SEMI BREAK CONTINUE
 %token OPENPAREN CLOSEPAREN OPENBRACE CLOSEBRACE
 %token <bool> BOOL_LITERAL
-%token <string> STRING_LITERAL ID TYPE
+%token <string> STRING_LITERAL ID DOT_ID TYPE
 %token <int> NUMBER_LITERAL
-%token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL DOT
+%token ADD MINUS TIMES DIVIDE LT LTOE GT GTOE EQUAL NOTEQUAL
 %token NOT DISJ CONJ
 %token PREPEND_TOP PREPEND_BOTTOM APPEND_TOP APPEND_BOTTOM
 %token HAS CALLED
@@ -30,7 +34,6 @@ open Ast
 %left ADD MINUS
 %left TIMES DIVIDE
 %right NOT
-%left DOT
 /* Highest Precedence */
 
 %start program
@@ -132,13 +135,13 @@ arg_list:
 
 update:
     | vdecl                                 { $1 }
-    | ID COLON expr                         { Assign($1, $3) }
+    | var COLON expr                        { Assign($1, $3) }
 
 expr:
     | NUMBER_LITERAL                        { Number($1) }
     | BOOL_LITERAL                          { Boolean($1) }
     | STRING_LITERAL                        { String($1) }
-    | ID                                    { Id($1) } 
+    | var                                   { Var($1) }
     | expr ADD expr                         { Binop($1, Add, $3) }
     | expr MINUS expr                       { Binop($1, Minus, $3) }
     | expr TIMES expr                       { Binop($1, Multiply, $3) }
@@ -151,9 +154,12 @@ expr:
     | expr NOTEQUAL expr                    { Binop($1, NotEqual, $3) }
     | expr DISJ expr                        { Binop($1, Disj, $3) }
     | expr CONJ expr                        { Binop($1, Conj, $3) }
-    | expr DOT expr                         { Binop($1, Dot, $3) }
     | NOT expr                              { Unop(Not, $2) }
     | OPENPAREN expr CLOSEPAREN             { $2 }
+    
+var:
+    | ID                                    { SimpleId($1) }
+    | DOT_ID                                { DotId(split_dot_id $1) }
 
 %%
 

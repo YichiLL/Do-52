@@ -38,10 +38,14 @@
             end
 }
 
+(* Complicated Regexes *)
+let rgx_indent = ('\n'[' ''\t']*("//"[^'\n']*)*)+
+let rgx_id = ['a'-'z']['A'-'Z''a'-'z''0'-'9''_']*
+
 rule token = parse
 (* White Space and Comments *)
 | [' ''\t']                     { token lexbuf }
-| ('\n'[' ''\t']*("//"[^'\n']*)*)+ as str { eval_indent str }
+| rgx_indent as str             { eval_indent str }
 | eof                           { EOF }
 
 (* Operators *)
@@ -57,7 +61,6 @@ rule token = parse
 | "!="                          { NOTEQUAL}
 | "|"                           { DISJ }   (* i.e. disjunct *)
 | "&"                           { CONJ }   (* i.e. conjunct *)
-| "."                           { DOT }
 | "!"                           { NOT }
 | "t>"                          { PREPEND_TOP }
 | "b>"                          { PREPEND_BOTTOM }
@@ -96,12 +99,14 @@ rule token = parse
 (* -------------- Miscellaneous ------------ *)
 (* IDs can be any lowercase letter followed by a combination of numbers,
  * letters, or underscores. *)
-| ['a'-'z']['A'-'Z''a'-'z''0'-'9''_']* as id       { ID(id) }
+| rgx_id as id                  { ID(id) }
+| ((rgx_id)'.')+(rgx_id) as id      { DOT_ID(id) }
 
 (* Type IDs can be an uppecase letter followed by a combination of letters. *)
 | ['A'-'Z']['A'-'Z''a'-'z']* as _type              { TYPE(_type) }
 
-(* This triggered if comment starts a program. *)
+(* This triggered if comment starts a program. Otherwise comments taken care of
+ * in rgx_indent. *)
 | "//"[^'\n']*                  { token lexbuf }
 
 (* Punctuation *)
