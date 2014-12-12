@@ -6,3 +6,4 @@ parser.ml
 *.automaton
 *.conflicts
 testall.log
+parse.*
