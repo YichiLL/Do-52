@@ -57,7 +57,6 @@ type update =
 
 type stmt =
     | Update of update
-    | UncheckedCall of Ast.func_call
     | Call of func_call
     | If of expr * stmt list * stmt list
     | While of expr * stmt list

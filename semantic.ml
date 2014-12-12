@@ -18,7 +18,7 @@ type symbol_table = {
 type environment = {
     scope : symbol_table;
     fields: Sast.field_decl list;
-    mutable unchecked_calls: Ast.func_call list;
+    mutable unchecked_calls: Sast.func_call list;
     mutable func_decls: Sast.func_decl list;
     can_break : bool; (* If a break statement makes sense. *)
     can_continue: bool; (* If a continue statement makes sense. *)
@@ -65,6 +65,24 @@ let find_field env (_type, id) =
     List.find (fun field_decl -> 
                 ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
                     env.fields
+
+(* Tries to match a function call to an func_decl in the environment. *)
+let find_func_decl env fname = 
+    List.find (fun func_decl -> fname = func_decl.decl_name) env.func_decls
+
+(* Checks if each arg matches its formal. *)
+let rec match_args args formals =
+    match args, formals with
+    | (arg :: args_rest), (formal :: formals_rest) -> 
+        let _, arg_type = arg
+        in let form_type = formal.formal_type
+        in if (arg_type = form_type) then
+            match_args args_rest formals_rest
+        else
+            false
+    | (_ :: _), []
+    | [], (_ :: _) -> false
+    | [], [] -> true
 
 (* ========================================================================= *)
 (*                          Semantic Analysis                                *)
@@ -199,7 +217,27 @@ let check_var_decl env (vdecl : Ast.var_decl) =
                         "type \"" ^ vdecl.var_decl_type ^ ".\""))
 
 (* Takes a call and adds it to the environment to be checked later --
- * see check_call and check_prgm. *)
+ * see check_call and check_prgm. Also checks the arguments to the call. *)
 let add_call env (call : Ast.func_call) =
-    env.unchecked_calls <- call :: env.unchecked_calls;
-    call
+    let unchecked_call =
+        { fname = call.fname;
+          args = List.map (check_expr env) call.args }
+    in
+        env.unchecked_calls <- unchecked_call :: env.unchecked_calls;
+        unchecked_call
+
+(* Checks to see if a call corresponds to a declared function. If not, throw
+ * an error. Check argument types match formal types in the func_decl. *)
+let check_call env (call : Sast.func_call) =
+    let func_decl = 
+        try
+            find_func_decl env call.fname 
+        with Not_found ->
+            raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
+                   "not been declared."))
+    in
+        if (match_args call.args func_decl.formals) then
+            call
+        else
+            raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
+                    " not match the procedure's declaration."))
