@@ -90,7 +90,7 @@ let rec match_args args formals =
 (* Recursively checks each ID in a DotId node after the first.
  * We need to check each ID to verify it's a valid field
  * in the type of the previous ID. *)
-let rec check_field env last_type id_ls =
+let rec check_fields env last_type id_ls =
     match id_ls with
     | id :: ls ->
         let id = List.hd id_ls
@@ -100,7 +100,7 @@ let rec check_field env last_type id_ls =
             with Not_found ->
                 raise (UndeclaredID("Undeclared identifier: \"" ^ id ^ ".\""))
         in
-            check_field env field_decl.field_type ls
+            check_fields env field_decl.field_type ls
     | [] -> last_type
 
 (* Takes a node of type var in our AST and checks to make sure it refers
@@ -129,7 +129,7 @@ let check_var env = function
         in let final_id =
             String.concat "." id_list
         in
-            (final_id, check_field env vdecl.var_decl_type (List.tl id_list))
+            (final_id, check_fields env vdecl.var_decl_type (List.tl id_list))
 
 (* Takes a node of type Ast.expr and converts to Sast.expr, i.e. an expr
  * with an associated type. Also checks to make sure than all ops are used
@@ -241,3 +241,21 @@ let check_call env (call : Sast.func_call) =
         else
             raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
                     " not match the procedure's declaration."))
+
+(* Checks an update by checking its subtypes. Also makes sure assignments
+ * are valid. *)
+let check_update env = function
+    | Ast.Assign(var, expr) ->
+        let var_id, var_type = 
+            check_var env var
+        in let _, expr_type =
+            check_expr env expr
+        in
+            if (var_type = expr_type) then
+                Sast.Assign(var_id, expr, var_type)
+            else
+                raise (TypeMismatch("Cannot assign an expression of type \"" ^
+                        string_of_type expr_type ^ "\" to a variable of " ^
+                        "type \"" ^ string_of_type var_type ^ ".\""))
+    | Ast.VarDecl(vdecl) ->
+        Sast.VarDecl(check_var_decl env vdecl)

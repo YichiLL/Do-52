@@ -38,6 +38,10 @@ type var_decl = {
     var_decl_value : expr;
 }
 
+type update =
+    | Assign of string * expr * datatype
+    | VarDecl of var_decl
+
 (* This is where it is for a very specific reason. Everything use of "expr"
  * before this refers to Ast.expr; every use after this refers to this
  * following definition of expr, i.e. an expr with type information. 
@@ -50,10 +54,6 @@ type func_call = {
     fname : string;
     args : expr list;
 }
-
-type update =
-    | Assign of var * expr
-    | VarDecl of var_decl
 
 type stmt =
     | Update of update
