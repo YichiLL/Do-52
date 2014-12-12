@@ -42,11 +42,11 @@ let split_dot_id dot_id =
 %%
 
 program:
-    | header vdecl_list func_list EOF           { { configs = List.rev (fst $1);
+    | header vdecl_list func_list EOF       { { configs = List.rev (fst $1);
                                                 field_decls = List.rev (snd $1);
                                                 vars = List.rev $2;
                                                 funcs = List.rev $3; } }
-    | header func_list EOF                    { { configs = List.rev (fst $1);
+    | header func_list EOF                  { { configs = List.rev (fst $1);
                                                 field_decls = List.rev (snd $1);
                                                 vars = [];
                                                 funcs = List.rev $2; } }

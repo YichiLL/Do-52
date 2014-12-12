@@ -18,8 +18,6 @@ type simple_expr =
     | Unop of op * expr
     | Binop of expr * op * expr
 
-type expr = simple_expr * datatype
-
 type config_decl = {
     config_id : string;
     config_value : expr;
@@ -39,6 +37,14 @@ type var_decl = {
     var_decl_type : datatype;
     var_decl_value : expr;
 }
+
+(* This is where it is for a very specific reason. Everything use of "expr"
+ * before this refers to Ast.expr, every use after this refers to this
+ * following definition of expr, i.e. an expr with type information. 
+ * This means that our final SAST doesn't have type information at every node,
+ * only the highest node that makes sense. Types propagate up the tree --
+ * see semantic.ml. *)
+type expr = simple_expr * datatype
 
 type func_call = {
     fname : string;
