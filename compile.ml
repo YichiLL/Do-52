@@ -31,9 +31,12 @@ let java_of_op = function
     (*| Dot -> "."*)
     | Not -> "!"
 
+let java_of_player p =
+    string_of_int ((int_of_string (String.sub p 6 ((String.length p) - 6 )))-1)
+
 let java_of_objects var =  
     if Str.string_match (Str.regexp "player[0-9]+")  var 0 then 
-    "players.get(" ^ string_of_int ((int_of_string (String.sub var 6 ((String.length var) - 6 )))-1) ^ ")"
+    "players.get(" ^ java_of_player var ^ ")"
     else
     match var with
     | "size" -> "size()"
@@ -44,7 +47,9 @@ let java_of_objects var =
 
 let java_of_var var =
     match var with
-    |SimpleId(str) -> str
+    |SimpleId(str) -> if Str.string_match (Str.regexp "player[0-9]+")  str 0 then 
+    "players.get(" ^ java_of_player str ^ ")"
+    else str
     |DotId(str_list) -> String.concat "." (List.map (fun arg -> java_of_objects arg) str_list)
 
 let rec java_of_expr = function
@@ -67,6 +72,8 @@ let java_of_type _type =
     | "Number" -> "int"
     | "String" -> "String"
     | "Boolean" -> "boolean"
+    | "Player" -> "MyPlayer"
+    | "Set" -> "Set"
     | _ -> raise (UnknownType ("Type " ^ _type ^ " is not a valid type."))
 
 (* ; not appended here, see java_of_stmt *)
@@ -164,7 +171,7 @@ let java_of_function func =
         | _ -> "private"
     in let formals =
         String.concat ", " (List.map (fun formal -> 
-                            " " ^ formal.formal_type ^ " " ^
+                            " " ^ (java_of_type formal.formal_type) ^ " " ^
                             formal.formal_id) func.formals) 
     in
         access ^ " void " ^ func.decl_name ^ "(" ^ formals ^ ")\n" ^
