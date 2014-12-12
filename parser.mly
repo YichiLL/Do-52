@@ -162,4 +162,3 @@ var:
     | DOT_ID                                { DotId(split_dot_id $1) }
 
 %%
-
