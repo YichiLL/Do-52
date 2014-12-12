@@ -7,13 +7,14 @@
  * the old version. *)
 open Ast
 
-type datatype = Boolean | Number | String | Card | Set | Player
+type datatype = BooleanType | NumberType | StringType | CardType | SetType 
+                | PlayerType
 
 type simple_expr =
     | Number of int
     | String of string
     | Boolean of bool
-    | Var of string * datatype
+    | Var of string
     | Unop of op * expr
     | Binop of expr * op * expr
 
@@ -77,3 +78,12 @@ type program = {
     vars : update list;
     funcs : func_decl list;
 }
+
+(* For use with exceptions *)
+let string_of_type = function
+    | BooleanType -> "Boolean"
+    | NumberType -> "Number"
+    | StringType -> "String"
+    | CardType -> "Card"
+    | SetType -> "Set"
+    | PlayerType -> "Player"
