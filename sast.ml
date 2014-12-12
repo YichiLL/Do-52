@@ -39,10 +39,10 @@ type var_decl = {
 }
 
 (* This is where it is for a very specific reason. Everything use of "expr"
- * before this refers to Ast.expr, every use after this refers to this
+ * before this refers to Ast.expr; every use after this refers to this
  * following definition of expr, i.e. an expr with type information. 
  * This means that our final SAST doesn't have type information at every node,
- * only the highest node that makes sense. Types propagate up the tree --
+ * only at the highest node that makes sense. Types propagate up the tree --
  * see semantic.ml. *)
 type expr = simple_expr * datatype
 
@@ -57,6 +57,7 @@ type update =
 
 type stmt =
     | Update of update
+    | UncheckedCall of Ast.func_call
     | Call of func_call
     | If of expr * stmt list * stmt list
     | While of expr * stmt list

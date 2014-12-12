@@ -18,6 +18,8 @@ type symbol_table = {
 type environment = {
     scope : symbol_table;
     fields: Sast.field_decl list;
+    mutable unchecked_calls: Ast.func_call list;
+    mutable func_decls: Sast.func_decl list;
     can_break : bool; (* If a break statement makes sense. *)
     can_continue: bool; (* If a continue statement makes sense. *)
 }
@@ -195,3 +197,9 @@ let check_var_decl env (vdecl : Ast.var_decl) =
                 raise (TypeMismatch("You have assigned an expression of type" ^
                         "\"" ^ string_of_type _type ^ "\" to a variable of " ^
                         "type \"" ^ vdecl.var_decl_type ^ ".\""))
+
+(* Takes a call and adds it to the environment to be checked later --
+ * see check_call and check_prgm. *)
+let add_call env (call : Ast.func_call) =
+    env.unchecked_calls <- call :: env.unchecked_calls;
+    call
