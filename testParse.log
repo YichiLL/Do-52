@@ -41,6 +41,10 @@ testParse.sh: line 153: CheckFail: command not found
 Fatal error: exception Parsing.Parse_error
 ###### FAILED
 
+###### Testing test_empty_line
+./printer tests/test_empty_line.do > tests/test_empty_line.out
+###### SUCCESS
+
 ###### Testing test_field_decls
 ./printer tests/test_field_decls.do > tests/test_field_decls.out
 Fatal error: exception Parsing.Parse_error
@@ -48,6 +52,10 @@ Fatal error: exception Parsing.Parse_error
 
 ###### Testing test_for
 ./printer tests/test_for.do > tests/test_for.out
+###### SUCCESS
+
+###### Testing test_for2
+./printer tests/test_for2.do > tests/test_for2.out
 ###### SUCCESS
 
 ###### Testing test_function_call1
@@ -140,6 +148,10 @@ Fatal error: exception Parsing.Parse_error
 
 ###### Testing test_logic9
 ./printer tests/test_logic9.do > tests/test_logic9.out
+###### SUCCESS
+
+###### Testing test_multiple_dedent
+./printer tests/test_multiple_dedent.do > tests/test_multiple_dedent.out
 ###### SUCCESS
 
 ###### Testing test_timesloop

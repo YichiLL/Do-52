@@ -5,11 +5,8 @@ Player has Set called table
 
 setup:
 	{ player1.hand <t deck } * (deck.size / 2)
-	
-new Number turn : 0
 
 round:
-	do increment with turn
-	
-increment with Number num:
-	num : num + 1
+	new Number x : 4
+	for x : 0; x < 4; x : x - 1:
+		do foo with x
