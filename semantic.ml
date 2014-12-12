@@ -25,5 +25,3 @@ type symbol_table = {
     vars: Sast.var_decl list;
     funs: Sast.func_decl list;
 }
-
-type 
