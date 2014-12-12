@@ -15,13 +15,19 @@
 (* ========================================================================= *)
 (* Standard operations of any arity. *)
 type op = Add | Minus | Multiply | Divide | Equal | NotEqual | Lt | Gt | Ltoe
-            | Gtoe | Disj | Conj | Not | Dot
+            | Gtoe | Disj | Conj | Not
+
+(* A variable, like "a," "turn_count," or "player.hand.top" 
+ * Variables can appear in expressions or as part of assignments. *)
+type var =
+    | SimpleId of string
+    | DotId of string list
 
 type expr =
     | Number of int            (* Literal *)
     | String of string         (* Literal *)
     | Boolean of bool          (* Literal *)
-    | Id of string
+    | Var of var
     | Unop of op * expr
     | Binop of expr * op * expr
 
@@ -66,7 +72,7 @@ type func_call = {
  * have other kinds of statements--like if statements or while loops—-in a
  * for-loop header. *)
 type update = 
-    | Assign of string * expr
+    | Assign of var * expr
     | VarDecl of var_decl
 
 (* Whether a card is drawn form the top or bottom of a deck. *)
@@ -125,8 +131,11 @@ let string_of_op = function
     | Gtoe -> ">="
     | Disj -> "|"
     | Conj -> "&"
-    | Dot -> "."
     | Not -> "!"
+
+let string_of_var = function
+    | SimpleId id -> "(<Var> " ^ id ^ ")"
+    | DotId id_list -> "(<Var> id:" ^ (String.concat "." id_list) ^ ")"
 
 let rec string_of_expr expr = 
     let value = 
@@ -141,7 +150,7 @@ let rec string_of_expr expr =
                     "false"
             in
                 "(<Boolean> " ^ b ^ ")"
-        | Id id -> "(<Id> " ^ id ^ ")"
+        | Var v -> string_of_var v
         | Unop(op, e) -> "(<Unop> " ^ string_of_op op ^ string_of_expr e ^ ")"
         | Binop(e1, op, e2) -> "(<Binop> " ^ string_of_expr e1 ^ " " ^
                                 string_of_op op ^ " " ^ string_of_expr e2 ^ ")"
@@ -158,10 +167,11 @@ let rec string_of_expr expr =
 let string_of_update update =
     let value = 
         match update with
-        | Assign(id, e) -> "(<Assign> id:" ^ id ^ " expr:" ^ string_of_expr e
-                            ^ ")"
-        | VarDecl(var) -> "(<VarDecl> id:" ^ var.id ^ " type:" ^ var._type ^
-                          " value:" ^ string_of_expr var.value ^ ")"
+        | Assign(var, e) -> "(<Assign> var:" ^ string_of_var var ^ " expr:" 
+                            ^ string_of_expr e ^ ")"
+        | VarDecl(var_d) -> "(<VarDecl> id:" ^ var_d.var_decl_id ^ " type:" 
+                            ^ var_d.var_decl_type ^ " value:" ^ 
+                            string_of_expr var_d.var_decl_value ^ ")"
     in
         "(<Update> " ^ value ^ ")" 
 
@@ -224,6 +234,8 @@ let string_of_field_decl field_decl =
     "(<FieldDecl> expanded_type:" ^ field_decl.expanded_type ^ " _type:" ^
     field_decl._type ^ " id:" ^ field_decl.id ^ ")"
 
+(* List.fold_left here instead of String.concat so we can get a \n at the end
+ * of the list as well as between the items in the list. *)
 let string_of_program program =
     let append_nl s1 s2 =
         s1 ^ s2 ^ "\n"

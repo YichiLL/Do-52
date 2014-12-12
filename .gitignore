@@ -5,3 +5,6 @@ scanner.ml
 parser.ml
 *.automaton
 *.conflicts
+*.log
+parser.*
+printer

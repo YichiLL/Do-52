@@ -1,9 +1,13 @@
 // this is comment at the very beginning of the file
-configure players: 2 // setting players to 2
+configure playerCount: 1
+configure acesHigh: false
 
 Player has Set called table // adding table set to players
 
-new Number turns: 4 			// this comment is way over here
+setup:
+	{ player1.hand <t deck } * (deck.size / 2)
+
+// this comment is way over here
 
 // this is the main method
 round:

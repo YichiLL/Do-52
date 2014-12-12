@@ -1,5 +1,5 @@
 configure playerCount: 2 
-configure acesHigh: false
+configure maxCard: "Ace"
 
 Player has Set called table
 

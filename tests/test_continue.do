@@ -7,5 +7,7 @@ setup:
 	{ player1.hand <t deck } * (deck.size / 2)
 
 round:
-	if (2 > 1):
-		do output with true
+	new Number a : 5
+	while a >= 0:
+		a : a - 1
+		continue
