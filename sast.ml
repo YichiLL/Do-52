@@ -30,8 +30,6 @@ type field_decl = {
     field_id : string;
 }
 
-type header = config_decl list * field_decl list
-
 type var_decl = {
     var_decl_id : string;
     var_decl_type : datatype;
@@ -42,8 +40,8 @@ type update =
     | Assign of string * expr * datatype
     | VarDecl of var_decl
 
-(* This is where it is for a very specific reason. Everything use of "expr"
- * before this refers to Ast.expr; every use after this refers to this
+(* This is where it is for a very specific reason. Every use of "expr"
+ * before this refers to Ast.expr; every use after this refers to the
  * following definition of expr, i.e. an expr with type information. 
  * This means that our final SAST doesn't have type information at every node,
  * only at the highest node that makes sense. Types propagate up the tree --

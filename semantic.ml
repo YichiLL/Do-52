@@ -31,6 +31,7 @@ exception UndeclaredID of string
 exception TypeMismatch of string
 exception WrongType of string
 exception Redeclaration of string
+exception BadProgram of string (* No setup or round procedures. *)
 
 (* For syntax-ish errors that we're only catching now. *)
 exception IllegalUsage of string
@@ -211,7 +212,7 @@ let rec check_expr env = function
 (* Takes a var_decl node and checks to see if the var has already been declared
  * in the current scope. Raise an error if it has. Then checks to make sure
  * the var decl has the type that it is supposed to have. If it does, we then 
- * add it to the current scope and return a Sast.var_decl. *)
+ * add it to the current scope and return an Sast.var_decl. *)
 let check_var_decl env (vdecl : Ast.var_decl) =
     if exists_var_local env.scope vdecl.var_decl_id then
         raise (Redeclaration("The variable \"" ^ vdecl.var_decl_id ^ "\" has" ^
@@ -234,32 +235,6 @@ let check_var_decl env (vdecl : Ast.var_decl) =
                         "\"" ^ string_of_type _type ^ "\" to a variable of " ^
                         "type \"" ^ vdecl.var_decl_type ^ ".\""))
 
-(* Takes a call and adds it to the environment to be checked later --
- * see check_call and check_prgm. Also checks the arguments to the call. *)
-let add_call env (call : Ast.func_call) =
-    let unchecked_call =
-        { fname = call.fname;
-          args = List.map (check_expr env) call.args }
-    in
-        env.unchecked_calls <- unchecked_call :: env.unchecked_calls;
-        unchecked_call
-
-(* Checks to see if a call corresponds to a declared function. If not, throw
- * an error. Check argument types match formal types in the func_decl. *)
-let check_call env (call : Sast.func_call) =
-    let func_decl = 
-        try
-            find_func_decl env call.fname 
-        with Not_found ->
-            raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
-                   "not been declared."))
-    in
-        if (match_args call.args func_decl.formals) then
-            call
-        else
-            raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
-                    " not match the procedure's declaration."))
-
 (* Checks an update by checking its subtypes. Also makes sure assignments
  * are valid. *)
 let check_update env = function
@@ -277,6 +252,16 @@ let check_update env = function
                         "type \"" ^ string_of_type var_type ^ ".\""))
     | Ast.VarDecl(vdecl) ->
         Sast.VarDecl(check_var_decl env vdecl)
+
+(* Takes a call and adds it to the environment to be checked later --
+ * see check_call and check_prgm. Also checks the arguments to the call. *)
+let add_call env (call : Ast.func_call) =
+    let unchecked_call =
+        { fname = call.fname;
+          args = List.map (check_expr env) call.args }
+    in
+        env.unchecked_calls <- unchecked_call :: env.unchecked_calls;
+        unchecked_call
 
 (* Checks statements for semantic errors. Statements themselves don't have
  * types. Scoping largely implemented here. *)
@@ -457,7 +442,7 @@ let check_field_decl env (field_decl : Ast.field_decl) =
                     "already has a field by that name."))
     | _ -> raise (WrongType("You cannot add a field to any type except Player."))
 
-(* Converts an Ast.formal to a Sast.formal. This won't be necessary if we
+(* Converts an Ast.formal to an Sast.formal. This won't be necessary if we
  * decided to parse type strings into proper types in the first place. *)
 let check_formal (formal : Ast.formal) =
     { formal_id = formal.formal_id;
@@ -478,3 +463,60 @@ let check_func_decl env (func_decl : Ast.func_decl) =
         raise (Redeclaration("The procedure \"" ^ func_decl.decl_name
                 ^ "\" already exists and cannot be redeclared."))
 
+(* Checks to see if setup and round are declared in a program. *)
+let rec has_setup_and_round has_setup has_round func_decls =
+    match func_decls with
+    | [] -> has_setup && has_round
+    | fdecl :: rest -> 
+        match (fdecl.decl_name, List.length fdecl.formals) with
+        | "setup", 0 -> has_setup_and_round true has_round rest
+        | "round", 0 -> has_setup_and_round has_setup true rest
+        | _ -> has_setup_and_round has_setup has_round rest
+
+(* Checks to see if a call corresponds to a declared function. If not, throw
+ * an error. Check argument types match formal types in the func_decl.
+ * This function has type unit. *)
+let check_call env (call : Sast.func_call) =
+    let func_decl = 
+        try
+            find_func_decl env call.fname 
+        with Not_found ->
+            raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
+                   "not been declared."))
+    in
+        if (match_args call.args func_decl.formals) then
+            () (* type unit *)
+        else
+            raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
+                    " not match the procedure's declaration."))
+
+(* Performs semantic analysis on a program. Also makes sure that a program
+ * has a setup and a round procedure. Finally, ensures that all calls are
+ * matched with a func_decl. 
+ *
+ * In other words, takes an AST and makes an SAST. *)
+let check_prgm (prgm : Ast.program) = 
+    let global_scope =
+        { parent = None;
+          vars = []; }   (* vars = Runtime.vars *)
+    in let env =
+        { configs = [];     (* configs = Runtime.configs *)
+          fields = [];      (* fields = Runtime.fields *)          
+          scope = global_scope;
+          unchecked_calls = [];
+          func_decls = [];  (* func_decls = Runtime.func_decls *)
+          can_break = false;
+          can_continue = false; }
+    in
+        let checked_prgm = 
+            { configs = List.map (check_config env) prgm.configs;
+              field_decls = List.map (check_field_decl env) prgm.field_decls;
+              vars = List.map (check_update env) prgm.vars;
+              funcs = List.map (check_func_decl env) prgm.funcs; }
+        in
+            if (has_setup_and_round checked_prgm.funcs) then
+                List.iter (check_call env) env.unchecked_calls;
+                checked_prgm
+            else
+                raise (BadProgram("You must have a setup and round procedure" ^
+                        " in your program. They must both take 0 arguments."))
