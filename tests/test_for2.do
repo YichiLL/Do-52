@@ -8,5 +8,5 @@ setup:
 
 round:
 	new Number x : 4
-	for x; x > 0; x : x - 1:
+	for x : 4; x > 0; x : x - 1:
 		do output with x
