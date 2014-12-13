@@ -28,9 +28,29 @@ let java_of_op = function
     | Gtoe -> ">="
     | Disj -> "||"
     | Conj -> "&&"
-    | Dot -> "."
+    (*| Dot -> "."*)
     | Not -> "!"
 
+let java_of_player p =
+    string_of_int ((int_of_string (String.sub p 6 ((String.length p) - 6 )))-1)
+
+let java_of_objects var =  
+    if Str.string_match (Str.regexp "player[0-9]+")  var 0 then 
+    "players.get(" ^ java_of_player var ^ ")"
+    else
+    match var with
+    | "size" -> "size()"
+    | "top" -> "peek()"
+    | _ -> var
+
+
+
+let java_of_var var =
+    match var with
+    |SimpleId(str) -> if Str.string_match (Str.regexp "player[0-9]+")  str 0 then 
+    "players.get(" ^ java_of_player str ^ ")"
+    else str
+    |DotId(str_list) -> String.concat "." (List.map (fun arg -> java_of_objects arg) str_list)
 
 let rec java_of_expr = function
     | Number num -> string_of_int num
@@ -40,7 +60,7 @@ let rec java_of_expr = function
             "true"
         else
             "false"
-    | Id id -> id
+    | Var var -> java_of_var var
     | Unop(op, e) -> java_of_op op ^ java_of_expr e
     | Binop(e1, op, e2) -> "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
                            java_of_expr e2 ^ ")"
@@ -52,6 +72,8 @@ let java_of_type _type =
     | "Number" -> "int"
     | "String" -> "String"
     | "Boolean" -> "boolean"
+    | "Player" -> "MyPlayer"
+    | "Set" -> "Set"
     | _ -> raise (UnknownType ("Type " ^ _type ^ " is not a valid type."))
 
 (* ; not appended here, see java_of_stmt *)
@@ -66,9 +88,19 @@ let java_of_type _type =
     | _ -> raise (UnknownType ("Argument for output is not valid"))
 *)
 
+
+let rec java_of_output = function
+    | Number num -> "\"" ^ string_of_int num ^"\""
+    | String str -> str
+    | Var var -> java_of_var var
+    | Binop(e1, op, e2) -> if op !=  Add then raise (UnknownType ("Argument for output is not valid"))
+    else " " ^ java_of_output e1 ^ " " ^ java_of_op op ^ " " 
+    ^ java_of_output e2 ^ " "
+    | _ -> raise (UnknownType ("Argument for output is not valid"))
+
 let output_call call=
     match call.args with
-    | [a]-> "System.out.println(" ^ (java_of_expr a) ^ ");"
+    | [a]-> "System.out.println(" ^ (java_of_output a) ^ ");"
     | _ -> raise (UnknownType "Argument for input call not valid.")
     
 let input_call call=
@@ -86,10 +118,11 @@ let java_of_call call =
     match call.fname with
     | "output" -> output_call call
     | "input" -> input_call call
+    | "quit" -> "System.exit(0);\n"
     | _ -> normal_call call
 (* ; not appended here, see java_of_stmt *)
 let java_of_update = function
-    | Assign(id, e) -> id ^ " = " ^ java_of_expr e ^ ";"
+    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
     | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
                       java_of_expr var.var_decl_value ^ ";"
@@ -114,16 +147,16 @@ let rec java_of_stmt stmt =
                 | Top -> "Set.TOP"
                 | Bottom -> "Set.BOTTOM"
             in
-                "prepend(" ^ java_of_expr e1 ^ ", "  ^ source ^ ", " ^
-                java_of_expr e2 ^ ");"
+                "Set.prepend(" ^ java_of_expr e1 ^ ", "  ^ source ^ ", " ^
+                java_of_expr e2 ^ ");\n"
     | Append(e1, e2, draw_source) ->
             let source =
                 match draw_source with
                 | Top -> "Set.TOP"
                 | Bottom -> "Set.BOTTOM"
             in
-                "append(" ^ java_of_expr e1 ^ ", " ^ source ^ ", " ^
-                java_of_expr e2 ^ ");"
+                "Set.append(" ^ java_of_expr e1 ^ ", " ^ source ^ ", " ^
+                java_of_expr e2 ^ ");\n"
 and java_of_block block =
     let value =
         String.concat "\n" (List.map java_of_stmt block)
@@ -137,8 +170,8 @@ let java_of_function func =
         | "round" -> "public"
         | _ -> "private"
     in let formals =
-        String.concat ", " (List.map (fun formal -> formal.formal_type ^
-                            " " ^ formal.formal_type ^ " " ^
+        String.concat ", " (List.map (fun formal -> 
+                            " " ^ (java_of_type formal.formal_type) ^ " " ^
                             formal.formal_id) func.formals) 
     in
         access ^ " void " ^ func.decl_name ^ "(" ^ formals ^ ")\n" ^
@@ -171,7 +204,7 @@ let java_of_config config =
 
 
 let java_of_field_decl field_decl =
-    field_decl.field_type ^ " " ^ field_decl.field_id ^ ";"
+    field_decl.field_type ^ " " ^ field_decl.field_id ^ ";\n"
 
 let java_of_field_decl_assign field_decl = 
     match field_decl.field_type with
@@ -206,7 +239,7 @@ let java_of_game program =
         "ArrayList<MyPlayer> players;\n" ^
         "Scanner scanner;\n" ^
         "Set deck;\n" ^
-        "int numberOfPlayer = 4;\n" ^
+        "int playerCount = 4;\n" ^
         "int maxCard = 12;\n" ^
         "boolean ascend = true;\n" ^
         instance_vars ^ "\n" ^
@@ -215,7 +248,7 @@ let java_of_game program =
         "scanner = new Scanner(System.in);\n" ^
         "deck = new Deck(maxCard, ascend);\n" ^
         "players = new ArrayList<MyPlayer>();\n" ^
-        "for(int i = 0; i < numberOfPlayers; i++) {\n" ^
+        "for(int i = 0; i < playerCount; i++) {\n" ^
         "players.add(new MyPlayer(\"Player \" + (i+1)));\n" ^
         "}\n" ^
         "}\n\n" ^
