@@ -452,13 +452,15 @@ let check_formal (formal : Ast.formal) =
  * environment. Also checks to make sure we aren't redeclaring a function. 
  * This check is performed simpy with IDs, so overloading is not possible. *)
 let check_func_decl env (func_decl : Ast.func_decl) =
-    if (not (exists_func_decl env func_decl.decl_name)) then
+    if (not (exists_func_decl env func_decl.decl_name)) then begin
         let checked_fdecl = 
             { decl_name = func_decl.decl_name; 
               formals = List.map check_formal func_decl.formals;
               body = List.map (check_stmt env) func_decl.body; }
         in
-            env.func_decls <- checked_fdecl :: env.func_decls
+            env.func_decls <- checked_fdecl :: env.func_decls;
+            checked_fdecl 
+        end
     else
         raise (Redeclaration("The procedure \"" ^ func_decl.decl_name
                 ^ "\" already exists and cannot be redeclared."))
@@ -514,9 +516,10 @@ let check_prgm (prgm : Ast.program) =
               vars = List.map (check_update env) prgm.vars;
               funcs = List.map (check_func_decl env) prgm.funcs; }
         in
-            if (has_setup_and_round checked_prgm.funcs) then
+            if (has_setup_and_round false false checked_prgm.funcs) then begin
                 List.iter (check_call env) env.unchecked_calls;
                 checked_prgm
+                end
             else
                 raise (BadProgram("You must have a setup and round procedure" ^
                         " in your program. They must both take 0 arguments."))
