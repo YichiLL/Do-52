@@ -30,10 +30,10 @@ parser.cmi : parser.mli ast.cmi
 	ocamlc $(CFLAGS) parser.mli
 
 runtime.cmi: runtime.ml
-	ocamlc $(CFLAGS) $^
+	ocamlc $(CFLAGS) runtime.ml
 
 runtime.cmo : runtime.ml
-	ocamlc $(CFLAGS) $^
+	ocamlc $(CFLAGS) runtime.ml
 
 sast.cmi : sast.ml
 	ocamlc $(CFLAGS) $^
