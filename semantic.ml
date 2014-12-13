@@ -31,6 +31,9 @@ exception TypeMismatch of string
 exception WrongType of string
 exception Redeclaration of string
 
+(* For syntax-ish errors that we're only catching now. *)
+exception IllegalUsage of string
+
 (* ------------------------ Helper Functions ------------------------------- *)
 (* Converts a string representing a type to a type, or throws an error if the
  * type is unrecognized. *)
@@ -259,3 +262,135 @@ let check_update env = function
                         "type \"" ^ string_of_type var_type ^ ".\""))
     | Ast.VarDecl(vdecl) ->
         Sast.VarDecl(check_var_decl env vdecl)
+
+(* Checks statements for semantic errors. Statements themselves don't have
+ * types. Scoping largely implemented here. *)
+let rec check_stmt env = function
+    | Ast.Update(update) -> Sast.Update(check_update env update)
+    | Ast.Call(call) -> Sast.Call(add_call env call)
+    | Ast.If(expr, tblock, fblock) ->
+        let checked_expr, expr_type = check_expr env expr in
+        begin match expr_type with 
+        | NumberType | BooleanType -> 
+            let new_scope =
+                { parent = Some(env.scope);
+                  vars = []; }
+            in let new_env =
+                { scope = new_scope;
+                  fields = env.fields;
+                  unchecked_calls = env.unchecked_calls;
+                  func_decls = env.func_decls;
+                  can_break = false;
+                  can_continue = false; }
+            in
+                let checked_tblock = 
+                    check_block new_env tblock
+                in let checked_fblock =
+                    check_block new_env fblock
+                in
+                    Sast.If((checked_expr, expr_type), checked_tblock, 
+                             checked_fblock)
+        | _ -> raise (WrongType("The type \"" ^ string_of_type expr_type ^ 
+                      "\" cannot appear in the predicate of an if statement."))
+        end
+    | Ast.While(expr, block) ->
+        let checked_expr, expr_type = check_expr env expr in 
+        begin match expr_type with 
+        | NumberType | BooleanType -> 
+            let new_scope =
+                { parent = Some(env.scope);
+                  vars = []; }
+            in let new_env =
+                { scope = new_scope;
+                  fields = env.fields;
+                  unchecked_calls = env.unchecked_calls;
+                  func_decls = env.func_decls;
+                  can_break = true;
+                  can_continue = true; }
+            in
+                let checked_block =
+                    check_block new_env block
+                in
+                    Sast.While((checked_expr, expr_type), checked_block)
+        | _ -> raise (WrongType("The type \"" ^ string_of_type expr_type ^ 
+                      "\" cannot appear in the predicate of an if statement."))
+        end
+    | Ast.For(setup, expr, update, block) ->
+        let checked_update = check_update env update in
+        let checked_setup = check_update env setup in
+        let checked_expr, expr_type = check_expr env expr in
+        begin match expr_type with
+        | NumberType | BooleanType ->
+           begin match checked_update with
+           | Sast.Assign(_,_,_) -> 
+               let new_scope =
+                   { parent = Some(env.scope);
+                     vars = []; }
+               in let new_env =
+                   { scope = new_scope;
+                     fields = env.fields;
+                     unchecked_calls = env.unchecked_calls;
+                     func_decls = env.func_decls;
+                     can_break = true;
+                     can_continue = true; }
+               in
+                   let checked_block =
+                       check_block new_env block
+                   in
+                       Sast.For(checked_update, (checked_expr, expr_type),
+                                checked_setup, checked_block)
+           | _ -> raise (IllegalUsage("You cannot declare a variable in the"
+                         ^ " update section of a for loop header.")) end
+        | _ -> raise (WrongType("The type \"" ^ string_of_type expr_type ^ 
+                     "\" cannot appear in the predicate of an if statement."))
+        end
+    | Ast.Break ->
+        if env.can_break then
+            Sast.Break
+        else
+            raise (IllegalUsage("You can only use a break statement " ^
+                   "inside of a while or for loop."))
+    | Ast.Continue ->
+        if env.can_continue then
+            Sast.Continue
+        else
+            raise (IllegalUsage("You can only use a continue statement " ^
+                   "inside of a while or for loop."))
+    | Ast.TimesLoop(stmt, expr) ->
+        let checked_stmt =
+            check_stmt env stmt
+        in let checked_expr, expr_type =
+            check_expr env expr
+        in
+            begin match expr_type with 
+            | NumberType -> 
+                Sast.(TimesLoop(checked_stmt, (checked_expr, expr_type)))
+            | _ -> 
+                raise (WrongType("You can only use expressions of type " ^
+                           "Number to repeat a statement."))
+            end
+    | Ast.Prepend(e1, e2, draw_source) ->
+        let checked_expr1, expr_type1 =
+            check_expr env e1
+        in let checked_expr2, expr_type2 =
+            check_expr env e2
+        in begin match expr_type1, expr_type2 with
+        | SetType, SetType ->
+            Sast.Prepend((checked_expr1, expr_type1), 
+                          (checked_expr2, expr_type2), draw_source)
+        | _ -> raise (WrongType("The prepend operator can only be used with " ^
+                      "variables of type Set."))
+        end
+     | Ast.Append(e1, e2, draw_source) ->
+        let checked_expr1, expr_type1 =
+            check_expr env e1
+        in let checked_expr2, expr_type2 =
+            check_expr env e2
+        in match expr_type1, expr_type2 with
+        | SetType, SetType ->
+            Sast.Append((checked_expr1, expr_type1), 
+                         (checked_expr2, expr_type2), draw_source)
+        | _ -> raise (WrongType("The append operator can only be used with " ^
+                       "variables of type Set."))
+and check_block env block =
+    List.map (check_stmt env) block
