@@ -86,7 +86,7 @@ let funcs =
    ({ decl_name = "quit";
       formals = [];
       body = []; },
-      "java form of quit") 
+      "System.exit(0);\n") 
 ]
 
 let fields = 
