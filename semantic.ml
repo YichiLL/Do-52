@@ -17,7 +17,7 @@ type symbol_table = {
  * tree. *)
 type environment = {
     configs: Sast.config_decl list;
-    fields: Sast.field_decl list;
+    mutable fields: Sast.field_decl list;
     scope : symbol_table;
     mutable unchecked_calls: Sast.func_call list;
     mutable func_decls: Sast.func_decl list;
@@ -72,6 +72,12 @@ let exists_var_local scope id =
 let find_field env (_type, id) =
     List.find (fun field_decl -> 
                 ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
+                    env.fields
+
+(* Checks to see if a field called id exists in the type _type. *)
+let exists_field env (_type, id) =
+    List.exists (fun field_decl -> 
+                 ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
                     env.fields
 
 (* Tries to match a function call to an func_decl in the environment. *)
@@ -403,7 +409,8 @@ let rec check_stmt env = function
 and check_block env block =
     List.map (check_stmt env) block
 
-(* Checks that a config_decl refers to an existing configurable variable. *)
+(* Checks that a config_decl refers to an existing configurable variable and
+ * that the expression is of the right type. *)
 let check_config env (config_decl : Ast.config_decl) =
     let real_config = (* i.e. the existing config *)
         try
@@ -424,3 +431,24 @@ let check_config env (config_decl : Ast.config_decl) =
                    string_of_type real_config.config_type ^ "\" and cannot " ^
                    "be configured with an expression of type \"" ^
                    string_of_type expr_type ^ ".\""))
+
+(* Checks that a field_decl is adding to type Player, since we decided that
+ * it didn't make sense to extend Card or Set. Then makes sure that the
+ * ID doesn't match a field that already exists. Finally, adds the field
+ * to the environment. *)
+let check_field_decl env (field_decl : Ast.field_decl) =
+    match (type_of_string field_decl.field_type) with
+    | PlayerType ->
+        if (not (exists_field env (PlayerType, field_decl.field_id))) then
+            let checked_field =
+                { parent_type = type_of_string field_decl.parent_type;
+                  field_type = type_of_string field_decl.field_type;
+                  field_id = field_decl.field_id; }
+            in
+                env.fields <- checked_field :: env.fields;
+                checked_field
+        else
+            raise (Redeclaration("You cannot add the field \"" ^
+                    field_decl.field_id ^ " to Player, because Player " ^
+                    "already has a field by that name."))
+    | _ -> raise (WrongType("You cannot add a field to any type except Player."))
