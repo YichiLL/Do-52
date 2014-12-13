@@ -16,8 +16,9 @@ type symbol_table = {
 (* An environment represents the current context for a particular node in our
  * tree. *)
 type environment = {
-    scope : symbol_table;
+    configs: Sast.config_decl list;
     fields: Sast.field_decl list;
+    scope : symbol_table;
     mutable unchecked_calls: Sast.func_call list;
     mutable func_decls: Sast.func_decl list;
     can_break : bool; (* If a break statement makes sense. *)
@@ -46,6 +47,10 @@ let type_of_string type_str =
     | "Set" -> SetType
     | "Player" -> PlayerType
     | _ -> raise (UnknownType("The type \"" ^ type_str ^ "\" is not valid."))
+
+(* Looks for a matching config_decl and returns it. *)
+let find_config env id =
+    List.find (fun config_decl -> id = config_decl.config_id) env.configs
 
 (* Looks for a var in the current scope. If it isn't there, checks the next
  * scope. If we've reach global scope and we still haven't found the var, throw
@@ -276,8 +281,9 @@ let rec check_stmt env = function
                 { parent = Some(env.scope);
                   vars = []; }
             in let new_env =
-                { scope = new_scope;
+                { configs = env.configs; 
                   fields = env.fields;
+                  scope = new_scope;
                   unchecked_calls = env.unchecked_calls;
                   func_decls = env.func_decls;
                   can_break = false;
@@ -301,8 +307,9 @@ let rec check_stmt env = function
                 { parent = Some(env.scope);
                   vars = []; }
             in let new_env =
-                { scope = new_scope;
+                { configs = env.configs;
                   fields = env.fields;
+                  scope = new_scope;
                   unchecked_calls = env.unchecked_calls;
                   func_decls = env.func_decls;
                   can_break = true;
@@ -327,8 +334,9 @@ let rec check_stmt env = function
                    { parent = Some(env.scope);
                      vars = []; }
                in let new_env =
-                   { scope = new_scope;
+                   { configs = env.configs;
                      fields = env.fields;
+                     scope = new_scope;
                      unchecked_calls = env.unchecked_calls;
                      func_decls = env.func_decls;
                      can_break = true;
@@ -394,3 +402,25 @@ let rec check_stmt env = function
                        "variables of type Set."))
 and check_block env block =
     List.map (check_stmt env) block
+
+(* Checks that a config_decl refers to an existing configurable variable. *)
+let check_config env (config_decl : Ast.config_decl) =
+    let real_config = (* i.e. the existing config *)
+        try
+            find_config env config_decl.config_id
+        with Not_found ->
+            raise (UndeclaredID("There is no configurable variable with the " ^
+                    "id \"" ^ config_decl.config_id ^ ".\""))
+    in let checked_expr, expr_type =
+        check_expr env config_decl.config_value
+    in
+        if (expr_type = real_config.config_type) then
+            { config_id = config_decl.config_id; 
+              config_value = config_decl.config_value;
+              config_type = expr_type; }
+        else
+            raise (TypeMismatch("The configurable \"" ^ config_decl.config_id ^
+                   "\"" ^ " has type \"" ^ 
+                   string_of_type real_config.config_type ^ "\" and cannot " ^
+                   "be configured with an expression of type \"" ^
+                   string_of_type expr_type ^ ".\""))
