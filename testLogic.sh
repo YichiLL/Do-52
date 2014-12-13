@@ -5,7 +5,7 @@ DO_FIFTY_TWO="./compile"
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=testall.log
+globallog=testLogic.log
 rm -f $globallog
 error=0
 globalerror=0

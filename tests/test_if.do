@@ -7,13 +7,13 @@ setup:
 	{ player1.hand <t deck } * (deck.size / 2)
 
 round:
-	if 5 < 6:
+	if 7 < 6:
 		if 5 > 4:
 			do foo
 		else:
 			do bar
-
-	do baz
+	else:
+		do baz
 
 baz:
 	do output with "Baz"

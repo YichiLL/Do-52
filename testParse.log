@@ -28,12 +28,20 @@ testParse.sh: line 153: CheckFail: command not found
 ./printer tests/test_arith7.do > tests/test_arith7.out
 ###### SUCCESS
 
+###### Testing test_break
+./printer tests/test_break.do > tests/test_break.out
+###### SUCCESS
+
 ###### Testing test_comments
 ./printer tests/test_comments.do > tests/test_comments.out
 ###### SUCCESS
 
 ###### Testing test_configure
 ./printer tests/test_configure.do > tests/test_configure.out
+###### SUCCESS
+
+###### Testing test_continue
+./printer tests/test_continue.do > tests/test_continue.out
 ###### SUCCESS
 
 ###### Testing testt_op.do

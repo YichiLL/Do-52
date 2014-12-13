@@ -12,7 +12,7 @@ setup:
 // this is the main method
 round:
 	// a comment
-	do output with turns
+	do output with "Comment"
 	
 	// another comment
-	do output with turns
+	do output with "Over"
