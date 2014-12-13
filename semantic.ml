@@ -84,6 +84,10 @@ let exists_field env (_type, id) =
 let find_func_decl env fname = 
     List.find (fun func_decl -> fname = func_decl.decl_name) env.func_decls
 
+(* Sees if a name has already been used for a function. *)
+let exists_func_decl env fname =
+    List.exists (fun func_decl -> fname = func_decl.decl_name) env.func_decls
+
 (* Checks if each arg matches its formal. *)
 let rec match_args args formals =
     match args, formals with
@@ -424,7 +428,7 @@ let check_config env (config_decl : Ast.config_decl) =
         if (expr_type = real_config.config_type) then
             { config_id = config_decl.config_id; 
               config_value = config_decl.config_value;
-              config_type = expr_type; }
+              config_type = expr_type; } (* Returning Sast.config_decl *)
         else
             raise (TypeMismatch("The configurable \"" ^ config_decl.config_id ^
                    "\"" ^ " has type \"" ^ 
@@ -446,9 +450,31 @@ let check_field_decl env (field_decl : Ast.field_decl) =
                   field_id = field_decl.field_id; }
             in
                 env.fields <- checked_field :: env.fields;
-                checked_field
+                checked_field (* Returning Sast.field_decl *)
         else
             raise (Redeclaration("You cannot add the field \"" ^
                     field_decl.field_id ^ " to Player, because Player " ^
                     "already has a field by that name."))
     | _ -> raise (WrongType("You cannot add a field to any type except Player."))
+
+(* Converts an Ast.formal to a Sast.formal. This won't be necessary if we
+ * decided to parse type strings into proper types in the first place. *)
+let check_formal (formal : Ast.formal) =
+    { formal_id = formal.formal_id;
+      formal_type = (type_of_string formal.formal_type); }
+
+(* Checks the body of a function declaration before adding the function to the
+ * environment. Also checks to make sure we aren't redeclaring a function. 
+ * This check is performed simpy with IDs, so overloading is not possible. *)
+let check_func_decl env (func_decl : Ast.func_decl) =
+    if (not (exists_func_decl env func_decl.decl_name)) then
+        let checked_fdecl = 
+            { decl_name = func_decl.decl_name; 
+              formals = List.map check_formal func_decl.formals;
+              body = List.map (check_stmt env) func_decl.body; }
+        in
+            env.func_decls <- checked_fdecl :: env.func_decls
+    else
+        raise (Redeclaration("The procedure \"" ^ func_decl.decl_name
+                ^ "\" already exists and cannot be redeclared."))
+
