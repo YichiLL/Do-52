@@ -15,12 +15,34 @@ body : stmt list;
 
 open Sast
 
-type java_call = {
-java_fname : string;
-}
-
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
-let func_decl_to_java = 
-[ (("Card",[Sast.expr;Sast.expr;Sast.expr;Sast.expr]),"Card");
-  (("toString",[],[]),"toString")
-]
+let funcs = 
+[
+   ( {decl_name = "output";
+      formals = [];
+      body = []; },
+      "System.out.println()" ) ;
+   ( {decl_name = "output";
+      formals = 
+          [ { formal_id = "str";
+              formal_type = StringType; }];
+      body = []; },
+      "System.out.println(str)" ) ;
+   ({ decl_name = "output";
+      formals =
+          [{ formal_id = "number";
+             formal_type = NumberType; }];
+      body = []; },
+      "System.console.println(number)" ) ;  
+   ( {decl_name = "output";
+      formals = 
+          [ { formal_id = "card";
+              formal_type = CardType; }];
+      body = []; }
+      "System.out.println(card) ") ;
+   ({ decl_name = "output";
+      formals =
+          [{ formal_id = "player";
+             formal_type = PlayerType; }];
+      body = []; },
+      "System.console.println(player)") ;
