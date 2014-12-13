@@ -5,12 +5,21 @@ That way whenever you need the Java you just look through the list using a call.
 The other list is so that we can type check with Ids that involve dots. It's a list of field decls
 Basically we need to know about the public instance vars in each Java class for each type *)
 
-(* according to sast.ml
+(* For your reference on sast.ml
+type datatype = BooleanType | NumberType | StringType | CardType | SetType | PlayerType
+
 type func_decl = {
 decl_name : string;
 formals : formal list;
 body : stmt list;
 }
+type field_decl = {
+parent_type : datatype;
+field_type : datatype;
+field_id = string;
+}
+
+Also based on the examples at runtime_example.ml
 *)
 
 open Sast
@@ -77,4 +86,18 @@ let funcs =
    ({ decl_name = "quit";
       formals = [];
       body = []; },
-      "java form of quit") ;
+      "java form of quit") 
+]
+
+let fields = 
+[
+   { parent_type = CardType; field_type = NumberType; field_id = "rank"; } ;
+   { parent_type = CardType; field_type = NumberType; field_id = "suit"; } ;
+   { parent_type = CardType; field_type = StringType; field_id = "desc" } ;
+   { parent_type = SetType; field_type = NumberType; field_id = "size" } ;
+   { parent_type = SetType; field_type = StringType; field_id = "desc" } ;
+   { parent_type = SetType; field_type = CardType; field_id = "top" } ;
+   { parent_type = SetType; field_type = CardType; field_id = "bottom" } ;
+   { parent_type = PlayerType; field_type = SetType; field_id = "hand" } ;
+   { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
+]
