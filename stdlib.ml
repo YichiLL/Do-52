@@ -88,7 +88,20 @@ let vars = [
 ]
 
 (* A list of config_decls that correspond to configurable environment variables
- * in our runtime environment. *)
+ * in our runtime environment. Here config_value matters and is given a
+ * default value. *)
+let configs = [
+    { config_id = "numberOfPlayers";
+      config_value = Ast.Number(4);
+      config_type = NumberType; };
+    { config_id = "highestCard";
+      config_value = Ast.Number(0);
+      config_type = NumberType; };
+    { config_id = "ascendingOrder";
+      config_value = Ast.Boolean(true);
+      config_type = NumberType; }
+]
+
 
 (*
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
