@@ -74,7 +74,6 @@ Check() {
     echo 1>&2
     echo "###### Testing $basename" 1>&2
 
-
     generatedfiles="$generatedfiles tests/${newjavafile}.java tests/${basename}.diff tests/${basename}.out" &&
     Run "$DO_FIFTY_TWO" $1 &&
     Run "$JAVA $GAME" ">" tests/${basename}.out
@@ -94,50 +93,6 @@ Check() {
     fi
 }
 
-
-Checkfail() {
-    error=0
-    basename=`echo $1 | sed 's/.*\\///
-                             s/.do//'`
-    reffile=`echo $1 | sed 's/.do$//'`
-    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
-
-    echo -n "$basename..."
-
-    echo 1>&2
-    echo "###### Testing $basename" 1>&2
-
-    generatedfiles=""
-
-    generatedfiles="$generatedfiles ${basename}.i.out" &&
-    Run "$DO_FIFTY_TWO" "-i" "<" $1 ">" ${basename}.i.out &&
-
-    Compare ${basename}.i.out ${reffile}.out ${basename}.i.diff
-
-    # Report the status and clean up the generated files
-
-    if [ $error -eq 0 ] ; then
-	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
-	fi
-	echo "OK"
-	echo "###### SUCCESS" 1>&2
-    else
-	echo "###### FAILED" 1>&2
-	globalerror=$error
-    fi
-}
-
-while getopts kdpsh c; do
-    case $c in
-	k) # Keep intermediate files
-	    keep=1
-	    ;;
-	h) # Help
-	    Usage
-	    ;;
-    esac
-done
 
 shift `expr $OPTIND - 1`
 
