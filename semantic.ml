@@ -497,14 +497,17 @@ let check_call env (call : Sast.func_call) =
  * has a setup and a round procedure. Finally, ensures that all calls are
  * matched with a func_decl. 
  *
- * In other words, takes an AST and makes an SAST. *)
+ * In other words, takes an AST and makes an SAST. 
+ *
+ * The variables, configurations, fields, and functions provided by stdlib.ml
+ * are added to the environment here. *)
 let check_prgm (prgm : Ast.program) = 
     let global_scope =
         { parent = None;
           vars = (List.map fst Stdlib.vars); }
     in let env =
-        { configs = [];     (* configs = Stdlib.configs *)
-          fields = [];      (* fields = Stdlib.fields *)          
+        { configs = Stdlib.configs;
+          fields = Stdlib.fields;
           scope = global_scope;
           unchecked_calls = [];
           func_decls = [];  (* func_decls = Stdlib.func_decls *)

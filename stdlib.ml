@@ -12,23 +12,6 @@
  * See check_prgm in semantic.ml. That's where these lists are loaded into the
  * type-checking environment. *)
 
-(* For your reference on sast.ml
-type datatype = BooleanType | NumberType | StringType | CardType | SetType 
-                | PlayerType
-
-type func_decl = {
-decl_name : string;
-formals : formal list;
-body : stmt list;
-}
-type field_decl = {
-parent_type : datatype;
-field_type : datatype;
-field_id = string;
-}
-
-*)
-
 open Sast
 
 (* A list of var_decls that correspond to variables in our environment. The
@@ -102,6 +85,20 @@ let configs = [
       config_type = NumberType; }
 ]
 
+(* A list of fields for each of our aggregate types. IDs containing dots get
+ * checked against this list to make sure they are valid. See check_fields
+ * in semantic.ml *)
+let fields = [
+   { parent_type = CardType; field_type = NumberType; field_id = "rank"; } ;
+   { parent_type = CardType; field_type = NumberType; field_id = "suit"; } ;
+   { parent_type = CardType; field_type = StringType; field_id = "desc" } ;
+   { parent_type = SetType; field_type = NumberType; field_id = "size" } ;
+   { parent_type = SetType; field_type = StringType; field_id = "desc" } ;
+   { parent_type = SetType; field_type = CardType; field_id = "top" } ;
+   { parent_type = SetType; field_type = CardType; field_id = "bottom" } ;
+   { parent_type = PlayerType; field_type = SetType; field_id = "hand" } ;
+   { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
+]
 
 (*
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
@@ -224,16 +221,4 @@ let funcs =
       body = []; },
       "draw_hand(n)") ;
 ]
-
-let fields = 
-[
-   { parent_type = CardType; field_type = NumberType; field_id = "rank"; } ;
-   { parent_type = CardType; field_type = NumberType; field_id = "suit"; } ;
-   { parent_type = CardType; field_type = StringType; field_id = "desc" } ;
-   { parent_type = SetType; field_type = NumberType; field_id = "size" } ;
-   { parent_type = SetType; field_type = StringType; field_id = "desc" } ;
-   { parent_type = SetType; field_type = CardType; field_id = "top" } ;
-   { parent_type = SetType; field_type = CardType; field_id = "bottom" } ;
-   { parent_type = PlayerType; field_type = SetType; field_id = "hand" } ;
-   { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
-]*)
+*)
