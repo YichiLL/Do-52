@@ -27,7 +27,9 @@ open Sast
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
 let funcs = 
 [
+   (* ============== *)
    (* Main Functions *)
+   (* ============== *)
    ( {decl_name = "output";
       formals = [];
       body = []; },
@@ -89,7 +91,9 @@ let funcs =
       body = []; },
       "System.exit(0);\n")
 
+   (* ======================= *)
    (* MyPlayer type functions *)
+   (* ======================= *)
    ({ decl_name = "";
       formals =
           [{ formal_id = "card";
@@ -108,14 +112,37 @@ let funcs =
              formal_type = NumberType; }];
       body = []; },
       "playCard(i)") ;
-   ({ decl_name = "output";
+   ({ decl_name = "";
       formals = [];
       body = []; },
       "getScore()") ;
-   ({ decl_name = "output";
+   ({ decl_name = "";
       formals = [];
       body = []; },
       "selectCard()")
+
+   (* ================== *)
+   (* Set type functions *)
+   (* ================== *)
+   ({ decl_name = "";
+      formals = [];
+      body = []; },
+      "shuffle()") ;
+   ({ decl_name = "";
+      formals = List.concat ({ formal_id = "card"; formal_type = CardType; } list) [ { formal_id = "i"; formal_type = NumberType; }; 
+      { formal_id = "j"; formal_type = NumberType; } ] ; 
+      body = []; },
+      "swap(deck, i ,j)") ;
+   ({ decl_name = "";
+      formals = [];
+      body = []; },
+      "draw()") ;
+   ({ decl_name = "";
+      formals =
+          [{ formal_id = "n";
+             formal_type = NumberType; }];
+      body = []; },
+      "draw_hand(n)") ;
 ]
 
 let fields = 
