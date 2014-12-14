@@ -27,6 +27,7 @@ open Sast
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
 let funcs = 
 [
+   (* Main Functions *)
    ( {decl_name = "output";
       formals = [];
       body = []; },
@@ -86,7 +87,35 @@ let funcs =
    ({ decl_name = "quit";
       formals = [];
       body = []; },
-      "System.exit(0);\n") 
+      "System.exit(0);\n")
+
+   (* MyPlayer type functions *)
+   ({ decl_name = "";
+      formals =
+          [{ formal_id = "card";
+             formal_type = CardType; };  ];
+      body = []; },
+      "drawCard(card)" ) ;
+   ({ decl_name = "";
+      formals =
+          [{ formal_id = "set";
+             formal_type = SetType; }];
+      body = []; },
+      "drawCard(set)") ;
+   ({ decl_name = "";
+      formals =
+          [{ formal_id = "i";
+             formal_type = NumberType; }];
+      body = []; },
+      "playCard(i)") ;
+   ({ decl_name = "output";
+      formals = [];
+      body = []; },
+      "getScore()") ;
+   ({ decl_name = "output";
+      formals = [];
+      body = []; },
+      "selectCard()")
 ]
 
 let fields = 
