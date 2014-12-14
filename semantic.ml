@@ -81,14 +81,6 @@ let exists_field env (_type, id) =
                  ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
                     env.fields
 
-(* Tries to match a function call to an func_decl in the environment. *)
-let find_func_decl env fname = 
-    List.find (fun func_decl -> fname = func_decl.decl_name) env.func_decls
-
-(* Sees if a name has already been used for a function. *)
-let exists_func_decl env fname =
-    List.exists (fun func_decl -> fname = func_decl.decl_name) env.func_decls
-
 (* Checks if each arg matches its formal. *)
 let rec match_args args formals =
     match args, formals with
@@ -102,6 +94,18 @@ let rec match_args args formals =
     | (_ :: _), []
     | [], (_ :: _) -> false
     | [], [] -> true
+
+(* Tries to match a function call to a func_decl in the environment. Matches
+ * with both id and arg types so our overloaded output function works. *)
+let find_func_decl env fname args = 
+    List.find (fun func_decl -> (fname = func_decl.decl_name) &&
+                                (match_args args func_decl.formals)) 
+                                    env.func_decls
+
+(* Checks if a function already exists using an ID only. So programmers using
+ * our language cannot overload functions themselves. *)
+let exists_func_decl env fname =
+    List.exists (fun func_decl -> (fname = func_decl.decl_name)) env.func_decls
 
 (* ========================================================================= *)
 (*                          Semantic Analysis                                *)
@@ -476,21 +480,18 @@ let rec has_setup_and_round has_setup has_round func_decls =
         | _ -> has_setup_and_round has_setup has_round rest
 
 (* Checks to see if a call corresponds to a declared function. If not, throw
- * an error. Check argument types match formal types in the func_decl.
+ * an error. Since a call only matches if it has been given the right args,
+ * a call using the correct ID but wrong arg types will not work.
  * This function has type unit. *)
 let check_call env (call : Sast.func_call) =
-    let func_decl = 
+    let _ = 
         try
-            find_func_decl env call.fname 
+            find_func_decl env call.fname call.args
         with Not_found ->
             raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
-                   "not been declared."))
+                   "not been declared with the given parameters.."))
     in
-        if (match_args call.args func_decl.formals) then
-            () (* type unit *)
-        else
-            raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
-                    " not match the procedure's declaration."))
+        () (* Returns unit. *)
 
 (* Performs semantic analysis on a program. Also makes sure that a program
  * has a setup and a round procedure. Finally, ensures that all calls are
