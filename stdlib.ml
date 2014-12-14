@@ -1,9 +1,16 @@
-(* this is runtime.ml  has a list of (function decl, java form) tuples and a list of field decls for everything "default" we support *)
-
-(* One list is a list of (func_decl, java_form) tuples that are always available in every program. 
-That way whenever you need the Java you just look through the list using a call.fname
-The other list is so that we can type check with Ids that involve dots. It's a list of field decls
-Basically we need to know about the public instance vars in each Java class for each type *)
+(* stdlib.ml contains the API for our runtime system. You can think of it as
+ * do's stdlib.h or stdio.h. It allows programmers to interact with the runtime
+ * system we've set up with our java classes. 
+ *
+ * This API is in the form of a whole bunch of different declaration types.
+ * In C, this is accomplished by including a C header file full of declarations
+ * in C. We aren't using include statements, so we just need a list of all
+ * the declarations to pre-load into our environment as if they had actually
+ * been declared. That way different variables and functions can be set and
+ * called in a do program without confusing the semantic analyzer. 
+ *
+ * See check_prgm in semantic.ml. That's where these lists are loaded into the
+ * type-checking environment. *)
 
 (* For your reference on sast.ml
 type datatype = BooleanType | NumberType | StringType | CardType | SetType | PlayerType
@@ -23,6 +30,8 @@ Also based on the examples at runtime_example.ml
 *)
 
 open Sast
+
+
 
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
 let funcs = 
