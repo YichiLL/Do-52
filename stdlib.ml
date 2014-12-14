@@ -13,7 +13,8 @@
  * type-checking environment. *)
 
 (* For your reference on sast.ml
-type datatype = BooleanType | NumberType | StringType | CardType | SetType | PlayerType
+type datatype = BooleanType | NumberType | StringType | CardType | SetType 
+                | PlayerType
 
 type func_decl = {
 decl_name : string;
@@ -26,13 +27,34 @@ field_type : datatype;
 field_id = string;
 }
 
-Also based on the examples at runtime_example.ml
 *)
 
 open Sast
 
+(* A list of var_decls that correspond to variables in our environment. The
+ * list has the form [(var_decl, java) ...], i.e. it's a list of tuples with
+ * the equivalent java code that a reference to a var will be converted to
+ * at compile time. *)
+let vars = [
+    ( { var_decl_id = "player1";
+        var_decl_type = PlayerType;
+        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+      "players[0]");
+    ( { var_decl_id = "player2";
+        var_decl_type = PlayerType;
+        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+      "players[1]");
+    ( { var_decl_id = "player3";
+        var_decl_type = PlayerType;
+        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+      "players[2]");
+    ( { var_decl_id = "player4";
+        var_decl_type = PlayerType;
+        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+      "players[3]");
+]
 
-
+(*
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
 let funcs = 
 [
@@ -165,4 +187,4 @@ let fields =
    { parent_type = SetType; field_type = CardType; field_id = "bottom" } ;
    { parent_type = PlayerType; field_type = SetType; field_id = "hand" } ;
    { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
-]
+]*)

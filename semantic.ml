@@ -501,13 +501,13 @@ let check_call env (call : Sast.func_call) =
 let check_prgm (prgm : Ast.program) = 
     let global_scope =
         { parent = None;
-          vars = []; }   (* vars = Runtime.vars *)
+          vars = []; }   (* vars = Stdlib.vars *)
     in let env =
-        { configs = [];     (* configs = Runtime.configs *)
-          fields = [];      (* fields = Runtime.fields *)          
+        { configs = [];     (* configs = Stdlib.configs *)
+          fields = [];      (* fields = Stdlib.fields *)          
           scope = global_scope;
           unchecked_calls = [];
-          func_decls = [];  (* func_decls = Runtime.func_decls *)
+          func_decls = [];  (* func_decls = Stdlib.func_decls *)
           can_break = false;
           can_continue = false; }
     in
