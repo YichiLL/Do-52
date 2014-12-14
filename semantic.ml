@@ -430,20 +430,25 @@ let check_config env (config_decl : Ast.config_decl) =
  * ID doesn't match a field that already exists. Finally, adds the field
  * to the environment. *)
 let check_field_decl env (field_decl : Ast.field_decl) =
-    match (type_of_string field_decl.field_type) with
+    match (type_of_string field_decl.parent_type) with
     | PlayerType ->
-        if (not (exists_field env (PlayerType, field_decl.field_id))) then
-            let checked_field =
-                { parent_type = type_of_string field_decl.parent_type;
-                  field_type = type_of_string field_decl.field_type;
-                  field_id = field_decl.field_id; }
-            in
-                env.fields <- checked_field :: env.fields;
-                checked_field (* Returning Sast.field_decl *)
-        else
-            raise (Redeclaration("You cannot add the field \"" ^
-                    field_decl.field_id ^ " to Player, because Player " ^
-                    "already has a field by that name."))
+        begin match (type_of_string field_decl.field_type) with
+        | NumberType | BooleanType | StringType | SetType ->
+            if (not (exists_field env (PlayerType, field_decl.field_id))) then
+                let checked_field =
+                    { parent_type = type_of_string field_decl.parent_type;
+                      field_type = type_of_string field_decl.field_type;
+                      field_id = field_decl.field_id; }
+                in
+                    env.fields <- checked_field :: env.fields;
+                    checked_field (* Returning Sast.field_decl *)
+            else
+                raise (Redeclaration("You cannot add the field \"" ^
+                        field_decl.field_id ^ " to Player, because Player " ^
+                        "already has a field by that name."))
+        | _ -> raise (WrongType("You cannot add a field of type \"" ^
+        field_decl.field_type ^ "\" to Player."))
+        end
     | _ -> raise (WrongType("You cannot add a field to any type except Player."))
 
 (* Converts an Ast.formal to an Sast.formal. This won't be necessary if we

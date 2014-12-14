@@ -3,6 +3,30 @@
  * Usage: ./compile program.do *)
 
 open Ast
+open Sast
+
+(* ========================================================================= *)
+(*                             Helper Functions                              *)
+(* ========================================================================= *)
+(* Returns the java code for a stdlib var. *)
+let check_std_lib_for_var var_id =
+    let var_decl, java_code =
+        try
+            List.find (fun (vdecl, java) -> (vdecl.var_decl_id = var_id)) 
+                        Stdlib.vars
+        with Not_found ->
+            var_id
+    in
+        java_code
+
+(* Converts a type to a string representation of a java type. *)
+let java_of_type = function
+    | BooleanType -> "boolean"
+    | NumberType -> "int"
+    | StringType -> "String"
+    | CardType -> "Card"
+    | SetType -> "Set"
+    | PlayerType -> "MyPlayer"
 
 (* ========================================================================= *)
 (*                             Java Printing                                 *)
@@ -30,6 +54,63 @@ let java_of_op = function
     | Conj -> "&&"
     | Not -> "!"
 
+(* Converts a simple expression in our SAST to java code, checking the stdlib
+ * for special java code representations. *)
+let rec java_of_simple_expr = function
+    | Number num -> string_of_int num
+    | String str -> str
+    | Boolean boolean ->
+        if boolean then
+            "true"
+        else
+            "false"
+    | Var(var) -> check_std_lib_for_var var
+    | Unop(op, e) -> java_of_op op ^ java_of_simple_expr e
+    | Binop(e1, op, e2) -> "(" ^ java_of_simple_expr e1 ^ " " ^ 
+                           java_of_op op ^ " " ^ java_of_simple_expr e2 ^ ")"
+
+(* Converts a config_decl to a java assignment. Only numbers, booleans, or
+ * variables can be used for configure statements. *)
+let java_of_config config = 
+    match config.config_value with
+    | Number(n) -> 
+        let num =
+            if (config.config_id = "highestCard") then
+                n - 1
+            else
+                n
+        in
+            config.config_id ^ " = " ^ string_of_int (num) ^ ";"
+    | Boolean(b) -> config.config_id ^ " = " ^ string_of_bool b ^ ";"
+    | Var(var) -> config.config_id ^ " = " ^ check_stdlib_for_var var ^ ";" 
+    | _ -> raise (UnknownType "Invalid type used for configure statement.")
+
+
+(* Converts a field decl to a java instance var declaration. *)
+let java_of_field_decl field_decl =
+    (string_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
+
+(* Converts a field decl to a java var assignment, which will appear in the 
+ * constructor of the MyPlayer class. *)
+let java_of_field_decl_assign field_decl = 
+    match field_decl.field_type with
+    | SetType -> field_decl.field_id ^ " = new Set();"
+    | _ -> ""
+
+(* Takes a list of field_decls and converts the to a MyPlayer class. *)
+let java_of_player field_decls =
+    let instance_vars = 
+        String.concat "\n" (List.map java_of_field_decl field_decls)
+    in let assigns =
+        String.concat "\n" (List.map java_of_field_decl_assign field_decls)
+    in  
+        "public class MyPlayer extends Player {\n" ^
+        instance_vars ^
+        "public MyPlayer(String playerName) {\n"
+        ^   "super(playerName);\n" ^
+        assigns ^
+        "}\n}"
+
 let java_of_player p =
     string_of_int ((int_of_string (String.sub p 6 ((String.length p) - 6 )))-1)
 
@@ -51,18 +132,6 @@ let java_of_var var =
     else str
     |DotId(str_list) -> String.concat "." (List.map (fun arg -> java_of_objects arg) str_list)
 
-let rec java_of_expr = function
-    | Number num -> string_of_int num
-    | String str -> str
-    | Boolean boolean ->
-        if boolean then
-            "true"
-        else
-            "false"
-    | Var var -> java_of_var var
-    | Unop(op, e) -> java_of_op op ^ java_of_expr e
-    | Binop(e1, op, e2) -> "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
-                           java_of_expr e2 ^ ")"
 
 exception UnknownType of string
 
@@ -176,12 +245,6 @@ let java_of_function func =
         access ^ " void " ^ func.decl_name ^ "(" ^ formals ^ ")\n" ^
         java_of_block func.body 
 
-let normal_config config = 
-    match config.config_value with
-    | Number(n) -> config.config_id ^ " = " ^ string_of_int n ^ ";"
-    | Boolean(b) -> config.config_id ^ " = " ^ string_of_bool b ^ ";"
-    | _ -> raise (UnknownType "Invalid type used for configure statement.")
-
 let interpret_card_name name =
     match name with
     | "\"Ace\"" -> 0
@@ -196,32 +259,7 @@ let interpret_card_number config =
     |String(str) -> config.config_id ^ " = " ^ string_of_int (interpret_card_name str) ^" ;"
     |_ -> raise (UnknownType "Invalid type used for configure maxCard statement.")
 (* Semantic check assures us that config_value is either a number or bool *)
-let java_of_config config =
-    match config.config_id with
-    |"maxCard" -> interpret_card_number config
-    | _ -> normal_config config
 
-
-let java_of_field_decl field_decl =
-    field_decl.field_type ^ " " ^ field_decl.field_id ^ ";\n"
-
-let java_of_field_decl_assign field_decl = 
-    match field_decl.field_type with
-    | "Set" -> field_decl.field_id ^ " = new Set();"
-    | _ -> ""
-
-let java_of_player field_decls =
-    let instance_vars = 
-        String.concat "\n" (List.map java_of_field_decl field_decls)
-    in let assigns =
-        String.concat "\n" (List.map java_of_field_decl_assign field_decls)
-    in  
-        "public class MyPlayer extends Player {\n" ^
-        instance_vars ^
-        "public MyPlayer(String playerName) {\n"
-        ^   "super(playerName);\n" ^
-        assigns ^
-        "}\n}"
 
 (* Default config values yet to be implemented *)
 let java_of_game program =

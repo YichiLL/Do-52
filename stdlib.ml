@@ -23,19 +23,19 @@ let vars = [
     ( { var_decl_id = "player1";
         var_decl_type = PlayerType;
         var_decl_value = Ast.Number(0); },
-      "players[0]");
+      "players.get(0)");
     ( { var_decl_id = "player2";
         var_decl_type = PlayerType;
         var_decl_value = Ast.Number(0); },
-      "players[1]");
+      "players.get(1)");
     ( { var_decl_id = "player3";
         var_decl_type = PlayerType;
         var_decl_value = Ast.Number(0); },
-      "players[2]");
+      "players.get(2)");
     ( { var_decl_id = "player4";
         var_decl_type = PlayerType;
         var_decl_value = Ast.Number(0); },
-      "players[3]");
+      "players.get(3)");
     ( { var_decl_id = "jack";
         var_decl_type = NumberType;
         var_decl_value = Ast.Number(0); },
@@ -83,6 +83,7 @@ let configs = [
     { config_id = "ascendingOrder";
       config_value = Ast.Boolean(true);
       config_type = NumberType; }
+    (* suit order *)
 ]
 
 (* A list of fields for each of our aggregate types. IDs containing dots get
