@@ -4,7 +4,7 @@
 CFLAGS = -c
 YACCFLAGS = -v
 OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo sast.cmo\
-	  semantic.cmo stdlib.cmo
+	  stdlib.cmo semantic.cmo
 
 compile : $(OBJ) compile.cmo
 	ocamlc -o $@ str.cma $(OBJ) compile.cmo

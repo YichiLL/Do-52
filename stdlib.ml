@@ -34,25 +34,61 @@ open Sast
 (* A list of var_decls that correspond to variables in our environment. The
  * list has the form [(var_decl, java) ...], i.e. it's a list of tuples with
  * the equivalent java code that a reference to a var will be converted to
- * at compile time. *)
+ * at compile time. All of the var_decl_value fields are 0 because we don't
+ * need them. *)
 let vars = [
     ( { var_decl_id = "player1";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+        var_decl_value = Ast.Number(0); },
       "players[0]");
     ( { var_decl_id = "player2";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+        var_decl_value = Ast.Number(0); },
       "players[1]");
     ( { var_decl_id = "player3";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+        var_decl_value = Ast.Number(0); },
       "players[2]");
     ( { var_decl_id = "player4";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); }, (* Need expr, but doesn't matter. *)
+        var_decl_value = Ast.Number(0); },
       "players[3]");
+    ( { var_decl_id = "jack";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.JACK");
+    ( { var_decl_id = "queen";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.QUEEN");
+    ( { var_decl_id = "king";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.KING");
+    ( { var_decl_id = "ace";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.ACE");
+    ( { var_decl_id = "diamond";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.DIAMOND");
+    ( { var_decl_id = "club";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.CLUB");
+    ( { var_decl_id = "heart";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.HEART");
+    ( { var_decl_id = "spade";
+        var_decl_type = NumberType;
+        var_decl_value = Ast.Number(0); },
+      "Card.SPADE");
 ]
+
+(* A list of config_decls that correspond to configurable environment variables
+ * in our runtime environment. *)
 
 (*
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)

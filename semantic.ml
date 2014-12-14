@@ -501,7 +501,7 @@ let check_call env (call : Sast.func_call) =
 let check_prgm (prgm : Ast.program) = 
     let global_scope =
         { parent = None;
-          vars = []; }   (* vars = Stdlib.vars *)
+          vars = (List.map fst Stdlib.vars); }
     in let env =
         { configs = [];     (* configs = Stdlib.configs *)
           fields = [];      (* fields = Stdlib.fields *)          
