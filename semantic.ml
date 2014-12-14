@@ -452,15 +452,35 @@ let check_formal (formal : Ast.formal) =
     { formal_id = formal.formal_id;
       formal_type = (type_of_string formal.formal_type); }
 
+(* Converts a formal parameter to a variable declaration. *)
+let var_of_formal formal = 
+    { var_decl_id = formal.formal_id;
+      var_decl_type = formal.formal_type;
+      var_decl_value = Ast.Number(0); } (* This shouldn't ever be accessed. *)
+
 (* Checks the body of a function declaration before adding the function to the
  * environment. Also checks to make sure we aren't redeclaring a function. 
  * This check is performed simpy with IDs, so overloading is not possible. *)
 let check_func_decl env (func_decl : Ast.func_decl) =
     if (not (exists_func_decl env func_decl.decl_name)) then begin
-        let checked_fdecl = 
+        (* Adds formals to scope before checking body. *)
+        let checked_formals = 
+            List.map check_formal func_decl.formals
+        in let new_scope = 
+            { parent = Some(env.scope);
+              vars = List.map var_of_formal checked_formals; }
+        in let new_env =
+            { configs = env.configs; 
+              fields = env.fields;
+              scope = new_scope;
+              unchecked_calls = env.unchecked_calls;
+              func_decls = env.func_decls;
+              can_break = false;
+              can_continue = false; }
+        in let checked_fdecl = 
             { decl_name = func_decl.decl_name; 
               formals = List.map check_formal func_decl.formals;
-              body = List.map (check_stmt env) func_decl.body; }
+              body = List.map (check_stmt new_env) func_decl.body; }
         in
             env.func_decls <- checked_fdecl :: env.func_decls;
             checked_fdecl 
