@@ -81,14 +81,6 @@ let exists_field env (_type, id) =
                  ((_type, id) = (field_decl.parent_type, field_decl.field_id)))
                     env.fields
 
-(* Tries to match a function call to an func_decl in the environment. *)
-let find_func_decl env fname = 
-    List.find (fun func_decl -> fname = func_decl.decl_name) env.func_decls
-
-(* Sees if a name has already been used for a function. *)
-let exists_func_decl env fname =
-    List.exists (fun func_decl -> fname = func_decl.decl_name) env.func_decls
-
 (* Checks if each arg matches its formal. *)
 let rec match_args args formals =
     match args, formals with
@@ -102,6 +94,18 @@ let rec match_args args formals =
     | (_ :: _), []
     | [], (_ :: _) -> false
     | [], [] -> true
+
+(* Tries to match a function call to a func_decl in the environment. Matches
+ * with both id and arg types so our overloaded output function works. *)
+let find_func_decl env fname args = 
+    List.find (fun func_decl -> (fname = func_decl.decl_name) &&
+                                (match_args args func_decl.formals)) 
+                                    env.func_decls
+
+(* Checks if a function already exists using an ID only. So programmers using
+ * our language cannot overload functions themselves. *)
+let exists_func_decl env fname =
+    List.exists (fun func_decl -> (fname = func_decl.decl_name)) env.func_decls
 
 (* ========================================================================= *)
 (*                          Semantic Analysis                                *)
@@ -448,15 +452,35 @@ let check_formal (formal : Ast.formal) =
     { formal_id = formal.formal_id;
       formal_type = (type_of_string formal.formal_type); }
 
+(* Converts a formal parameter to a variable declaration. *)
+let var_of_formal formal = 
+    { var_decl_id = formal.formal_id;
+      var_decl_type = formal.formal_type;
+      var_decl_value = Ast.Number(0); } (* This shouldn't ever be accessed. *)
+
 (* Checks the body of a function declaration before adding the function to the
  * environment. Also checks to make sure we aren't redeclaring a function. 
  * This check is performed simpy with IDs, so overloading is not possible. *)
 let check_func_decl env (func_decl : Ast.func_decl) =
     if (not (exists_func_decl env func_decl.decl_name)) then begin
-        let checked_fdecl = 
+        (* Adds formals to scope before checking body. *)
+        let checked_formals = 
+            List.map check_formal func_decl.formals
+        in let new_scope = 
+            { parent = Some(env.scope);
+              vars = List.map var_of_formal checked_formals; }
+        in let new_env =
+            { configs = env.configs; 
+              fields = env.fields;
+              scope = new_scope;
+              unchecked_calls = env.unchecked_calls;
+              func_decls = env.func_decls;
+              can_break = false;
+              can_continue = false; }
+        in let checked_fdecl = 
             { decl_name = func_decl.decl_name; 
               formals = List.map check_formal func_decl.formals;
-              body = List.map (check_stmt env) func_decl.body; }
+              body = List.map (check_stmt new_env) func_decl.body; }
         in
             env.func_decls <- checked_fdecl :: env.func_decls;
             checked_fdecl 
@@ -476,37 +500,37 @@ let rec has_setup_and_round has_setup has_round func_decls =
         | _ -> has_setup_and_round has_setup has_round rest
 
 (* Checks to see if a call corresponds to a declared function. If not, throw
- * an error. Check argument types match formal types in the func_decl.
+ * an error. Since a call only matches if it has been given the right args,
+ * a call using the correct ID but wrong arg types will not work.
  * This function has type unit. *)
 let check_call env (call : Sast.func_call) =
-    let func_decl = 
+    let _ = 
         try
-            find_func_decl env call.fname 
+            find_func_decl env call.fname call.args
         with Not_found ->
             raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
-                   "not been declared."))
+                   "not been declared with the given parameters.."))
     in
-        if (match_args call.args func_decl.formals) then
-            () (* type unit *)
-        else
-            raise (TypeMismatch("The arguments to \"" ^ call.fname ^ "\" do" ^
-                    " not match the procedure's declaration."))
+        () (* Returns unit. *)
 
 (* Performs semantic analysis on a program. Also makes sure that a program
  * has a setup and a round procedure. Finally, ensures that all calls are
  * matched with a func_decl. 
  *
- * In other words, takes an AST and makes an SAST. *)
+ * In other words, takes an AST and makes an SAST. 
+ *
+ * The variables, configurations, fields, and functions provided by stdlib.ml
+ * are added to the environment here. *)
 let check_prgm (prgm : Ast.program) = 
     let global_scope =
         { parent = None;
-          vars = []; }   (* vars = Runtime.vars *)
+          vars = (List.map fst Stdlib.vars); }
     in let env =
-        { configs = [];     (* configs = Runtime.configs *)
-          fields = [];      (* fields = Runtime.fields *)          
+        { configs = Stdlib.configs;
+          fields = Stdlib.fields;
           scope = global_scope;
           unchecked_calls = [];
-          func_decls = [];  (* func_decls = Runtime.func_decls *)
+          func_decls = [];  (* func_decls = Stdlib.func_decls *)
           can_break = false;
           can_continue = false; }
     in

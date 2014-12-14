@@ -1,9 +1,11 @@
 # a simple "make" command builds the compiler
-# "make printer" builds the printer
+# "make printer" builds the AST printer
 
 CFLAGS = -c
 YACCFLAGS = -v
-OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo #semantic.cmo
+
+OBJ = ast.cmo indent.cmo scanner.cmo parser.cmo cache.cmo sast.cmo\
+	  stdlib.cmo semantic.cmo
 
 compile : $(OBJ) compile.cmo
 	ocamlc -o $@ str.cma $(OBJ) compile.cmo
@@ -28,6 +30,9 @@ parser.cmo : parser.ml parser.cmi
 
 parser.cmi : parser.mli ast.cmi
 	ocamlc $(CFLAGS) parser.mli
+
+stdlib.cmo : stdlib.ml
+	ocamlc $(CFLAGS) stdlib.ml
 
 sast.cmi : sast.ml
 	ocamlc $(CFLAGS) $^
