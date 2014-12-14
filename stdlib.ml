@@ -100,73 +100,73 @@ let fields = [
    { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
 ]
 
-(*
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
-let funcs = 
-[
-   (* ============== *)
-   (* Main Functions *)
-   (* ============== *)
-   ( {decl_name = "output";
-      formals = [];
-      body = []; },
-      "System.out.println()" ) ;
-   ( {decl_name = "output";
-      formals = 
-          [ { formal_id = "str";
-              formal_type = Sast.StringType; }];
-      body = []; },
-      "System.out.println(str)" ) ;
-   ({ decl_name = "output";
-      formals =
-          [{ formal_id = "number";
-             formal_type = Sast.NumberType; }];
-      body = []; },
-      "System.console.println(number)" ) ;
-   ({ decl_name = "output";
-      formals =
-          [{ formal_id = "boolean";
-             formal_type = Sast.BooleanType; }];
-      body = []; },
-      "System.console.println(boolean)") ;
-   ( {decl_name = "output";
-      formals = 
-          [ { formal_id = "card";
-              formal_type = Sast.CardType; }];
-      body = []; }
-      "System.out.println(card) ") ;
-   ({ decl_name = "output";
-      formals =
-          [{ formal_id = "player";
-             formal_type = Sast.PlayerType; }];
-      body = []; },
-      "System.console.println(player)") ;
-   ({ decl_name = "output";
-      formals =
-          [{ formal_id = "set";
-             formal_type = Sast.SetType; }];
-      body = []; },
-      "System.console.println(set)") ;
-   ({ decl_name = "input";
-      formals =
-          [{ formal_id = "str";
-             formal_type = Sast.StringType; }];
-      body = []; },
-      "import java.util.Scanner; str = new Scanner(System.in)")
-   (* ({ decl_name = "turn";
-      formals =
-          [{ formal_id = "player";
-             formal_type = Sast.PlayerType; }];
-      body = []; },
-      "java form of turn with player: player1") ;  *)
-   (* ({ decl_name = "evaluate";
-      formals = [];
-      body = []; },
-      "java form of evaluate") ; *) 
-   ({ decl_name = "quit";
-      formals = [];
-      body = []; },
-      "System.exit(0);\n")
+let funcs = [
+   (* ======================================================== *)
+   (*                   Main Functions                         *)
+   (* ======================================================== *)
+   (* Print a line *)
+   ( { decl_name = "output";
+       formals = [];
+       body = []; },
+       "System.out.println()" );
+
+   (* Print a string *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "str";
+                     formal_type = Sast.StringType; } ];
+       body = []; },
+       "System.out.println(str)" );
+
+   (* Print a number *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "number";
+                     formal_type = Sast.NumberType; } ];
+       body = []; },
+       "System.console.println(number)" );
+
+   (* Print a boolean *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "boolean";
+                     formal_type = Sast.BooleanType; } ];
+       body = []; },
+       "System.console.println(boolean)") ;
+
+   (* Print a card *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "card";
+                     formal_type = Sast.CardType; } ];
+       body = []; },
+       "System.out.println(card) ") ;
+
+   (* Print a set *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "set";
+                     formal_type = Sast.SetType; } ];
+       body = []; },
+       "System.console.println(set)") ;
+
+   (* Print a player *)
+   ( { decl_name = "output";
+       formals = [ { formal_id = "player";
+                     formal_type = Sast.PlayerType; } ];
+       body = []; },
+       "System.console.println(player)") ;
+
+   (* Input *)
+   ( { decl_name = "input";
+       formals = [ { formal_id = "str";
+                     formal_type = Sast.StringType; } ];
+       body = []; },
+       "str = new Scanner(System.in)");
+
+   (* Quit *)
+   ( { decl_name = "quit";
+       formals = [];
+       body = []; },
+       "System.exit(0);\n" );
+
+(*
 
    (* ======================= *)
    (* MyPlayer type functions *)
@@ -220,5 +220,5 @@ let funcs =
              formal_type = NumberType; }];
       body = []; },
       "draw_hand(n)") ;
+      *)
 ]
-*)
