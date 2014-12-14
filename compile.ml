@@ -12,7 +12,7 @@ open Ast
 *  made-up "pretty" syntax. 
 *
 *  The resulting program will be ugly because we don't have information about
-*  spacing or indentation in the AST. We could maybe keep track of depth and
+*  spacing or indentation in the SAST. We could maybe keep track of depth and
 *  space things that way, but it's not really worth it because nobody is meant
 *  to see the java code and java ignores whitespace anyway. *)
 let java_of_op = function
@@ -28,7 +28,6 @@ let java_of_op = function
     | Gtoe -> ">="
     | Disj -> "||"
     | Conj -> "&&"
-    (*| Dot -> "."*)
     | Not -> "!"
 
 let java_of_player p =

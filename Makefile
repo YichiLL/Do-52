@@ -19,8 +19,8 @@ indent.cmo : indent.ml
 cache.cmo : cache.ml scanner.ml parser.ml
 	ocamlc $(CFLAGS) cache.ml
 
-#semantic.cmo : semantic.ml
-#	ocamlc $(CFLAGS) semantic.ml
+semantic.cmo : semantic.ml
+	ocamlc $(CFLAGS) semantic.ml
 
 scanner.cmo : scanner.ml parser.cmi indent.cmi
 	ocamlc $(CFLAGS) scanner.ml
