@@ -27,8 +27,12 @@
 ./printer tests/test_arith7.do > tests/test_arith7.out
 ###### SUCCESS
 
-###### Testing test_break
-./printer tests/test_break.do > tests/test_break.out
+###### Testing test_break1
+./printer tests/test_break1.do > tests/test_break1.out
+###### SUCCESS
+
+###### Testing test_break2
+./printer tests/test_break2.do > tests/test_break2.out
 ###### SUCCESS
 
 ###### Testing test_comments
@@ -39,8 +43,12 @@
 ./printer tests/test_configure.do > tests/test_configure.out
 ###### SUCCESS
 
-###### Testing test_continue
-./printer tests/test_continue.do > tests/test_continue.out
+###### Testing test_continue1
+./printer tests/test_continue1.do > tests/test_continue1.out
+###### SUCCESS
+
+###### Testing test_continue2
+./printer tests/test_continue2.do > tests/test_continue2.out
 ###### SUCCESS
 
 ###### Testing testt_op.do
@@ -56,13 +64,23 @@
 Fatal error: exception Parsing.Parse_error
 ###### FAILED
 
-###### Testing test_for
-./printer tests/test_for.do > tests/test_for.out
+###### Testing test_for1
+./printer tests/test_for1.do > tests/test_for1.out
 ###### SUCCESS
 
 ###### Testing test_for2
 ./printer tests/test_for2.do > tests/test_for2.out
 ###### SUCCESS
+
+###### Testing test_for3
+./printer tests/test_for3.do > tests/test_for3.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_for4
+./printer tests/test_for4.do > tests/test_for4.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
 
 ###### Testing test_function_call1
 ./printer tests/test_function_call1.do > tests/test_function_call1.out
@@ -87,6 +105,11 @@ Fatal error: exception Parsing.Parse_error
 ###### Testing test_if2
 ./printer tests/test_if2.do > tests/test_if2.out
 ###### SUCCESS
+
+###### Testing test_if3
+./printer tests/test_if3.do > tests/test_if3.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
 
 ###### Testing test_logic1
 ./printer tests/test_logic1.do > tests/test_logic1.out
@@ -164,6 +187,21 @@ Fatal error: exception Parsing.Parse_error
 ./printer tests/test_timesloop.do > tests/test_timesloop.out
 ###### SUCCESS
 
+###### Testing test_until1
+./printer tests/test_until1.do > tests/test_until1.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_until2
+./printer tests/test_until2.do > tests/test_until2.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing test_until3
+./printer tests/test_until3.do > tests/test_until3.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
 ###### Testing test_var1
 ./printer tests/test_var1.do > tests/test_var1.out
 ###### SUCCESS
@@ -181,6 +219,11 @@ Fatal error: exception Parsing.Parse_error
 Fatal error: exception Parsing.Parse_error
 ###### FAILED
 
-###### Testing test_while
-./printer tests/test_while.do > tests/test_while.out
+###### Testing test_while1
+./printer tests/test_while1.do > tests/test_while1.out
 ###### SUCCESS
+
+###### Testing test_while2
+./printer tests/test_while2.do > tests/test_while2.out
+Fatal error: exception Parsing.Parse_error
+###### FAILED
