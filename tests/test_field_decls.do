@@ -13,3 +13,4 @@ round:
 	
 increment with Number num:
 	num : num + 1
+	do output with num

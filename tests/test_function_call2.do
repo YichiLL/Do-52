@@ -8,4 +8,6 @@ setup:
 
 round:
 	do bar with 4 and (5 + 3) * 2
-	do output with bar
+
+bar with Number x and Number y:
+	do output with (x + y)

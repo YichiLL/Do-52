@@ -1,4 +1,3 @@
-testParse.sh: line 153: CheckFail: command not found
 
 ###### Testing test_arith1
 ./printer tests/test_arith1.do > tests/test_arith1.out
@@ -28,6 +27,10 @@ testParse.sh: line 153: CheckFail: command not found
 ./printer tests/test_arith7.do > tests/test_arith7.out
 ###### SUCCESS
 
+###### Testing test_break
+./printer tests/test_break.do > tests/test_break.out
+###### SUCCESS
+
 ###### Testing test_comments
 ./printer tests/test_comments.do > tests/test_comments.out
 ###### SUCCESS
@@ -36,10 +39,13 @@ testParse.sh: line 153: CheckFail: command not found
 ./printer tests/test_configure.do > tests/test_configure.out
 ###### SUCCESS
 
+###### Testing test_continue
+./printer tests/test_continue.do > tests/test_continue.out
+###### SUCCESS
+
 ###### Testing testt_op.do
 ./printer tests/test_dot_op.do > tests/testt_op.do.out
-Fatal error: exception Parsing.Parse_error
-###### FAILED
+###### SUCCESS
 
 ###### Testing test_empty_line
 ./printer tests/test_empty_line.do > tests/test_empty_line.out

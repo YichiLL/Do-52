@@ -1,11 +1,13 @@
 #!/bin/sh
 
 DO_FIFTY_TWO="./compile"
+JAVA="javac"
+GAME="game.java"
 
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=testall.log
+globallog=testLogic.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -74,8 +76,9 @@ Check() {
 
 
     generatedfiles="$generatedfiles tests/${newjavafile}.java tests/${basename}.diff tests/${basename}.out" &&
-    Run "$DO_FIFTY_TWO" $1 ">" tests/${basename}.out &&
-    Compare tests/${newjavafile}.java tests/${basename}.gold tests/${basename}.diff
+    Run "$DO_FIFTY_TWO" $1 &&
+    Run "$JAVA $GAME" ">" tests/${basename}.out
+    Compare tests/${basename}.out tests/${basename}.gold tests/${basename}.diff
 
     # Report the status and clean up the generated files
 
@@ -108,6 +111,7 @@ Checkfail() {
 
     generatedfiles="$generatedfiles ${basename}.i.out" &&
     Run "$DO_FIFTY_TWO" "-i" "<" $1 ">" ${basename}.i.out &&
+
     Compare ${basename}.i.out ${reffile}.out ${basename}.i.diff
 
     # Report the status and clean up the generated files

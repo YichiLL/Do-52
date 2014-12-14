@@ -9,3 +9,5 @@ setup:
 round:
 	do foo with (1 + 1)
 
+foo with Number x:
+	do output with x
