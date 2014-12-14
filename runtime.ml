@@ -34,55 +34,55 @@ let funcs =
    ( {decl_name = "output";
       formals = 
           [ { formal_id = "str";
-              formal_type = StringType; }];
+              formal_type = Sast.StringType; }];
       body = []; },
       "System.out.println(str)" ) ;
    ({ decl_name = "output";
       formals =
           [{ formal_id = "number";
-             formal_type = NumberType; }];
+             formal_type = Sast.NumberType; }];
       body = []; },
       "System.console.println(number)" ) ;
    ({ decl_name = "output";
       formals =
           [{ formal_id = "boolean";
-             formal_type = BooleanType; }];
+             formal_type = Sast.BooleanType; }];
       body = []; },
       "System.console.println(boolean)") ;
    ( {decl_name = "output";
       formals = 
           [ { formal_id = "card";
-              formal_type = CardType; }];
+              formal_type = Sast.CardType; }];
       body = []; }
       "System.out.println(card) ") ;
    ({ decl_name = "output";
       formals =
           [{ formal_id = "player";
-             formal_type = PlayerType; }];
+             formal_type = Sast.PlayerType; }];
       body = []; },
       "System.console.println(player)") ;
    ({ decl_name = "output";
       formals =
           [{ formal_id = "set";
-             formal_type = SetType; }];
+             formal_type = Sast.SetType; }];
       body = []; },
       "System.console.println(set)") ;
    ({ decl_name = "input";
       formals =
           [{ formal_id = "str";
-             formal_type = StringType; }];
+             formal_type = Sast.StringType; }];
       body = []; },
-      "java form of input with new String in")
-   ({ decl_name = "turn";
+      "import java.util.Scanner; str = new Scanner(System.in)")
+   (* ({ decl_name = "turn";
       formals =
           [{ formal_id = "player";
-             formal_type = PlayerType; }];
+             formal_type = Sast.PlayerType; }];
       body = []; },
-      "java form of turn with player: player1") ;
-   ({ decl_name = "evaluate";
+      "java form of turn with player: player1") ;  *)
+   (* ({ decl_name = "evaluate";
       formals = [];
       body = []; },
-      "java form of evaluate") ; 
+      "java form of evaluate") ; *) 
    ({ decl_name = "quit";
       formals = [];
       body = []; },
