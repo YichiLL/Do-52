@@ -1,4 +1,7 @@
 *.cmi
+*.class
+Game.java
+MyPlayer.java
 *.cmo
 *.mli
 scanner.ml
