@@ -162,22 +162,28 @@ let rec check_expr env = function
     | Ast.String(str) -> Sast.String(str), StringType
     | Ast.Boolean(b) -> Sast.Boolean(b), BooleanType
     | Ast.Var(var) -> 
-        let var_id, var_type =
+        let id, _type =
             check_var env var
         in
-            Sast.Var(var_id), var_type
+            Var(id), _type 
     | Ast.Unop(op, expr) -> 
-        let _, _type =
+        let checked_expr =
             check_expr env expr
+        in let _, _type =
+            checked_expr
         in begin match _type with
-        | BooleanType -> Sast.Unop(op, expr), _type
+        | BooleanType -> Sast.Unop(op, checked_expr), _type
         | _ -> raise (WrongType(string_of_type _type ^ " cannot be used with" ^
                       " the \"" ^ string_of_op op ^ "\" operator.")) end
     | Ast.Binop(expr1, op, expr2) ->
-        let (_, type1) = 
+        let checked_expr1 = 
             check_expr env expr1
-        in let (_, type2) =
+        in let _, type1 =
+            checked_expr1
+        in let checked_expr2 =
             check_expr env expr2
+        in let _, type2 = 
+            checked_expr2
         in 
             if (not (type1 = type2)) then
                 raise (TypeMismatch(string_of_type type1 ^ " does not match "
@@ -199,19 +205,19 @@ let rec check_expr env = function
                         | _ -> raise_error type1 op end
                     | Equal | NotEqual ->
                         begin match type1 with
-                        | NumberType | StringType | CardType -> type1
+                        | NumberType | StringType | CardType -> BooleanType
                         | _ -> raise_error type1 op end
                     | Lt | Gt | Ltoe | Gtoe ->
                         begin match type1 with
-                        | NumberType | CardType -> type1
+                        | NumberType | CardType -> BooleanType
                         | _ -> raise_error type1 op end
                     | Disj | Conj -> 
                         begin match type1 with
-                        | BooleanType -> type1
+                        | BooleanType -> BooleanType
                         | _ -> raise_error type1 op end
                     | _ -> raise (Failure("Illegal operator."))
                 in
-                    Sast.Binop(expr1, op, expr2), _type
+                    Sast.Binop(checked_expr1, op, checked_expr2), _type
                
 (* Takes a var_decl node and checks to see if the var has already been declared
  * in the current scope. Raise an error if it has. Then checks to make sure
@@ -222,14 +228,16 @@ let check_var_decl env (vdecl : Ast.var_decl) =
         raise (Redeclaration("The variable \"" ^ vdecl.var_decl_id ^ "\" has" ^
                " already been declared in its scope."))
     else
-        let _, _type =
+        let checked_expr =
             check_expr env vdecl.var_decl_value
+        in let _, _type =
+            checked_expr
         in
             if ((type_of_string vdecl.var_decl_type) =  _type) then
                 let checked_vdecl =
                     { var_decl_id = vdecl.var_decl_id;
                       var_decl_type = _type;
-                      var_decl_value = vdecl.var_decl_value; }
+                      var_decl_value = checked_expr; }
                 in 
                     (* Add to scope then return *)
                     env.scope.vars <- checked_vdecl :: env.scope.vars; 
@@ -245,11 +253,13 @@ let check_update env = function
     | Ast.Assign(var, expr) ->
         let var_id, var_type = 
             check_var env var
-        in let _, expr_type =
+        in let checked_expr =
             check_expr env expr
+        in let _, expr_type =
+            checked_expr
         in
             if (var_type = expr_type) then
-                Sast.Assign(var_id, expr, var_type)
+                Sast.Assign(var_id, checked_expr)
             else
                 raise (TypeMismatch("Cannot assign an expression of type \"" ^
                         string_of_type expr_type ^ "\" to a variable of " ^
@@ -328,7 +338,7 @@ let rec check_stmt env = function
         begin match expr_type with
         | NumberType | BooleanType ->
            begin match checked_update with
-           | Sast.Assign(_,_,_) -> 
+           | Sast.Assign(_,_) -> 
                let new_scope =
                    { parent = Some(env.scope);
                      vars = []; }
@@ -411,12 +421,14 @@ let check_config env (config_decl : Ast.config_decl) =
         with Not_found ->
             raise (UndeclaredID("There is no configurable variable with the " ^
                     "id \"" ^ config_decl.config_id ^ ".\""))
-    in let checked_expr, expr_type =
+    in let checked_expr =
         check_expr env config_decl.config_value
+    in let _, expr_type =
+        checked_expr
     in
         if (expr_type = real_config.config_type) then
             { config_id = config_decl.config_id; 
-              config_value = config_decl.config_value;
+              config_value = checked_expr;
               config_type = expr_type; } (* Returning Sast.config_decl *)
         else
             raise (TypeMismatch("The configurable \"" ^ config_decl.config_id ^
@@ -461,7 +473,7 @@ let check_formal (formal : Ast.formal) =
 let var_of_formal formal = 
     { var_decl_id = formal.formal_id;
       var_decl_type = formal.formal_type;
-      var_decl_value = Ast.Number(0); } (* This shouldn't ever be accessed. *)
+      var_decl_value = (Sast.Number(0), NumberType); } (* This shouldn't ever be accessed. *)
 
 (* Checks the body of a function declaration before adding the function to the
  * environment. Also checks to make sure we aren't redeclaring a function. 

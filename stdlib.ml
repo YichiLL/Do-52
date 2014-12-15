@@ -22,51 +22,51 @@ open Sast
 let vars = [
     ( { var_decl_id = "player1";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "players.get(0)");
     ( { var_decl_id = "player2";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "players.get(1)");
     ( { var_decl_id = "player3";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "players.get(2)");
     ( { var_decl_id = "player4";
         var_decl_type = PlayerType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "players.get(3)");
     ( { var_decl_id = "jack";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.JACK");
     ( { var_decl_id = "queen";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.QUEEN");
     ( { var_decl_id = "king";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.KING");
     ( { var_decl_id = "ace";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.ACE");
     ( { var_decl_id = "diamond";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.DIAMOND");
     ( { var_decl_id = "club";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.CLUB");
     ( { var_decl_id = "heart";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.HEART");
     ( { var_decl_id = "spade";
         var_decl_type = NumberType;
-        var_decl_value = Ast.Number(0); },
+        var_decl_value = (Sast.Number(0), NumberType); },
       "Card.SPADE");
 ]
 
@@ -75,14 +75,14 @@ let vars = [
  * default value. *)
 let configs = [
     { config_id = "numberOfPlayers";
-      config_value = Ast.Number(4);
+      config_value = (Sast.Number(4), NumberType);
       config_type = NumberType; };
     { config_id = "highestCard";
-      config_value = Ast.Number(0);
+      config_value = (Sast.Number(0), NumberType);
       config_type = NumberType; };
     { config_id = "ascendingOrder";
-      config_value = Ast.Boolean(true);
-      config_type = NumberType; }
+      config_value = (Sast.Boolean(true), BooleanType);
+      config_type = BooleanType; }
     (* suit order *)
 ]
 
