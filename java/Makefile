@@ -10,6 +10,7 @@ CLASSES = \
         Card.java \
 	Set.java\
         Deck.java \
+	Utility.java\
 	Player.java\
 	MyPlayer.java\
 	Game.java \

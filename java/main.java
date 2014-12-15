@@ -8,7 +8,6 @@ public class main {
 		while(true)
 			game.round();
 		
-		
 	}
 	
 

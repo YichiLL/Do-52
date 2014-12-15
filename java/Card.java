@@ -1,8 +1,8 @@
 public class Card {
-	static final int SPADE = 0;
-	static final int HEART = 1;
-	static final int CLOVER = 2;
-	static final int DIAMOND = 3;
+	static final int SPADE = 4;
+	static final int HEART = 3;
+	static final int CLUB = 2;
+	static final int DIAMOND = 1;
 	static final String[] cardNames = {
 		"One", "Two", "Three", "Four", "Five",
 		"Six", "Seven", "Eight", "Nine", "Ten",
@@ -11,10 +11,14 @@ public class Card {
 	static final String[] suitNames = {
 		"Spade", "Heart", "Clover", "Diamond"
 	};
+	static final int JACK = 10;
+	static final int QUEEN = 11;
+	static final int KING = 12;
+	static final int ACE = 0;
 	
-	private int cardNumber;
+	protected int cardNumber;
 	int val;
-	private int suit;
+	protected int suit;
 	int suitVal;
 	
 	/*example, in a game of big 2, the card 2 of Spades will have
@@ -26,7 +30,7 @@ public class Card {
 		cardNumber = num;
 		val = value;
 		suit = suitNum;
-		suitVal = suitValue;
+		suitVal = suitNum;
 				
 	}
 	
@@ -34,5 +38,7 @@ public class Card {
 	public String toString(){
 		return cardNames[cardNumber] + " of " + suitNames[suit];
 	}
+	
+	
 
 }

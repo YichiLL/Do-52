@@ -8,8 +8,8 @@ public class Game {
 	Player player2;
 	Set deck;
 	int numberOfPlayers = 4;
-	int maxCard =12;
-	boolean ascend = true;
+	int highestCard =12;
+	boolean ascendingOrder = true;
 	
 	//instance variables
 	int warCount = 0;
@@ -24,10 +24,10 @@ public class Game {
 	public Game(){
 		//configure statements
 		numberOfPlayers = 2;
-		maxCard = 12;
-		ascend = true;
+		highestCard = 12;
+		ascendingOrder = true;
 		
-		deck = new Deck(maxCard, ascend);
+		deck = new Deck(highestCard, ascendingOrder);
 		players = new ArrayList<MyPlayer>();
 	
 		for(int i = 0; i < numberOfPlayers; i++){
@@ -120,5 +120,8 @@ public class Game {
 		}
 		
 	}
+
+	
+	
 	
 }

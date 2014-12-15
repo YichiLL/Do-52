@@ -135,6 +135,17 @@ public class Set {
 
 	}
 	
+	public Card top(){
+		if(size()>0)
+			return peek(0);
+		return null;
+	}
+	
+	public Card bottom(){
+		if(size()>0)
+			return peek(size());
+		return null;
+	}
 	public int value(int n){
 		if(n > (size()-1)){
 			return 0;
