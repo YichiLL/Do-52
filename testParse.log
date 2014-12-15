@@ -61,8 +61,7 @@
 
 ###### Testing test_field_decls
 ./printer tests/test_field_decls.do > tests/test_field_decls.out
-Fatal error: exception Parsing.Parse_error
-###### FAILED
+###### SUCCESS
 
 ###### Testing test_for1
 ./printer tests/test_for1.do > tests/test_for1.out
@@ -92,6 +91,10 @@ Fatal error: exception Parsing.Parse_error
 
 ###### Testing test_function_call3
 ./printer tests/test_function_call3.do > tests/test_function_call3.out
+###### SUCCESS
+
+###### Testing test_hello_world
+./printer tests/test_hello_world.do > tests/test_hello_world.out
 ###### SUCCESS
 
 ###### Testing test_if
@@ -204,11 +207,13 @@ Fatal error: exception Parsing.Parse_error
 
 ###### Testing test_var1
 ./printer tests/test_var1.do > tests/test_var1.out
-###### SUCCESS
+Fatal error: exception Parsing.Parse_error
+###### FAILED
 
 ###### Testing test_var2
 ./printer tests/test_var2.do > tests/test_var2.out
-###### SUCCESS
+Fatal error: exception Parsing.Parse_error
+###### FAILED
 
 ###### Testing test_var3
 ./printer tests/test_var3.do > tests/test_var3.out
