@@ -95,7 +95,7 @@ let java_of_var var_id =
  * for special java code representations. *)
 let rec java_of_expr = function
     | Number(num), _ -> string_of_int num
-    | String(str), _ -> "\"" ^ str ^ "\""
+    | String(str), _ -> str
     | Boolean(boolean), _ ->
         if boolean then
             "true"
@@ -217,6 +217,8 @@ let java_of_call call =
             | StringType -> var_id ^ " = Utility.inputString()"
             | _ -> raise (CompilerError("Bad type passed to input()."))
             end
+    | "quit" ->
+        "System.exit(0)"
     | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
         
 let java_of_update = function
@@ -295,9 +297,9 @@ let java_of_game program =
         instance_vars ^ "\n" ^
         "public Game() {\n" ^
         config_vars ^
-        "deck = new Deck(maxCard, ascend);\n" ^
+        "deck = new Deck(highestCard, ascendingOrder);\n" ^
         "players = new ArrayList<MyPlayer>();\n" ^
-        "for(int i = 0; i < playerCount; i++) {\n" ^
+        "for(int i = 0; i < numberOfPlayers; i++) {\n" ^
         "players.add(new MyPlayer(\"Player \" + (i+1)));\n" ^
         "}\n" ^
         "}\n\n" ^
