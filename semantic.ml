@@ -204,9 +204,7 @@ let rec check_expr env = function
                         | NumberType -> type1
                         | _ -> raise_error type1 op end
                     | Equal | NotEqual ->
-                        begin match type1 with
-                        | NumberType | StringType | CardType -> BooleanType
-                        | _ -> raise_error type1 op end
+                        BooleanType
                     | Lt | Gt | Ltoe | Gtoe ->
                         begin match type1 with
                         | NumberType | CardType -> BooleanType
@@ -528,7 +526,18 @@ let check_call env (call : Sast.func_call) =
             raise (UndeclaredID("The procedure \"" ^ call.fname ^ "\" has " ^
                    "not been declared with the given parameters.."))
     in
-        () (* Returns unit. *)
+        match call.fname with
+        | "input" ->
+            (* Input only ever takes one arg. *)
+            let expr, _ =
+                List.hd call.args
+            in
+                begin match expr with
+                | Var(_) -> ()
+                | _ -> raise (IllegalUsage("You can only use a variable " ^
+                                "expression with \"input.\""))
+                end
+        | _ -> () (* Returns unit. *)
 
 (* Performs semantic analysis on a program. Also makes sure that a program
  * has a setup and a round procedure. Finally, ensures that all calls are
@@ -544,7 +553,7 @@ let check_prgm (prgm : Ast.program) =
           vars = (List.map fst Stdlib.vars); }
     in let env =
         { configs = Stdlib.configs;
-          fields = Stdlib.fields;
+          fields = (List.map fst Stdlib.fields);
           scope = global_scope;
           unchecked_calls = [];
           func_decls = [];  (* func_decls = Stdlib.func_decls *)

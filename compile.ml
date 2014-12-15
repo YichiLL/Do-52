@@ -2,21 +2,40 @@
  *
  * Usage: ./compile program.do *)
 
-open Ast
 open Sast
 
 (* ========================================================================= *)
 (*                             Helper Functions                              *)
 (* ========================================================================= *)
-(* Returns the java code for a stdlib var. *)
-let check_std_lib_for_var var_id =
-    let var_decl, java_code =
+exception CompilerError of string
+
+(* Finds the java code for a given variable ID from stdlib. If the ID isn't 
+ * in stdlib, just returns the id. *)
+let find_java_for_var var_id = 
+    let java_code =
         try
-            List.find (fun (vdecl, java) -> (vdecl.var_decl_id = var_id)) 
-                        Stdlib.vars
+            let _, java =
+                List.find (fun (vdecl, _) -> (vdecl.var_decl_id = var_id)) 
+                            Stdlib.vars
+            in
+                java
         with Not_found ->
             var_id
     in
+        java_code
+
+(* Returns the java equivalent of a field access. *)
+let find_java_for_field field_id =
+    let java_code =
+        try 
+            let _, java =
+                List.find (fun (field_decl, _) -> 
+                    (field_decl.field_id = field_id)) Stdlib.fields
+            in
+                java
+        with Not_found ->
+            field_id
+    in 
         java_code
 
 (* ========================================================================= *)
@@ -30,6 +49,7 @@ let check_std_lib_for_var var_id =
 *  spacing or indentation in the SAST. We could maybe keep track of depth and
 *  space things that way, but it's not really worth it because nobody is meant
 *  to see the java code and java ignores whitespace anyway. *)
+
 (* Converts a type to a string representation of a java type. *)
 let java_of_type = function
     | BooleanType -> "boolean"
@@ -39,80 +59,102 @@ let java_of_type = function
     | SetType -> "Set"
     | PlayerType -> "MyPlayer"
 
+(* Converts an op to the Java equivalent. *)
 let java_of_op = function
-    | Add -> "+"
-    | Minus -> "-"
-    | Multiply -> "*"
-    | Divide -> "/"
-    | Equal -> "=="
-    | NotEqual -> "!="
-    | Lt -> "<"
-    | Gt -> ">"
-    | Ltoe -> "<="
-    | Gtoe -> ">="
-    | Disj -> "||"
-    | Conj -> "&&"
-    | Not -> "!"
+    | Ast.Add -> "+"
+    | Ast.Minus -> "-"
+    | Ast.Multiply -> "*"
+    | Ast.Divide -> "/"
+    | Ast.Equal -> "=="
+    | Ast.NotEqual -> "!="
+    | Ast.Lt -> "<"
+    | Ast.Gt -> ">"
+    | Ast.Ltoe -> "<="
+    | Ast.Gtoe -> ">="
+    | Ast.Disj -> "||"
+    | Ast.Conj -> "&&"
+    | Ast.Not -> "!"
+
+(* Returns the proper java field names concatenated together. *)
+let rec java_of_field_vars field_vars =
+    match field_vars with
+    | [] -> ""
+    | _ -> "." ^ (String.concat "." (List.map find_java_for_field field_vars))
+
+(* Returns the java code for a var. Vars in the stdlib have special java
+ * representations, most vars just use the var_id. *)
+let java_of_var var_id =
+    let id_list =
+        Str.split (Str.regexp("[.]")) var_id
+    in 
+        match id_list with
+        | [] -> raise (CompilerError("No id given to java_of_var."))
+        | hd :: tl -> find_java_for_var hd ^ java_of_field_vars tl
 
 (* Converts a simple expression in our SAST to java code, checking the stdlib
  * for special java code representations. *)
-let rec java_of_simple_expr expr =
-    let simple, _type = expr in 
-    match simple with
-    | Number num -> string_of_int num
-    | String str -> str
-    | Boolean boolean ->
+let rec java_of_expr = function
+    | Number(num), _ -> string_of_int num
+    | String(str), _ -> "\"" ^ str ^ "\""
+    | Boolean(boolean), _ ->
         if boolean then
             "true"
         else
             "false"
-    | Var(var) -> check_std_lib_for_var var
-    | Unop(op, e) -> java_of_op op ^ java_of_simple_expr e
-    | Binop(e1, op, e2) -> 
-           (*assumes that logical operators on set will be regarding set size*)
-        begin match op with
-        |Disj | Conj ->  "(" ^ java_of_simple_expr e1 ^ " " ^
-                        java_of_op op  ^ " " ^ java_of_simple_expr e2  ")"
-        | _ -> begin match e1 with
-        |( _ , StringType) -> begin match op with
-            | Equal ->  "(Utility.compareString(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | NotEqual -> "(!Utility.compareString(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | Add ->  java_of_simple_expr e1 ^ " " ^
-                        java_of_op op  ^ " " ^ java_of_simple_expr e2 
-        |( _ , NumberType) -> "(" ^ java_of_simple_expr e1 ^ " " ^
-                        java_of_op op  ^ " " ^ java_of_simple_expr e2 ^ ")"
-        | ( _ , CardType) -> begin match op with
-            | Equal ->   "(Utility.cardEqual(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | NotEqual ->  "(Utility.cardNotEqual(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | Lt ->   "(Utility.cardLessThan(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | Gt ->  "(Utility.cardGreaterThan(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | Ltoe -> "(Utility.cardLessOrEqualThan(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | Gtoe -> "(Utility.cardGreaterOrEqualThan(" ^ java_of_simple_expr e1  ^ 
-                    ", " ^ java_of_simple_expr e2  ")"
-            | _ -> raise (WrongType ("You can't have operation" ^ java_of_op op ^ " with type Card"))
-        | ( _ , SetType) -> begin match op with
-            | Equal | NotEqual | Lt | Gt | Ltoe | Gtoe ->  
-             "(" ^ java_of_simple_expr e1 ^ " " ^
-                        java_of_op op  ^ " " ^ java_of_simple_expr e2 ^ ")"
-            
-            | _ -> raise (WrongType ("You can't have operation" ^ java_of_op op ^ " with type Card"))
-    
-
-
-        
+    | Var(var), _ -> java_of_var var
+    | Unop(op, e), _ -> java_of_op op ^ java_of_expr e
+    | Binop(e1, op, e2), _  -> 
+        let _, expr_types = 
+            e1
+        in 
+            begin match expr_types with
+            | NumberType | BooleanType -> 
+                "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                java_of_expr e2 ^ ")"
+            | StringType ->
+                begin match op with
+                | Ast.Add ->
+                    "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                    java_of_expr e2 ^ ")"
+                | Ast.Equal ->
+                    "(Utility.compareString(" ^ java_of_expr e1 ^ ", " ^
+                    java_of_expr e2 ^ ")"
+                | Ast.NotEqual ->
+                    "(!Utility.compareString(" ^ java_of_expr e1 ^ ", " ^
+                    java_of_expr e2 ^ ")"
+                | _ -> raise (CompilerError("Invalid Op."))
+                end
+            | CardType ->
+                begin match op with
+                | Ast.Equal -> "(Utility.cardEqual(" ^ java_of_expr e1  ^ 
+                        ", " ^ java_of_expr e2 ^  ")"
+                | Ast.NotEqual -> "(Utility.cardNotEqual(" ^ java_of_expr e1  ^ 
+                        ", " ^ java_of_expr e2 ^ ")"
+                | Ast.Lt -> "(Utility.cardLessThan(" ^ java_of_expr e1  ^ 
+                        ", " ^ java_of_expr e2 ^ ")"
+                | Ast.Gt -> "(Utility.cardGreaterThan(" ^ java_of_expr e1  ^ 
+                        ", " ^ java_of_expr e2 ^ ")"
+                | Ast.Ltoe -> "(Utility.cardLessOrEqualThan(" ^ java_of_expr e1  
+                            ^ ", " ^ java_of_expr e2 ^ ")"
+                | Ast.Gtoe -> "(Utility.cardGreaterOrEqualThan(" ^ 
+                          java_of_expr e1  ^ ", " ^ 
+                          java_of_expr e2 ^ ")"
+                | _ -> raise (CompilerError("Invalid Op."))
+                end
+            | SetType | PlayerType ->
+                begin match op with
+                | Ast.Equal | Ast.NotEqual -> 
+                    "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                    java_of_expr e2 ^ ")"
+                | _ -> raise (CompilerError("Invalid Op."))
+                end
+            end
 
 (* Converts a config_decl to a java assignment. Only numbers, booleans, or
  * variables can be used for configure statements. *)
 let java_of_config config = 
     match config.config_value with
-    | Number(n) -> 
+    | Number(n), _ -> 
         let num =
             if (config.config_id = "highestCard") then
                 n - 1
@@ -120,9 +162,9 @@ let java_of_config config =
                 n
         in
             config.config_id ^ " = " ^ string_of_int (num) ^ ";"
-    | Boolean(b) -> config.config_id ^ " = " ^ string_of_bool b ^ ";"
-    | Var(var) -> config.config_id ^ " = " ^ check_stdlib_for_var var ^ ";" 
-    | _ -> raise (UnknownType "Invalid type used for configure statement.")
+    | Boolean(b), _ -> config.config_id ^ " = " ^ string_of_bool b ^ ";"
+    | Var(var), _-> config.config_id ^ " = " ^ java_of_var var ^ ";" 
+    | _ -> raise (CompilerError("Invalid type used for configure statement."))
 
 (* Converts a field decl to a java instance var declaration. *)
 let java_of_field_decl field_decl =
@@ -137,8 +179,8 @@ let java_of_field_decl_assign field_decl =
     | BooleanType -> field_decl.field_id ^ " = false;"
     | NumberType -> field_decl.field_id ^ " = 0;"
     (* Should be caught by semantic analysis, here to prevent warning. *)
-    | _ -> raise (WrongType("You can't have a field declaration with type " ^
-                    "\"" ^ string_of_type field_decl.field_type ^ ".\""))
+    | _ -> raise (CompilerError("You can't have a field declaration with type "
+                  ^ "\"" ^ string_of_type field_decl.field_type ^ ".\""))
 
 (* Takes a list of field_decls and converts them to a MyPlayer class. *)
 let java_of_player field_decls =
@@ -154,18 +196,30 @@ let java_of_player field_decls =
         assigns ^
         "}\n}"
 
+let java_of_args args =
+    String.concat ", " (List.map java_of_expr args)
 
-let java_of_update = function
-    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
-    | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
-                      var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value ^ ";"
-
-
-
-
-
-
+let java_of_call call =
+    match call.fname with
+    | "output" -> "System.out.println(" ^ java_of_args call.args ^ ")"
+    | "input" -> 
+        let expr, _type =
+            List.hd call.args
+        in let var_id =
+            begin match expr with
+            | Var(id) -> id
+            | _ -> raise (CompilerError("Bad type passed to input()."))
+            end
+        in
+            begin match _type with
+            | BooleanType -> var_id ^ " = Utility.inputBool()"
+            | NumberType -> var_id ^ " = Utility.inputInt()"
+            | StringType -> var_id ^ " = Utility.inputString()"
+            | _ -> raise (CompilerError("Bad type passed to input()."))
+            end
+    | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
+        
+(*
 
 let java_of_player p =
     string_of_int ((int_of_string (String.sub p 6 ((String.length p) - 6 )))-1)
@@ -225,18 +279,7 @@ let input_call call=
     | _ -> raise (UnknownType "Argument for input call not valid.")
 
 let normal_call call =
-    let args_java =
-        String.concat ", " (List.map (fun arg -> java_of_expr arg) call.args)
-    in
-        call.fname ^ "(" ^ args_java ^ ");"
 
-let java_of_call call =
-    match call.fname with
-    | "output" -> output_call call
-    | "input" -> input_call call
-    | "quit" -> "System.exit(0);\n"
-    | _ -> normal_call call
-(* ; not appended here, see java_of_stmt *)
 
 let rec java_of_stmt stmt =
     match stmt with
@@ -351,3 +394,4 @@ let _ =
         open_in Sys.argv.(1)
     in
         compile (Lexing.from_channel input_file)
+*)

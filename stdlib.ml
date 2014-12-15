@@ -83,22 +83,30 @@ let configs = [
     { config_id = "ascendingOrder";
       config_value = (Sast.Boolean(true), BooleanType);
       config_type = BooleanType; }
-    (* suit order *)
 ]
 
 (* A list of fields for each of our aggregate types. IDs containing dots get
  * checked against this list to make sure they are valid. See check_fields
  * in semantic.ml *)
 let fields = [
-   { parent_type = CardType; field_type = NumberType; field_id = "rank"; } ;
-   { parent_type = CardType; field_type = NumberType; field_id = "suit"; } ;
-   { parent_type = CardType; field_type = StringType; field_id = "desc" } ;
-   { parent_type = SetType; field_type = NumberType; field_id = "size" } ;
-   { parent_type = SetType; field_type = StringType; field_id = "desc" } ;
-   { parent_type = SetType; field_type = CardType; field_id = "top" } ;
-   { parent_type = SetType; field_type = CardType; field_id = "bottom" } ;
-   { parent_type = PlayerType; field_type = SetType; field_id = "hand" } ;
-   { parent_type = PlayerType; field_type = StringType; field_id = "desc" } 
+   ({ parent_type = CardType; field_type = NumberType; field_id = "rank"; },
+        "val");
+   ({ parent_type = CardType; field_type = NumberType; field_id = "suit"; },
+        "suit");
+   ({ parent_type = CardType; field_type = StringType; field_id = "desc"; },
+        "toString()");
+   ({ parent_type = SetType; field_type = NumberType; field_id = "size" },
+        "size()");
+   ({ parent_type = SetType; field_type = CardType; field_id = "top" },
+        "top()");
+   ({ parent_type = SetType; field_type = CardType; field_id = "bottom" },
+        "bottom()");
+   ({ parent_type = SetType; field_type = StringType; field_id = "desc"; },
+        "toString()");
+   ({ parent_type = PlayerType; field_type = SetType; field_id = "hand" },
+        "hand");
+   ({ parent_type = PlayerType; field_type = StringType; field_id = "desc"; },
+        "toString()");
 ]
 
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
@@ -107,65 +115,68 @@ let funcs = [
    (*                   Main Functions                         *)
    (* ======================================================== *)
    (* Print a line *)
-   ( { decl_name = "output";
+   { decl_name = "output";
        formals = [];
-       body = []; },
-       "System.out.println()" );
+       body = []; };
 
    (* Print a string *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "str";
+   { decl_name = "output";
+     formals = [ { formal_id = "str";
                      formal_type = Sast.StringType; } ];
-       body = []; },
-       "System.out.println(str)" );
+     body = []; };
 
    (* Print a number *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "number";
-                     formal_type = Sast.NumberType; } ];
-       body = []; },
-       "System.console.println(number)" );
+   { decl_name = "output";
+     formals = [ { formal_id = "number";
+                   formal_type = Sast.NumberType; } ];
+     body = []; };
 
    (* Print a boolean *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "boolean";
-                     formal_type = Sast.BooleanType; } ];
-       body = []; },
-       "System.console.println(boolean)") ;
+   { decl_name = "output";
+     formals = [ { formal_id = "boolean";
+                   formal_type = Sast.BooleanType; } ];
+     body = []; };
 
    (* Print a card *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "card";
-                     formal_type = Sast.CardType; } ];
-       body = []; },
-       "System.out.println(card) ") ;
+   { decl_name = "output";
+     formals = [ { formal_id = "card";
+                   formal_type = Sast.CardType; } ];
+     body = []; };
 
    (* Print a set *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "set";
-                     formal_type = Sast.SetType; } ];
-       body = []; },
-       "System.console.println(set)") ;
+   { decl_name = "output";
+     formals = [ { formal_id = "set";
+                   formal_type = Sast.SetType; } ];
+     body = []; };
 
    (* Print a player *)
-   ( { decl_name = "output";
-       formals = [ { formal_id = "player";
-                     formal_type = Sast.PlayerType; } ];
-       body = []; },
-       "System.console.println(player)") ;
+   { decl_name = "output";
+     formals = [ { formal_id = "player";
+                   formal_type = Sast.PlayerType; } ];
+     body = []; };
 
-   (* Input *)
-   ( { decl_name = "input";
-       formals = [ { formal_id = "str";
-                     formal_type = Sast.StringType; } ];
-       body = []; },
-       "str = new Scanner(System.in)");
+   (* Input Bool *)
+   { decl_name = "input";
+     formals = [ { formal_id = "bool";
+                   formal_type = Sast.BooleanType; } ];
+     body = []; };
+
+   (* Input Int *)
+   { decl_name = "input";
+     formals = [ { formal_id = "num";
+                   formal_type = Sast.NumberType; } ];
+     body = []; };
+
+   (* Input String *)
+   { decl_name = "input";
+     formals = [ { formal_id = "str";
+                   formal_type = Sast.StringType; } ];
+     body = []; };
 
    (* Quit *)
-   ( { decl_name = "quit";
-       formals = [];
-       body = []; },
-       "System.exit(0);\n" );
+   { decl_name = "quit";
+     formals = [];
+     body = []; };
 
 (*
 
