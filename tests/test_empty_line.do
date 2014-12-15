@@ -1,3 +1,5 @@
+setup:
+
 round:
 	do output with "Before empty line."
 

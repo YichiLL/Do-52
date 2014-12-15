@@ -1,4 +1,5 @@
-Player has Boolean called isCat
+setup:
+	Player has Boolean called isCat
 
 round:
 	player1.isCat : false
