@@ -56,8 +56,9 @@ let java_of_op = function
 
 (* Converts a simple expression in our SAST to java code, checking the stdlib
  * for special java code representations. *)
-let rec java_of_simple_expr expr _type =
-    match expr with
+let rec java_of_simple_expr expr =
+    let simple, _type = expr in 
+    match simple with
     | Number num -> string_of_int num
     | String str -> str
     | Boolean boolean ->
@@ -68,16 +69,44 @@ let rec java_of_simple_expr expr _type =
     | Var(var) -> check_std_lib_for_var var
     | Unop(op, e) -> java_of_op op ^ java_of_simple_expr e
     | Binop(e1, op, e2) -> 
-        match op with
-        | Equal | NotEqual ->
-            begin match _type with
-            | StringType ->
-                "(Utility.compareString(" ^ java_of_simple_expr e1 _type ^ 
-                ", " ^ java_of_simple_expr e2 _type "))"
+           (*assumes that logical operators on set will be regarding set size*)
+        begin match op with
+        |Disj | Conj ->  "(" ^ java_of_simple_expr e1 ^ " " ^
+                        java_of_op op  ^ " " ^ java_of_simple_expr e2  ")"
+        | _ -> begin match e1 with
+        |( _ , StringType) -> begin match op with
+            | Equal ->  "(Utility.compareString(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | NotEqual -> "(!Utility.compareString(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | Add ->  java_of_simple_expr e1 ^ " " ^
+                        java_of_op op  ^ " " ^ java_of_simple_expr e2 
+        |( _ , NumberType) -> "(" ^ java_of_simple_expr e1 ^ " " ^
+                        java_of_op op  ^ " " ^ java_of_simple_expr e2 ^ ")"
+        | ( _ , CardType) -> begin match op with
+            | Equal ->   "(Utility.cardEqual(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | NotEqual ->  "(Utility.cardNotEqual(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | Lt ->   "(Utility.cardLessThan(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | Gt ->  "(Utility.cardGreaterThan(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | Ltoe -> "(Utility.cardLessOrEqualThan(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | Gtoe -> "(Utility.cardGreaterOrEqualThan(" ^ java_of_simple_expr e1  ^ 
+                    ", " ^ java_of_simple_expr e2  ")"
+            | _ -> raise (WrongType ("You can't have operation" ^ java_of_op op ^ " with type Card"))
+        | ( _ , SetType) -> begin match op with
+            | Equal | NotEqual | Lt | Gt | Ltoe | Gtoe ->  
+             "(" ^ java_of_simple_expr e1 ^ " " ^
+                        java_of_op op  ^ " " ^ java_of_simple_expr e2 ^ ")"
+            
+            | _ -> raise (WrongType ("You can't have operation" ^ java_of_op op ^ " with type Card"))
+    
 
-        "(" ^ java_of_simple_expr e1 _type ^ " " ^ 
-                           java_of_op op ^ " " ^ 
-                           java_of_simple_expr e2 _type ^ ")"
+
+        
 
 (* Converts a config_decl to a java assignment. Only numbers, booleans, or
  * variables can be used for configure statements. *)
@@ -109,7 +138,7 @@ let java_of_field_decl_assign field_decl =
     | NumberType -> field_decl.field_id ^ " = 0;"
     (* Should be caught by semantic analysis, here to prevent warning. *)
     | _ -> raise (WrongType("You can't have a field declaration with type " ^
-                    "\"" ^ field_decl.field_type ^ ".\""))
+                    "\"" ^ string_of_type field_decl.field_type ^ ".\""))
 
 (* Takes a list of field_decls and converts them to a MyPlayer class. *)
 let java_of_player field_decls =
