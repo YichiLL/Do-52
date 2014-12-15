@@ -7,10 +7,7 @@ setup:
 	{ player1.hand <t deck } * (deck.size / 2)
 
 round:
-	new Boolean isCar : true
-	new Boolean fits : true
-	if isCat:
-		if fits:
-			do output with true
-	else:
-		do output with false
+	new Number a : 5
+	while (a >= 0):
+		a : a - 1
+		do output with a
