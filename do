@@ -1,8 +1,12 @@
 #!/bin/bash
+
 make
-./compile $1 
-mv Game.java MyPlayer.java runtime/
+./compile $1 && run_java
 make clean
-(cd runtime  && make run && make clean)
-cd ..
+
+function run_java {
+	mv Game.java MyPlayer.java runtime/
+	(cd runtime && make run && make clean)
+	cd ..
+}
 
