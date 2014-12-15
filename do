@@ -2,6 +2,7 @@
 make
 ./compile $1 
 mv Game.java MyPlayer.java runtime/
-(cd runtime && make run)
+make clean
+(cd runtime  && make run && make clean)
 cd ..
 
