@@ -19,15 +19,6 @@ let check_std_lib_for_var var_id =
     in
         java_code
 
-(* Converts a type to a string representation of a java type. *)
-let java_of_type = function
-    | BooleanType -> "boolean"
-    | NumberType -> "int"
-    | StringType -> "String"
-    | CardType -> "Card"
-    | SetType -> "Set"
-    | PlayerType -> "MyPlayer"
-
 (* ========================================================================= *)
 (*                             Java Printing                                 *)
 (* ========================================================================= *)
@@ -39,6 +30,15 @@ let java_of_type = function
 *  spacing or indentation in the SAST. We could maybe keep track of depth and
 *  space things that way, but it's not really worth it because nobody is meant
 *  to see the java code and java ignores whitespace anyway. *)
+(* Converts a type to a string representation of a java type. *)
+let java_of_type = function
+    | BooleanType -> "boolean"
+    | NumberType -> "int"
+    | StringType -> "String"
+    | CardType -> "Card"
+    | SetType -> "Set"
+    | PlayerType -> "MyPlayer"
+
 let java_of_op = function
     | Add -> "+"
     | Minus -> "-"
@@ -56,7 +56,8 @@ let java_of_op = function
 
 (* Converts a simple expression in our SAST to java code, checking the stdlib
  * for special java code representations. *)
-let rec java_of_simple_expr = function
+let rec java_of_simple_expr expr _type =
+    match expr with
     | Number num -> string_of_int num
     | String str -> str
     | Boolean boolean ->
@@ -66,8 +67,17 @@ let rec java_of_simple_expr = function
             "false"
     | Var(var) -> check_std_lib_for_var var
     | Unop(op, e) -> java_of_op op ^ java_of_simple_expr e
-    | Binop(e1, op, e2) -> "(" ^ java_of_simple_expr e1 ^ " " ^ 
-                           java_of_op op ^ " " ^ java_of_simple_expr e2 ^ ")"
+    | Binop(e1, op, e2) -> 
+        match op with
+        | Equal | NotEqual ->
+            begin match _type with
+            | StringType ->
+                "(Utility.compareString(" ^ java_of_simple_expr e1 _type ^ 
+                ", " ^ java_of_simple_expr e2 _type "))"
+
+        "(" ^ java_of_simple_expr e1 _type ^ " " ^ 
+                           java_of_op op ^ " " ^ 
+                           java_of_simple_expr e2 _type ^ ")"
 
 (* Converts a config_decl to a java assignment. Only numbers, booleans, or
  * variables can be used for configure statements. *)
@@ -85,7 +95,6 @@ let java_of_config config =
     | Var(var) -> config.config_id ^ " = " ^ check_stdlib_for_var var ^ ";" 
     | _ -> raise (UnknownType "Invalid type used for configure statement.")
 
-
 (* Converts a field decl to a java instance var declaration. *)
 let java_of_field_decl field_decl =
     (string_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
@@ -95,9 +104,14 @@ let java_of_field_decl field_decl =
 let java_of_field_decl_assign field_decl = 
     match field_decl.field_type with
     | SetType -> field_decl.field_id ^ " = new Set();"
-    | _ -> ""
+    | StringType -> field_decl.field_id ^ " = \"\";"
+    | BooleanType -> field_decl.field_id ^ " = false;"
+    | NumberType -> field_decl.field_id ^ " = 0;"
+    (* Should be caught by semantic analysis, here to prevent warning. *)
+    | _ -> raise (WrongType("You can't have a field declaration with type " ^
+                    "\"" ^ field_decl.field_type ^ ".\""))
 
-(* Takes a list of field_decls and converts the to a MyPlayer class. *)
+(* Takes a list of field_decls and converts them to a MyPlayer class. *)
 let java_of_player field_decls =
     let instance_vars = 
         String.concat "\n" (List.map java_of_field_decl field_decls)
@@ -110,6 +124,19 @@ let java_of_player field_decls =
         ^   "super(playerName);\n" ^
         assigns ^
         "}\n}"
+
+
+let java_of_update = function
+    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
+    | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
+                      var.var_decl_id ^ " = " ^
+                      java_of_expr var.var_decl_value ^ ";"
+
+
+
+
+
+
 
 let java_of_player p =
     string_of_int ((int_of_string (String.sub p 6 ((String.length p) - 6 )))-1)
@@ -135,14 +162,6 @@ let java_of_var var =
 
 exception UnknownType of string
 
-let java_of_type _type = 
-    match _type with
-    | "Number" -> "int"
-    | "String" -> "String"
-    | "Boolean" -> "boolean"
-    | "Player" -> "MyPlayer"
-    | "Set" -> "Set"
-    | _ -> raise (UnknownType ("Type " ^ _type ^ " is not a valid type."))
 
 (* ; not appended here, see java_of_stmt *)
 (*let rec output_expr = function
@@ -189,11 +208,6 @@ let java_of_call call =
     | "quit" -> "System.exit(0);\n"
     | _ -> normal_call call
 (* ; not appended here, see java_of_stmt *)
-let java_of_update = function
-    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
-    | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
-                      var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value ^ ";"
 
 let rec java_of_stmt stmt =
     match stmt with
