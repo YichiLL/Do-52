@@ -14,6 +14,7 @@ round:
 			do bar
 	else:
 		do baz
+	do quit
 
 baz:
 	do output with "Baz"

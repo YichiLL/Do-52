@@ -8,3 +8,4 @@ setup:
 
 round:
 	do output with "Hello!"
+	do quit

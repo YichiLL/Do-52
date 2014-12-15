@@ -12,3 +12,4 @@ round:
 		do output with false
 	else:
 		do output with true
+	do quit

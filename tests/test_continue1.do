@@ -12,3 +12,4 @@ round:
 			continue
 		else:
 			do output with x
+	do quit

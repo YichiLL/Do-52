@@ -11,3 +11,4 @@ round:
 	for x : 0; x < 4; x : x + 1:
 		do output with x
 		break
+	do quit
