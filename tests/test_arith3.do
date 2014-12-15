@@ -9,3 +9,4 @@ setup:
 round:
 	new Number n : 2 * 2
 	do output with n
+	do quit

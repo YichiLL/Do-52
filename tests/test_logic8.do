@@ -9,3 +9,4 @@ setup:
 round:
 	new	Boolean b : false & !true
 	do output with b
+	do quit

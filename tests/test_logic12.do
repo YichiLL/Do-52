@@ -8,3 +8,4 @@ setup:
 
 round:
 	do output with (4 <= 5)
+	do quit

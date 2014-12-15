@@ -14,3 +14,4 @@ round:
 			do output with true
 	else:
 		do output with false
+	do quit

@@ -13,3 +13,4 @@ round:
 		do output with a
 
 	do output with false
+	do quit

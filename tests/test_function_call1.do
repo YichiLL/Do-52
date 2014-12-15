@@ -8,6 +8,7 @@ setup:
 
 round:
 	do foo with (1 + 1)
+	do quit
 
 foo with Number x:
 	do output with x

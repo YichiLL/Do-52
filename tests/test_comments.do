@@ -16,3 +16,4 @@ round:
 	
 	// another comment
 	do output with "Over"
+	do quit

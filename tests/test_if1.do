@@ -9,3 +9,4 @@ setup:
 round:
 	if (2 > 1):
 		do output with true
+	do quit

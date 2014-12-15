@@ -5,6 +5,7 @@ round:
 
 	do output with "After empty line."
 	do foo
+	do quit
 
 foo:
 	if 5 > 4:

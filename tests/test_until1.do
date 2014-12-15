@@ -12,3 +12,4 @@ round:
 	x : x + 1
 	do output with x
 	} until (x > 7)
+	do quit

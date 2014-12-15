@@ -12,3 +12,4 @@ round:
 		a : a - 1
 		do output with a
 		break
+	do quit
