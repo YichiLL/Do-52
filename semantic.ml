@@ -248,7 +248,7 @@ let check_var_decl env (vdecl : Ast.var_decl) =
 (* Header var decls get parsed as updates, but we need a function to check them
  * that always returns a var_decl so that they can be put into scope. See
  * check_pgrm below. *)
-let check_update_hack env update =
+let check_update_header env update =
     match update with
     | Ast.Assign(_, _) -> raise (WrongType("You cannot assign in the header."))
     | Ast.VarDecl(vdecl) ->
@@ -582,7 +582,7 @@ let check_prgm (prgm : Ast.program) =
         in let all_fields = 
             List.append std_fields added_fields
         in let (added_vars : var_decl list) =
-            List.map (check_update_hack header_env) prgm.vars
+            List.map (check_update_header header_env) prgm.vars
         in let (added_vars_update : update list) =
             List.map (fun var_decl -> Sast.VarDecl(var_decl)) added_vars
         in let all_vars =
