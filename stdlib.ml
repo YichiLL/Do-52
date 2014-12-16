@@ -68,6 +68,10 @@ let vars = [
         var_decl_type = NumberType;
         var_decl_value = (Sast.Number(0), NumberType); },
       "Card.SPADE");
+    ( { var_decl_id = "deck";
+        var_decl_type = SetType;
+        var_decl_value = (Sast.Number(0), NumberType); },
+      "deck");
 ]
 
 (* A list of config_decls that correspond to configurable environment variables
