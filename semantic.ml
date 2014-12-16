@@ -293,8 +293,8 @@ let rec check_stmt env = function
                   scope = new_scope;
                   unchecked_calls = env.unchecked_calls;
                   func_decls = env.func_decls;
-                  can_break = false;
-                  can_continue = false; }
+                  can_break = env.can_break;
+                  can_continue = env.can_continue; }
             in
                 let checked_tblock = 
                     check_block new_env tblock
