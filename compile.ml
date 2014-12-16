@@ -207,8 +207,16 @@ let java_of_player field_decls =
         assigns ^
         "}\n}"
 
+let java_of_function_expr expr = 
+    match expr with
+    | Var(var), _ -> java_of_var var
+    | _ -> java_of_expr expr
+
 let java_of_args args =
     String.concat ", " (List.map java_of_expr args)
+
+let java_of_function_args args =
+    String.concat ", " (List.map java_of_function_expr args)
 
 let java_of_call call =
     match call.fname with
@@ -230,7 +238,7 @@ let java_of_call call =
             end
     | "quit" ->
         "System.exit(0)"
-    | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
+    | _ -> call.fname ^ "(" ^ java_of_function_args call.args ^ ")"
         
 let java_of_update = function
     | Assign(id, e) -> 
@@ -311,8 +319,7 @@ let java_of_game program =
     let config_vars = 
         String.concat "\n" (List.map java_of_config program.configs)
     in let instance_vars =
-        String.concat "\n" (List.map (fun vd -> java_of_update vd ^ ";")
-                             program.vars)
+        String.concat "\n" (List.map java_of_update program.vars)
     in let funcs =
         String.concat "\n" (List.map java_of_function program.funcs)
     in
