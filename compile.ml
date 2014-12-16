@@ -222,15 +222,15 @@ let java_of_call call =
     | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
         
 let java_of_update = function
-    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
+    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e
     | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value ^ ";"
+                      java_of_expr var.var_decl_value
 
 let rec java_of_stmt stmt =
     match stmt with
     | Call(call) -> java_of_call call ^ ";"
-    | Update(update) -> java_of_update update
+    | Update(update) -> java_of_update update ^ ";"
     | If(e, tb, fb) -> "if (" ^ java_of_expr e ^ ")\n" ^ java_of_block tb
                         ^ "else\n" ^ java_of_block fb
     | While(e, b) -> "while (" ^ java_of_expr e ^ ")\n" ^ java_of_block b

@@ -330,9 +330,9 @@ let rec check_stmt env = function
                       "\" cannot appear in the predicate of an if statement."))
         end
     | Ast.For(setup, expr, update, block) ->
-        let checked_update = check_update env update in
         let checked_setup = check_update env setup in
         let checked_expr, expr_type = check_expr env expr in
+        let checked_update = check_update env update in
         begin match expr_type with
         | NumberType | BooleanType ->
            begin match checked_update with
@@ -352,8 +352,8 @@ let rec check_stmt env = function
                    let checked_block =
                        check_block new_env block
                    in
-                       Sast.For(checked_update, (checked_expr, expr_type),
-                                checked_setup, checked_block)
+                       Sast.For(checked_setup, (checked_expr, expr_type),
+                                checked_update, checked_block)
            | _ -> raise (IllegalUsage("You cannot declare a variable in the"
                          ^ " update section of a for loop header.")) end
         | _ -> raise (WrongType("The type \"" ^ string_of_type expr_type ^ 
