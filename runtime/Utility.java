@@ -60,39 +60,40 @@ public class Utility {
 			return false;
 	} 
 	
-	public static void inputString(String[] input){
+	public static String inputString(){
 		Scanner a = new Scanner(System.in);
-		input[0] = a.nextLine();
+		return a.nextLine();
 	}
 	
-	public static void inputInt(int[] input){
+	public static int inputInt(){
 		boolean error = true;
 		while(error){
 			try{
 			error = false;
 			Scanner a = new Scanner(System.in);
-			input[0] = a.nextInt(); 
+			int input = a.nextInt(); 
 
 			}catch(Exception e){
 				error = true;
 				System.out.println("The number input is not valid. Input another number.");
 			}
 		}
+		return 0;
 	}
 	
-	public static void inputBool(boolean[] input){
+	public static boolean inputBool(){
 		System.out.println("Y/N?");
 		boolean error = true;
 		while(error){
 			
 			error = false;
 			Scanner a = new Scanner(System.in);
-			String sInput = a.nextLine();
+			String input = a.nextLine();
 			
-			if (compareString(sInput,"Y"))
-				input[0] = true;
-			else if(compareString(sInput,"N"))
-				input[0] = false;
+			if (compareString(input,"Y"))
+				return true;
+			else if(compareString(input,"N"))
+				return false;
 			else {
 				error = true;
 				System.out.println("Input not valid. Y/N?");
@@ -100,6 +101,7 @@ public class Utility {
 				
 			
 		}
+		return false;
 	}
 	
 }
