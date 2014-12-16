@@ -69,7 +69,7 @@ CompileRunTime(){
     Run "javac -g Card.java" && 
     Run "javac -g Deck.java" && 
     Run "javac -g Player.java" && 
-    Run "javac -g Set.java" && 
+    Run "javac -g Set.java"
 }
 
 Check() {
@@ -101,7 +101,7 @@ Check() {
 
     if [ $error -eq 0 ] ; then
     if [ $keep -eq 0 ] ; then
-        rm -f $generatedfiles
+        rm -f tests/*.out
     fi
     echo "OK - $basename succeeds"
     echo "###### SUCCESS" 1>&2
