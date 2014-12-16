@@ -115,30 +115,30 @@ let rec java_of_expr = function
                 begin match op with
                 | Ast.Add ->
                     "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
-                    java_of_expr e2 ^ ")"
+                    java_of_expr e2 ^ "))"
                 | Ast.Equal ->
                     "(Utility.compareString(" ^ java_of_expr e1 ^ ", " ^
-                    java_of_expr e2 ^ ")"
+                    java_of_expr e2 ^ "))"
                 | Ast.NotEqual ->
                     "(!Utility.compareString(" ^ java_of_expr e1 ^ ", " ^
-                    java_of_expr e2 ^ ")"
+                    java_of_expr e2 ^ "))"
                 | _ -> raise (CompilerError("Invalid Op."))
                 end
             | CardType ->
                 begin match op with
                 | Ast.Equal -> "(Utility.cardEqual(" ^ java_of_expr e1  ^ 
-                        ", " ^ java_of_expr e2 ^  ")"
+                        ", " ^ java_of_expr e2 ^  "))"
                 | Ast.NotEqual -> "(Utility.cardNotEqual(" ^ java_of_expr e1  ^ 
-                        ", " ^ java_of_expr e2 ^ ")"
+                        ", " ^ java_of_expr e2 ^ "))"
                 | Ast.Lt -> "(Utility.cardLessThan(" ^ java_of_expr e1  ^ 
-                        ", " ^ java_of_expr e2 ^ ")"
+                        ", " ^ java_of_expr e2 ^ "))"
                 | Ast.Gt -> "(Utility.cardGreaterThan(" ^ java_of_expr e1  ^ 
-                        ", " ^ java_of_expr e2 ^ ")"
+                        ", " ^ java_of_expr e2 ^ "))"
                 | Ast.Ltoe -> "(Utility.cardLessOrEqualThan(" ^ java_of_expr e1  
-                            ^ ", " ^ java_of_expr e2 ^ ")"
+                            ^ ", " ^ java_of_expr e2 ^ "))"
                 | Ast.Gtoe -> "(Utility.cardGreaterOrEqualThan(" ^ 
                           java_of_expr e1  ^ ", " ^ 
-                          java_of_expr e2 ^ ")"
+                          java_of_expr e2 ^ "))"
                 | _ -> raise (CompilerError("Invalid Op."))
                 end
             | SetType | PlayerType ->
