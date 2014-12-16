@@ -1,1 +1,1 @@
-false
+Fatal error: exception Semantic.TypeMismatch("Boolean does not match Number.")
