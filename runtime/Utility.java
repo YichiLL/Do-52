@@ -87,11 +87,11 @@ public class Utility {
 			
 			error = false;
 			Scanner a = new Scanner(System.in);
-			String input = a.nextLine();
+			String sInput = a.nextLine();
 			
-			if (compareString(input,"Y"))
+			if (compareString(sInput,"Y"))
 				input[0] = true;
-			else if(compareString(input,"N"))
+			else if(compareString(sInput,"N"))
 				input[0] = false;
 			else {
 				error = true;
@@ -100,7 +100,6 @@ public class Utility {
 				
 			
 		}
-		return false;
 	}
 	
 }
