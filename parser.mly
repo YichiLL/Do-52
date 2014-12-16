@@ -127,8 +127,8 @@ stmt:
     | OPENBRACE stmt CLOSEBRACE TIMES expr  { TimesLoop($2, $5) }
     | expr PREPEND_TOP expr                 { Prepend($1, $3, Top) }
     | expr PREPEND_BOTTOM expr              { Prepend($1, $3, Bottom) }
-    | expr APPEND_TOP expr                  { Append($1, $3, Top) }
-    | expr APPEND_BOTTOM expr               { Append($1, $3, Bottom) }
+    | expr APPEND_TOP expr                  { Append($3, $1, Top) }
+    | expr APPEND_BOTTOM expr               { Append($3, $1, Bottom) }
 
 arg_list:
     | expr                                  { [$1] }
