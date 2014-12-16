@@ -248,8 +248,8 @@ let java_of_update = function
             begin match _type with
             | BooleanType 
             | NumberType 
-            | StringType -> java_of_var id ^ "[0] = " ^  java_of_expr e ^ ";"
-            | _ -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
+            | StringType -> java_of_var id ^ "[0] = " ^  java_of_expr e
+            | _ -> java_of_var id ^ " = " ^ java_of_expr e
             end
     | VarDecl(var) -> 
         begin match var.var_decl_type with
@@ -257,10 +257,10 @@ let java_of_update = function
         | NumberType
         | StringType -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = new " ^ java_of_type var.var_decl_type 
-                      ^ "{" ^ java_of_expr var.var_decl_value ^ "};"
+                      ^ "{" ^ java_of_expr var.var_decl_value ^ "}"
         | _ -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value ^ ";"
+                      java_of_expr var.var_decl_value
     end
 
 
