@@ -12,3 +12,5 @@ parser.ml
 parser.*
 printer
 testParse.log
+*.diff
+*.out
