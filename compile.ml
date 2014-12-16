@@ -52,9 +52,9 @@ let find_java_for_field field_id =
 
 (* Converts a type to a string representation of a java type. *)
 let java_of_type = function
-    | BooleanType -> "boolean"
-    | NumberType -> "int"
-    | StringType -> "String"
+    | BooleanType -> "boolean[]"
+    | NumberType -> "int[]"
+    | StringType -> "String[]"
     | CardType -> "Card"
     | SetType -> "Set"
     | PlayerType -> "MyPlayer"
@@ -93,17 +93,27 @@ let java_of_var var_id =
 
 (* Converts a simple expression in our SAST to java code, checking the stdlib
  * for special java code representations. *)
-let rec java_of_expr = function
-    | Number(num), _ -> string_of_int num
-    | String(str), _ -> str
-    | Boolean(boolean), _ ->
+let rec java_of_expr expr = 
+let (simple, _type) = 
+    expr  
+in 
+match simple with 
+    | Number(num)-> string_of_int num
+    | String(str)-> str
+    | Boolean(boolean)->
         if boolean then
             "true"
         else
             "false"
-    | Var(var), _ -> java_of_var var
-    | Unop(op, e), _ -> java_of_op op ^ java_of_expr e
-    | Binop(e1, op, e2), _  -> 
+    | Var(var)-> 
+        begin match _type with
+        | StringType
+        | NumberType
+        | BooleanType -> java_of_var var ^ "[0]"
+        | _ -> java_of_var var
+        end
+    | Unop(op, e)-> java_of_op op ^ java_of_expr e
+    | Binop(e1, op, e2)-> 
         let _, expr_types = 
             e1
         in 
@@ -148,7 +158,8 @@ let rec java_of_expr = function
                     java_of_expr e2 ^ ")"
                 | _ -> raise (CompilerError("Invalid Op."))
                 end
-            end
+            end 
+
 
 (* Converts a config_decl to a java assignment. Only numbers, booleans, or
  * variables can be used for configure statements. *)
@@ -222,10 +233,28 @@ let java_of_call call =
     | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
         
 let java_of_update = function
-    | Assign(id, e) -> java_of_var id ^ " = " ^ java_of_expr e
-    | VarDecl(var) -> java_of_type var.var_decl_type ^ " " ^ 
+    | Assign(id, e) -> 
+        let expr, _type = 
+            e 
+        in 
+            begin match _type with
+            | BooleanType 
+            | NumberType 
+            | StringType -> java_of_var id ^ "[0]" ^ java_of_expr e ^ ";"
+            | _ -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
+            end
+    | VarDecl(var) -> 
+        begin match var.var_decl_type with
+        | BooleanType
+        | NumberType
+        | StringType -> java_of_type var.var_decl_type ^ " " ^ 
+                      var.var_decl_id ^ " = new " ^ java_of_type var.var_decl_type 
+                      ^ "{" ^ java_of_expr var.var_decl_value ^ "};"
+        | _ -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value
+                      java_of_expr var.var_decl_value ^ ";"
+    end
+
 
 let rec java_of_stmt stmt =
     match stmt with

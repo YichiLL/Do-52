@@ -12,6 +12,7 @@ public class Set {
 	final static int APPEND = 0;
 	final static int PREPEND = 1;
 	
+
 	public Set(ArrayList<Card> setOfCards){
 		set = setOfCards;
 	}
@@ -146,18 +147,18 @@ public class Set {
 			return peek(size());
 		return null;
 	}
-	public int value(int n){
-		if(n > (size()-1)){
-			return 0;
-		}
-		return set.get(n).val;
-	}
-	
-	public int suitValue(int n){
-		if(n > (size()-1))
-			return 0;
-		return set.get(n).suitVal;
-	}
+//	public int value(int n){
+//		if(n > (size()-1)){
+//			return 0;
+//		}
+//		return set.get(n).val;
+//	}
+//	
+//	public int suitValue(int n){
+//		if(n > (size()-1))
+//			return 0;
+//		return set.get(n).suitVal[0];
+//	}
 	
 	static public Set merge(Set set1, Set set2){
 		Set set= new Set();
