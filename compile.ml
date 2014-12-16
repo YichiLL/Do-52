@@ -299,6 +299,7 @@ let java_of_game program =
         "public Game() {\n" ^
         config_vars ^
         "deck = new Deck(highestCard, ascendingOrder);\n" ^
+        "deck.shuffle();\n" ^
         "players = new ArrayList<MyPlayer>();\n" ^
         "for(int i = 0; i < numberOfPlayers; i++) {\n" ^
         "players.add(new MyPlayer(\"Player \" + (i+1)));\n" ^

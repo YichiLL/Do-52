@@ -33,6 +33,7 @@ public class Set {
 		deck.set(i, deck.get(j));
 		deck.set(j, tmp);
 	}
+
 	/* ==========================Prepend===========================/
 	 * sourceSet: source
 	 * topOrBottom : indicates topOrBottom card from source set

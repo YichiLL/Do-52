@@ -18,13 +18,7 @@ public class Utility {
 	public static boolean cardGreaterThan(Card c1, Card c2){
 		if(c1.val > c2.val)
 			return true;
-		else if(c1.val == c2.val){
-			if(c1.suitVal > c2.suitVal)
-				return true;
-			else
-				return false;
-		}
-			return false;
+		return false;
 	}
 	
 	public static boolean cardGreaterOrEqualThan(Card c1, Card c2){
@@ -37,13 +31,7 @@ public class Utility {
 	public static boolean cardLessThan(Card c1, Card c2){
 		if(c1.val < c2.val)
 			return true;
-		else if(c1.val == c2.val){
-			if(c1.suitVal < c2.suitVal)
-				return true;
-			else
-				return false;
-		} else
-			return false;
+		return false;
 	}
 	
 	public static boolean cardLessOrEqualThan(Card c1, Card c2){
