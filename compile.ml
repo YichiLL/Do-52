@@ -58,12 +58,7 @@ let java_of_type = function
     | CardType -> "Card"
     | SetType -> "Set"
     | PlayerType -> "MyPlayer"
-let normal_type _type  = 
-match _type with
-    | BooleanType -> "boolean"
-    | NumberType -> "int"
-    | StringType -> "String"
-    | _ -> java_of_type _type
+
 (* Converts an op to the Java equivalent. *)
 let java_of_op = function
     | Ast.Add -> "+"
@@ -184,16 +179,16 @@ let java_of_config config =
 
 (* Converts a field decl to a java instance var declaration. *)
 let java_of_field_decl field_decl =
-    (java_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
+    (string_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
 
 (* Converts a field decl to a java var assignment, which will appear in the 
  * constructor of the MyPlayer class. *)
 let java_of_field_decl_assign field_decl = 
     match field_decl.field_type with
     | SetType -> field_decl.field_id ^ " = new Set();"
-    | StringType -> field_decl.field_id ^ " = new String[1]\"\";"
-    | BooleanType -> field_decl.field_id ^ " = new boolean[1];"
-    | NumberType -> field_decl.field_id ^ " = new int[1];"
+    | StringType -> field_decl.field_id ^ " = \"\";"
+    | BooleanType -> field_decl.field_id ^ " = false;"
+    | NumberType -> field_decl.field_id ^ " = 0;"
     (* Should be caught by semantic analysis, here to prevent warning. *)
     | _ -> raise (CompilerError("You can't have a field declaration with type "
                   ^ "\"" ^ string_of_type field_decl.field_type ^ ".\""))
@@ -212,16 +207,8 @@ let java_of_player field_decls =
         assigns ^
         "}\n}"
 
-let java_of_function_expr expr = 
-    match expr with
-    | Var(var), _ -> java_of_var var
-    | _ -> java_of_expr expr
-
 let java_of_args args =
     String.concat ", " (List.map java_of_expr args)
-
-let java_of_function_args args =
-    String.concat ", " (List.map java_of_function_expr args)
 
 let java_of_call call =
     match call.fname with
@@ -236,14 +223,14 @@ let java_of_call call =
             end
         in
             begin match _type with
-            | BooleanType -> "Utility.inputBool(" ^var_id^")"
-            | NumberType -> "Utility.inputInt(" ^var_id^")"
-            | StringType -> "Utility.inputString(" ^var_id^")"
+            | BooleanType -> var_id ^ " = Utility.inputBool()"
+            | NumberType -> var_id ^ " = Utility.inputInt()"
+            | StringType -> var_id ^ " = Utility.inputString()"
             | _ -> raise (CompilerError("Bad type passed to input()."))
             end
     | "quit" ->
         "System.exit(0)"
-    | _ -> call.fname ^ "(" ^ java_of_function_args call.args ^ ")"
+    | _ -> call.fname ^ "(" ^ java_of_args call.args ^ ")"
         
 let java_of_update = function
     | Assign(id, e) -> 
@@ -253,8 +240,8 @@ let java_of_update = function
             begin match _type with
             | BooleanType 
             | NumberType 
-            | StringType -> java_of_var id ^ "[0] = " ^  java_of_expr e
-            | _ -> java_of_var id ^ " = " ^ java_of_expr e
+            | StringType -> java_of_var id ^ "[0]" ^ java_of_expr e ^ ";"
+            | _ -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
             end
     | VarDecl(var) -> 
         begin match var.var_decl_type with
@@ -262,49 +249,12 @@ let java_of_update = function
         | NumberType
         | StringType -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = new " ^ java_of_type var.var_decl_type 
-                      ^ "{" ^ java_of_expr var.var_decl_value ^ "}"
+                      ^ "{" ^ java_of_expr var.var_decl_value ^ "};"
         | _ -> java_of_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = " ^
-                      java_of_expr var.var_decl_value
+                      java_of_expr var.var_decl_value ^ ";"
     end
 
-let rec normal_expr expr =
-let (simple, _type) = 
-    expr  
-in 
-match simple with 
-    | Var(var)-> java_of_var var
-    | Unop(op, e)-> java_of_op op ^ normal_expr e
-    | Binop(e1, op, e2)-> 
-        let _, expr_types = 
-            e1
-        in 
-            begin match expr_types with
-            | NumberType | BooleanType -> 
-                "(" ^ normal_expr e1 ^ " " ^ java_of_op op ^ " " ^
-                normal_expr e2 ^ ")"
-            | StringType ->
-                begin match op with
-                | Ast.Add ->
-                    "(" ^ normal_expr e1 ^ " " ^ java_of_op op ^ " " ^
-                    normal_expr e2 ^ ")"
-                | Ast.Equal ->
-                    "(Utility.compareString(" ^ normal_expr e1 ^ ", " ^
-                    normal_expr e2 ^ ")"
-                | Ast.NotEqual ->
-                    "(!Utility.compareString(" ^ normal_expr e1 ^ ", " ^
-                    normal_expr e2 ^ ")"
-                | _ -> raise (CompilerError("Invalid Op."))
-                end
-            | _ -> java_of_expr expr
-            end 
-    | _ -> java_of_expr expr
-
-let normal_update = function
-    | Assign(id, e) -> java_of_var id ^ " = " ^ normal_expr e
-    | VarDecl(var) -> normal_type var.var_decl_type ^ " " ^ 
-                      var.var_decl_id ^ " = "
-                      ^  normal_expr var.var_decl_value 
 
 let rec java_of_stmt stmt =
     match stmt with
@@ -315,10 +265,10 @@ let rec java_of_stmt stmt =
     | While(e, b) -> "while (" ^ java_of_expr e ^ ")\n" ^ java_of_block b
     | Break -> "break;"
     | Continue -> "continue;"
-    | For(a, e, u, b) -> "for (" ^ normal_update a ^ "; " ^ normal_expr e
-                         ^ "; " ^ normal_update u ^ ")\n" ^ 
+    | For(a, e, u, b) -> "for (" ^ java_of_update a ^ "; " ^ java_of_expr e
+                         ^ "; " ^ java_of_update u ^ ")\n" ^ 
                          java_of_block b
-    | TimesLoop(stmt, expr) -> "for (int i = 0; i < " ^ normal_expr expr ^
+    | TimesLoop(stmt, expr) -> "for (int i = 0; i < " ^ java_of_expr expr ^
                                 "; i++)\n{\n" ^ java_of_stmt stmt ^ "\n}\n"
     | Prepend(e1, e2, draw_source) ->
             let source =
@@ -361,7 +311,8 @@ let java_of_game program =
     let config_vars = 
         String.concat "\n" (List.map java_of_config program.configs)
     in let instance_vars =
-        String.concat "\n" (List.map java_of_update program.vars)
+        String.concat "\n" (List.map (fun vd -> java_of_update vd ^ ";")
+                             program.vars)
     in let funcs =
         String.concat "\n" (List.map java_of_function program.funcs)
     in
