@@ -236,9 +236,9 @@ let java_of_call call =
             end
         in
             begin match _type with
-            | BooleanType -> var_id ^ " = Utility.inputBool()"
-            | NumberType -> var_id ^ " = Utility.inputInt()"
-            | StringType -> var_id ^ " = Utility.inputString()"
+            | BooleanType -> "Utility.inputBool(" ^var_id^")"
+            | NumberType -> "Utility.inputInt(" ^var_id^")"
+            | StringType -> "Utility.inputString(" ^var_id^")"
             | _ -> raise (CompilerError("Bad type passed to input()."))
             end
     | "quit" ->
@@ -305,7 +305,7 @@ let normal_update = function
     | VarDecl(var) -> normal_type var.var_decl_type ^ " " ^ 
                       var.var_decl_id ^ " = "
                       ^  normal_expr var.var_decl_value 
-                      
+
 let rec java_of_stmt stmt =
     match stmt with
     | Call(call) -> java_of_call call ^ ";"
