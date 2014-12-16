@@ -584,7 +584,7 @@ let check_prgm (prgm : Ast.program) =
         in let (added_vars : var_decl list) =
             List.map (check_update_hack header_env) prgm.vars
         in let (added_vars_update : update list) =
-            List.map (check_update header_env) prgm.vars
+            List.map (fun var_decl -> Sast.VarDecl(var_decl)) added_vars
         in let all_vars =
             List.append std_vars added_vars
         in let global_scope =
@@ -600,7 +600,7 @@ let check_prgm (prgm : Ast.program) =
               can_continue = false; }
         in
             let checked_prgm = 
-                { configs = List.map (check_config env) prgm.configs;
+                { configs = List.map (check_config header_env) prgm.configs;
                   field_decls = added_fields;
                   vars = added_vars_update;
                   funcs = List.map (check_func_decl env) prgm.funcs; }

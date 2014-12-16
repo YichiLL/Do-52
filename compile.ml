@@ -282,7 +282,8 @@ let java_of_game program =
     let config_vars = 
         String.concat "\n" (List.map java_of_config program.configs)
     in let instance_vars =
-        String.concat "\n" (List.map java_of_update program.vars)
+        String.concat "\n" (List.map (fun vd -> java_of_update vd ^ ";")
+                             program.vars)
     in let funcs =
         String.concat "\n" (List.map java_of_function program.funcs)
     in
