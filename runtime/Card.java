@@ -4,12 +4,12 @@ public class Card {
 	static final int CLUB = 2;
 	static final int DIAMOND = 1;
 	static final String[] cardNames = {
-		"One", "Two", "Three", "Four", "Five",
+		"Ace", "Two", "Three", "Four", "Five",
 		"Six", "Seven", "Eight", "Nine", "Ten",
 		"Jack", "Queen", "King"
 	};
 	static final String[] suitNames = {
-		"Spade", "Heart", "Clover", "Diamond"
+		"Spades", "Hearts", "Clubs", "Diamonds"
 	};
 	static final int JACK = 10;
 	static final int QUEEN = 11;

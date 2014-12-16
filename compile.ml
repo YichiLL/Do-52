@@ -115,7 +115,7 @@ let rec java_of_expr = function
                 begin match op with
                 | Ast.Add ->
                     "(" ^ java_of_expr e1 ^ " " ^ java_of_op op ^ " " ^
-                    java_of_expr e2 ^ "))"
+                    java_of_expr e2 ^ ")"
                 | Ast.Equal ->
                     "(Utility.compareString(" ^ java_of_expr e1 ^ ", " ^
                     java_of_expr e2 ^ "))"
@@ -282,7 +282,8 @@ let java_of_game program =
     let config_vars = 
         String.concat "\n" (List.map java_of_config program.configs)
     in let instance_vars =
-        String.concat "\n" (List.map java_of_update program.vars)
+        String.concat "" (List.map (fun vd -> java_of_update vd ^ ";") 
+                            program.vars)
     in let funcs =
         String.concat "\n" (List.map java_of_function program.funcs)
     in
