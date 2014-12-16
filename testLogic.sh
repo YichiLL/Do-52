@@ -145,7 +145,7 @@ CheckFail() {
 
     if [ $error -lt 1 ] ; then
     if [ $keep -eq 0 ] ; then
-        rm -f $generatedfiles
+        #rm -f $generatedfiles
     fi
     echo "OK - $basename succeeds"
     echo "###### SUCCESS" 1>&2
