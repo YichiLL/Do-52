@@ -121,7 +121,7 @@ let rec check_fields env last_type id_ls =
             try
                 find_field env (last_type, id)
             with Not_found ->
-                raise (UndeclaredID("Undeclared identifier: \"" ^ id ^ ".\""))
+                raise (UndeclaredID("Undeclared field: \"" ^ id ^ ".\""))
         in
             check_fields env field_decl.field_type ls
     | [] -> last_type
@@ -216,7 +216,7 @@ let rec check_expr env = function
                     | _ -> raise (Failure("Illegal operator."))
                 in
                     Sast.Binop(checked_expr1, op, checked_expr2), _type
-               
+
 (* Takes a var_decl node and checks to see if the var has already been declared
  * in the current scope. Raise an error if it has. Then checks to make sure
  * the var decl has the type that it is supposed to have. If it does, we then 
@@ -244,6 +244,15 @@ let check_var_decl env (vdecl : Ast.var_decl) =
                 raise (TypeMismatch("You have assigned an expression of type" ^
                         "\"" ^ string_of_type _type ^ "\" to a variable of " ^
                         "type \"" ^ vdecl.var_decl_type ^ ".\""))
+
+(* Header var decls get parsed as updates, but we need a function to check them
+ * that always returns a var_decl so that they can be put into scope. See
+ * check_pgrm below. *)
+let check_update_hack env update =
+    match update with
+    | Ast.Assign(_, _) -> raise (WrongType("You cannot assign in the header."))
+    | Ast.VarDecl(vdecl) ->
+        check_var_decl env vdecl
 
 (* Checks an update by checking its subtypes. Also makes sure assignments
  * are valid. *)
@@ -553,28 +562,53 @@ let check_call env (call : Sast.func_call) =
  * The variables, configurations, fields, and functions provided by stdlib.ml
  * are added to the environment here. *)
 let check_prgm (prgm : Ast.program) = 
-    let global_scope =
+    let std_vars = 
+        List.map fst Stdlib.vars
+    in let std_fields =
+        List.map fst Stdlib.fields
+    in let header_scope =
         { parent = None;
-          vars = (List.map fst Stdlib.vars); }
-    in let env =
+          vars = std_vars; }
+    in let header_env =
         { configs = Stdlib.configs;
-          fields = (List.map fst Stdlib.fields);
-          scope = global_scope;
+          fields = std_fields;
+          scope = header_scope;
           unchecked_calls = [];
-          func_decls = [];  (* func_decls = Stdlib.func_decls *)
+          func_decls = [];  
           can_break = false;
           can_continue = false; }
-    in
-        let checked_prgm = 
-            { configs = List.map (check_config env) prgm.configs;
-              field_decls = List.map (check_field_decl env) prgm.field_decls;
-              vars = List.map (check_update env) prgm.vars;
-              funcs = List.map (check_func_decl env) prgm.funcs; }
+        in let added_fields =
+            List.map (check_field_decl header_env) prgm.field_decls
+        in let all_fields = 
+            List.append std_fields added_fields
+        in let (added_vars : var_decl list) =
+            List.map (check_update_hack header_env) prgm.vars
+        in let (added_vars_update : update list) =
+            List.map (check_update header_env) prgm.vars
+        in let all_vars =
+            List.append std_vars added_vars
+        in let global_scope =
+            { parent = None;
+              vars = all_vars; }
+        in let env =
+            { configs = Stdlib.configs;
+              fields = all_fields;
+              scope = global_scope;
+              unchecked_calls = [];
+              func_decls = [];  
+              can_break = false;
+              can_continue = false; }
         in
-            if (has_setup_and_round false false checked_prgm.funcs) then begin
-                List.iter (check_call env) env.unchecked_calls;
-                checked_prgm
-                end
-            else
-                raise (BadProgram("You must have a setup and round procedure" ^
-                        " in your program. They must both take 0 arguments."))
+            let checked_prgm = 
+                { configs = List.map (check_config env) prgm.configs;
+                  field_decls = added_fields;
+                  vars = added_vars_update;
+                  funcs = List.map (check_func_decl env) prgm.funcs; }
+            in
+                if (has_setup_and_round false false checked_prgm.funcs) then begin
+                    List.iter (check_call env) env.unchecked_calls;
+                    checked_prgm
+                    end
+                else
+                    raise (BadProgram("You must have a setup and round procedure" ^
+                            " in your program. They must both take 0 arguments."))

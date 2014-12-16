@@ -164,14 +164,17 @@ let rec string_of_expr expr =
     in
         "(<Call> id:" ^ call.fname ^ " args:[" ^ args_s ^ "])" 
 
+let string_of_var_decl var_d =
+    "(<VarDecl> id:" ^ var_d.var_decl_id ^ " type:" 
+    ^ var_d.var_decl_type ^ " value:" ^ 
+    string_of_expr var_d.var_decl_value ^ ")"
+
 let string_of_update update =
     let value = 
         match update with
         | Assign(var, e) -> "(<Assign> var:" ^ string_of_var var ^ " expr:" 
                             ^ string_of_expr e ^ ")"
-        | VarDecl(var_d) -> "(<VarDecl> id:" ^ var_d.var_decl_id ^ " type:" 
-                            ^ var_d.var_decl_type ^ " value:" ^ 
-                            string_of_expr var_d.var_decl_value ^ ")"
+        | VarDecl(var_d) -> string_of_var_decl var_d
     in
         "(<Update> " ^ value ^ ")" 
 

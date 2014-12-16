@@ -1,7 +1,8 @@
+Player has Boolean called isCat
+
 setup:
-	Player has Boolean called isCat
+	player1.isCat : false
 
 round:
-	player1.isCat : false
 	do output with player1.isCat
 	do quit
