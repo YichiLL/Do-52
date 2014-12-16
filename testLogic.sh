@@ -61,6 +61,17 @@ RunFail() {
     }
 }
 
+CompileRunTime(){
+    Run "javac -g MyPlayer.java" &&
+    Run "javac -g Game.java" &&
+    Run "javac -g Utility.java" && 
+    Run "javac -g main.java" && 
+    Run "javac -g Card.java" && 
+    Run "javac -g Deck.java" && 
+    Run "javac -g Player.java" && 
+    Run "javac -g Set.java" && 
+}
+
 Check() {
     error=0
     basename=`echo $1 | sed 's/.*\\///
@@ -78,15 +89,15 @@ Check() {
     generatedfiles="$generatedfiles tests/${newjavafile}.java tests/${basename}.diff tests/${basename}.out" &&
     Run "$DO_FIFTY_TWO" $1 &&
     Run "mv Game.java MyPlayer.java $RUNTIME" && 
-    #Run "make clean" &&
     Run "cd runtime/" &&
-    Run "javac -g MyPlayer.java" &&
-    Run "javac -g Game.java" &&
+    CompileRunTime &&
     Run "java -cp . $MAIN >" ../tests/${basename}.out &&
+    Run "make clean" &&
     Run "cd .." &&
     #Run "$JAVA" tests/${newjavafile}.java ">" tests/${basename}.out
     Compare tests/${basename}.out tests/${basename}.gold tests/${basename}.diff
     # Report the status and clean up the generated files
+    
 
     if [ $error -eq 0 ] ; then
     if [ $keep -eq 0 ] ; then
@@ -107,18 +118,14 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test_*.do"
+    files="tests/*.do"
 fi
 
 for file in $files
 do
     case $file in
-    *test_*)
-        Check $file 2>> $globallog
-        ;;
     *)
-        echo "unknown file type $file"
-        globalerror=1
+        Check $file 2>> $globallog
         ;;
     esac
 done
