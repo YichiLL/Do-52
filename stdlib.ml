@@ -70,7 +70,7 @@ let vars = [
       "Card.SPADE");
     ( { var_decl_id = "deck";
         var_decl_type = SetType;
-        var_decl_value = (Sast.Number(0), NumberType); }.
+        var_decl_value = (Sast.Number(0), NumberType); },
       "deck");
 ]
 
