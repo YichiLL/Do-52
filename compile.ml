@@ -248,7 +248,7 @@ let java_of_update = function
             begin match _type with
             | BooleanType 
             | NumberType 
-            | StringType -> java_of_var id ^ "[0]" ^ java_of_expr e ^ ";"
+            | StringType -> java_of_var id ^ "[0] = " ^  java_of_expr e ^ ";"
             | _ -> java_of_var id ^ " = " ^ java_of_expr e ^ ";"
             end
     | VarDecl(var) -> 
