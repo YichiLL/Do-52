@@ -220,7 +220,7 @@ let java_of_function_args args =
 
 let java_of_call call =
     match call.fname with
-    | "output" -> "System.out.println(" ^ java_of_args call.args ^ ")"
+    | "output" -> "System.out.println(" ^ java_of_function_args call.args ^ ")"
     | "input" -> 
         let expr, _type =
             List.hd call.args
