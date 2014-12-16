@@ -179,16 +179,16 @@ let java_of_config config =
 
 (* Converts a field decl to a java instance var declaration. *)
 let java_of_field_decl field_decl =
-    (string_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
+    (java_of_type field_decl.field_type) ^ " " ^ field_decl.field_id ^ ";\n"
 
 (* Converts a field decl to a java var assignment, which will appear in the 
  * constructor of the MyPlayer class. *)
 let java_of_field_decl_assign field_decl = 
     match field_decl.field_type with
     | SetType -> field_decl.field_id ^ " = new Set();"
-    | StringType -> field_decl.field_id ^ " = \"\";"
-    | BooleanType -> field_decl.field_id ^ " = false;"
-    | NumberType -> field_decl.field_id ^ " = 0;"
+    | StringType -> field_decl.field_id ^ " = new String[1]\"\";"
+    | BooleanType -> field_decl.field_id ^ " = new boolean[1];"
+    | NumberType -> field_decl.field_id ^ " = new int[1];"
     (* Should be caught by semantic analysis, here to prevent warning. *)
     | _ -> raise (CompilerError("You can't have a field declaration with type "
                   ^ "\"" ^ string_of_type field_decl.field_type ^ ".\""))
