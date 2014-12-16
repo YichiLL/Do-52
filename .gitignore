@@ -14,3 +14,4 @@ printer
 testParse.log
 *.diff
 *.out
+compile
