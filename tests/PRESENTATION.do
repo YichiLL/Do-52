@@ -1,20 +1,24 @@
+// war in do
 configure numberOfPlayers: 2 
+configure highestCard: ace
+configure ascendingOrder: true
 
-new Number testNum : 3
+Player has Number called x // makes player.table available
 
-Player has Number called score
+new Number warCount: 0
 
 setup:
-             
-round:
-        do increaseMyScore with player1
-        do output with "The score of player1 before: " + player1.score
-        do output with "The score of player1 after: " + player1.score
-        do output with "testNum: " + testNum
-        do output with "number of players: " + numberOfPlayers
-        do quit
+	// deal cards
+	do turn with player1
+	do output with "The score of player1 before: " + player1.x
+	do output with "The score of player1 after: " + player1.x
+	do output with "testNum: " + x
 
-increaseMyScore with Player p:
-                if p.score = 0:
-                   p.score : p.score + 1
-                   do quit
+round:
+	do output with "number of players: " + numberOfPlayers
+	do quit
+
+turn with Player player:
+	if p.x = 0:
+		p.x : p.x + 1
+		do quit
