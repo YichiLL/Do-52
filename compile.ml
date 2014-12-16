@@ -58,7 +58,12 @@ let java_of_type = function
     | CardType -> "Card"
     | SetType -> "Set"
     | PlayerType -> "MyPlayer"
-
+let normal_type _type  = 
+match _type with
+    | BooleanType -> "boolean"
+    | NumberType -> "int"
+    | StringType -> "String"
+    | _ -> java_of_type _type
 (* Converts an op to the Java equivalent. *)
 let java_of_op = function
     | Ast.Add -> "+"
@@ -263,7 +268,44 @@ let java_of_update = function
                       java_of_expr var.var_decl_value
     end
 
+let rec normal_expr expr =
+let (simple, _type) = 
+    expr  
+in 
+match simple with 
+    | Var(var)-> java_of_var var
+    | Unop(op, e)-> java_of_op op ^ normal_expr e
+    | Binop(e1, op, e2)-> 
+        let _, expr_types = 
+            e1
+        in 
+            begin match expr_types with
+            | NumberType | BooleanType -> 
+                "(" ^ normal_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                normal_expr e2 ^ ")"
+            | StringType ->
+                begin match op with
+                | Ast.Add ->
+                    "(" ^ normal_expr e1 ^ " " ^ java_of_op op ^ " " ^
+                    normal_expr e2 ^ ")"
+                | Ast.Equal ->
+                    "(Utility.compareString(" ^ normal_expr e1 ^ ", " ^
+                    normal_expr e2 ^ ")"
+                | Ast.NotEqual ->
+                    "(!Utility.compareString(" ^ normal_expr e1 ^ ", " ^
+                    normal_expr e2 ^ ")"
+                | _ -> raise (CompilerError("Invalid Op."))
+                end
+            | _ -> java_of_expr expr
+            end 
+    | _ -> java_of_expr expr
 
+let normal_update = function
+    | Assign(id, e) -> java_of_var id ^ " = " ^ normal_expr e
+    | VarDecl(var) -> normal_type var.var_decl_type ^ " " ^ 
+                      var.var_decl_id ^ " = "
+                      ^  normal_expr var.var_decl_value 
+                      
 let rec java_of_stmt stmt =
     match stmt with
     | Call(call) -> java_of_call call ^ ";"
@@ -273,10 +315,10 @@ let rec java_of_stmt stmt =
     | While(e, b) -> "while (" ^ java_of_expr e ^ ")\n" ^ java_of_block b
     | Break -> "break;"
     | Continue -> "continue;"
-    | For(a, e, u, b) -> "for (" ^ java_of_update a ^ "; " ^ java_of_expr e
-                         ^ "; " ^ java_of_update u ^ ")\n" ^ 
+    | For(a, e, u, b) -> "for (" ^ normal_update a ^ "; " ^ normal_expr e
+                         ^ "; " ^ normal_update u ^ ")\n" ^ 
                          java_of_block b
-    | TimesLoop(stmt, expr) -> "for (int i = 0; i < " ^ java_of_expr expr ^
+    | TimesLoop(stmt, expr) -> "for (int i = 0; i < " ^ normal_expr expr ^
                                 "; i++)\n{\n" ^ java_of_stmt stmt ^ "\n}\n"
     | Prepend(e1, e2, draw_source) ->
             let source =
