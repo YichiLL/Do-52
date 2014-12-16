@@ -176,4 +176,10 @@ public class Set {
 	public int size(){
 		return set.size();
 	}
+
+	public String[] desc(){
+		String[] sOutput = new String[1];
+		sOutput[0] = toString();
+		return sOutput;
+	}
 }

@@ -20,6 +20,12 @@ public class Player{
 		return playerName;
 	}
 
+	public String[] desc(){
+		String[] sOutput = new String[1];
+		sOutput[0] = toString();
+		return sOutput;
+	}
+
 	
 	
 	//end of user defined functions

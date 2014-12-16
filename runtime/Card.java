@@ -16,6 +16,8 @@ public class Card {
 	static final int[] KING= {12};
 	static final int[] ACE= {0}; 
 	
+
+
 	protected int[] cardNumber;
 	int[] val;
 	protected int[] suit;
@@ -37,6 +39,12 @@ public class Card {
 	//interface of the card
 	public String toString(){
 		return cardNames[cardNumber[0]] + " of " + suitNames[suit[0]];
+	}
+
+	public String[] desc(){
+		String[] sOutput = new String[1];
+		sOutput[0] = toString();
+		return sOutput;
 	}
 	
 	
