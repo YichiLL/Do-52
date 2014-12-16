@@ -13,7 +13,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: run_tests.sh [options] [.do files]"
+    echo "Usage: testParse.sh [options] [.do files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -113,12 +113,8 @@ fi
 for file in $files
 do
     case $file in
-    *test_*)
-        Check $file 2>> $globallog
-        ;;
     *)
-        echo "unknown file type $file"
-        globalerror=1
+        Check $file 2>> $globallog
         ;;
     esac
 done

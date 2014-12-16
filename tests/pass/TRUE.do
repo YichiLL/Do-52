@@ -1,5 +1,5 @@
 setup:
-	do output with -5
+	do output with true
 
 round:
 	do quit

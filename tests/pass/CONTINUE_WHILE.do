@@ -1,8 +1,10 @@
 setup:
 	new Number x : 0
-	for x : 0; x < 4; x : x + 1:
+	while (x < 5):
+		x : x + 1
+		if x < 5:
+			continue	
 		do output with x
-		break
 
 round:
 	do quit

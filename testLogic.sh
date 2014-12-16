@@ -11,13 +11,14 @@ ulimit -t 30
 globallog=testLogic.log
 globalfaillog=testLogicFAIL.log
 rm -f $globallog
+rm -f $globalfaillog
 error=0
 globalerror=0
 
 keep=0
 
 Usage() {
-    echo "Usage: run_tests.sh [options] [.do files]"
+    echo "Usage: testLogic.sh [options] [.do files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
@@ -107,7 +108,6 @@ Check() {
     Run "java -cp . $MAIN >" ../tests/${basename}.out &&
     Run "make clean" &&
     Run "cd .." &&
-    #Run "$JAVA" tests/${newjavafile}.java ">" tests/${basename}.out
     Compare tests/${basename}.out tests/${basename}.gold tests/${basename}.diff
     # Report the status and clean up the generated files
     
@@ -145,7 +145,7 @@ CheckFail() {
 
     if [ $error -lt 1 ] ; then
     if [ $keep -eq 0 ] ; then
-        #rm -f $generatedfiles
+        rm -f tests/test_failure/${basename}.out
     fi
     echo "OK - $basename succeeds"
     echo "###### SUCCESS" 1>&2
@@ -165,7 +165,6 @@ else
     files="tests/*.do"
     failfiles="tests/test_failure/*.do"
 fi
-
 for file in $files
 do
     case $file in
@@ -174,13 +173,11 @@ do
         ;;
     esac
 done
-
-for file in $failfiles
+for file2 in $failfiles
 do
-    case $file in
+    case $file2 in
     *)
-    
-        CheckFail $file 2>>  $globalfaillog
+        CheckFail $file2 2>>  $globalfaillog
         ;;
     esac
 done
