@@ -1,6 +1,6 @@
 setup: 
-	play with player1
-	play with player2
+	do play with player1
+	do play with player2
 
 round:
 	do quit
