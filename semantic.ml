@@ -1,7 +1,6 @@
 (* semantic.ml creates an sast from our ast. It basically resolves each item
  * in the tree to a type and raises errors if there is a type mismatch
- * or unknown ID reference. Types propogate up the tree to the highest
- * level that makes sense. *)
+ * or unknown ID reference. *)
 open Ast
 open Sast
 
