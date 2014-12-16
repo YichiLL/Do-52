@@ -338,8 +338,13 @@ let rec check_stmt env = function
            begin match checked_update with
            | Sast.Assign(_,_) -> 
                let new_scope =
-                   { parent = Some(env.scope);
-                     vars = []; }
+                   match checked_setup with
+                   | Sast.VarDecl(var_decl) ->
+                       { parent = Some(env.scope);
+                         vars = [ var_decl ]; }
+                   | _ ->
+                       { parent = Some(env.scope);
+                         vars = []; }
                in let new_env =
                    { configs = env.configs;
                      fields = env.fields;
