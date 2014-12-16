@@ -97,7 +97,7 @@ let fields = [
    ({ parent_type = CardType; field_type = NumberType; field_id = "suit"; },
         "suit");
    ({ parent_type = CardType; field_type = StringType; field_id = "desc"; },
-        "desc()");
+        "toString()");
    ({ parent_type = SetType; field_type = NumberType; field_id = "size" },
         "size()");
    ({ parent_type = SetType; field_type = CardType; field_id = "top" },
@@ -105,11 +105,11 @@ let fields = [
    ({ parent_type = SetType; field_type = CardType; field_id = "bottom" },
         "bottom()");
    ({ parent_type = SetType; field_type = StringType; field_id = "desc"; },
-        "desc()");
+        "toString()");
    ({ parent_type = PlayerType; field_type = SetType; field_id = "hand" },
         "hand");
    ({ parent_type = PlayerType; field_type = StringType; field_id = "desc"; },
-        "desc()");
+        "toString()");
 ]
 
 (* a list of tuples: ((funcs:Sast.func_decl),(java:java_call)) *)
