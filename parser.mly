@@ -33,6 +33,7 @@ let split_dot_id dot_id =
 %nonassoc LT LTOE GT GTOE
 %left ADD MINUS
 %left TIMES DIVIDE
+%left UMINUS
 %right NOT
 /* Highest Precedence */
 
@@ -155,6 +156,7 @@ expr:
     | expr DISJ expr                        { Binop($1, Disj, $3) }
     | expr CONJ expr                        { Binop($1, Conj, $3) }
     | NOT expr                              { Unop(Not, $2) }
+    | MINUS expr %prec UMINUS               { Unop(Minus, $2) }
     | OPENPAREN expr CLOSEPAREN             { $2 }
     
 var:
