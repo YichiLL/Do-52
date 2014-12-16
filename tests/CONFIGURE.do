@@ -1,5 +1,5 @@
-configure playerCount: 1
-configure acesHigh: false
+configure numberOfPlayers: 1
+configure highestCard: 1
 
 Player has Set called table
 
