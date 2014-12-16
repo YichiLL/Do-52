@@ -9,6 +9,7 @@ MAIN="main"
 ulimit -t 30
 
 globallog=testLogic.log
+globalfaillog=testLogicFAIL.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -22,10 +23,22 @@ Usage() {
     exit 1
 }
 
+Compiler(){
+    Run "make"
+}
+
 SignalError() {
     if [ $error -eq 0 ] ; then
 	echo "FAILED"
 	error=1
+    fi
+    echo "  $1"
+}
+
+SignalErrorFail() {
+    if [ $error eq 0 ] ; then
+    echo "$1 failed to fail"; else
+    echo "OK - $* failed"
     fi
     echo "  $1"
 }
@@ -101,7 +114,38 @@ Check() {
 
     if [ $error -eq 0 ] ; then
     if [ $keep -eq 0 ] ; then
-        rm -f tests/*.out
+        rm -f tests/*.out 
+    fi
+    echo "OK - $basename succeeds"
+    echo "###### SUCCESS" 1>&2
+    else
+    echo "###### FAILED" 1>&2
+    globalerror=$error
+    fi
+}
+
+CheckFail() {
+    error=0
+    basename=`echo $1 | sed 's/.*\\///
+                             s/.do//'`
+    reffile=`echo $1 | sed 's/.do$//'`
+    basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
+    javafile=`echo $basename |sed -e 's/^//g' -e 's/-/_/g'`
+    ajavafile=`echo $javafile | perl -pe 's/\S+/\u$&/g'`
+
+    newjavafile=`echo $ajavafile | perl -pe 's/([^ ])_([a-z])/\\1\\u\\2/g'`
+
+    echo 1>&2
+    echo "###### Testing $basename" 1>&2
+
+    generatedfiles="$generatedfiles tests/test_failure/${newjavafile}.java tests/test_failure/${basename}.diff tests/test_failure/${basename}.out" &&
+    RunFail "$DO_FIFTY_TWO" $1 ">" tests/test_failure/${basename}.out 
+
+    # Report the status and clean up the generated files
+
+    if [ $error -lt 1 ] ; then
+    if [ $keep -eq 0 ] ; then
+        rm -f $generatedfiles
     fi
     echo "OK - $basename succeeds"
     echo "###### SUCCESS" 1>&2
@@ -119,6 +163,7 @@ then
     files=$@
 else
     files="tests/*.do"
+    failfiles="tests/test_failure/*.do"
 fi
 
 for file in $files
@@ -126,6 +171,16 @@ do
     case $file in
     *)
         Check $file 2>> $globallog
+        ;;
+    esac
+done
+
+for file in $failfiles
+do
+    case $file in
+    *)
+    
+        CheckFail $file 2>>  $globalfaillog
         ;;
     esac
 done
