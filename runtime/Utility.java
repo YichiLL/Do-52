@@ -9,17 +9,17 @@ public class Utility {
 			return false;
 	}
 	public static boolean cardEquals(Card c1, Card c2){
-		if(c1.val[0]==c2.val[0])
+		if(c1.val==c2.val)
 			return true;
 		else
 			return false;
 	}
 	
 	public static boolean cardGreaterThan(Card c1, Card c2){
-		if(c1.val[0] > c2.val[0])
+		if(c1.val > c2.val)
 			return true;
 		else if(c1.val == c2.val){
-			if(c1.suitVal[0] > c2.suitVal[0])
+			if(c1.suitVal > c2.suitVal)
 				return true;
 			else
 				return false;
@@ -28,17 +28,17 @@ public class Utility {
 	}
 	
 	public static boolean cardGreaterOrEqualThan(Card c1, Card c2){
-		if(c1.val[0] >= c2.val[0])
+		if(c1.val >= c2.val)
 			return true;
 		else
 			return false;
 	}
 	
 	public static boolean cardLessThan(Card c1, Card c2){
-		if(c1.val[0] < c2.val[0])
+		if(c1.val < c2.val)
 			return true;
 		else if(c1.val == c2.val){
-			if(c1.suitVal[0] < c2.suitVal[0])
+			if(c1.suitVal < c2.suitVal)
 				return true;
 			else
 				return false;
@@ -47,7 +47,7 @@ public class Utility {
 	}
 	
 	public static boolean cardLessOrEqualThan(Card c1, Card c2){
-		if(c1.val[0] <= c2.val[0])
+		if(c1.val <= c2.val)
 			return true;
 		else
 			return false;
@@ -75,7 +75,7 @@ public class Utility {
 
 			}catch(Exception e){
 				error = true;
-				System.out.println("The number input is not valid. Input another number.");
+				System.out.println("The number input is not valid. Make another selection.");
 			}
 		}
 		return 0;

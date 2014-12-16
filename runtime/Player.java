@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -18,12 +17,6 @@ public class Player{
 	
 	public String toString(){
 		return playerName;
-	}
-
-	public String[] desc(){
-		String[] sOutput = new String[1];
-		sOutput[0] = toString();
-		return sOutput;
 	}
 
 	
