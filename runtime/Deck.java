@@ -37,20 +37,7 @@ public class Deck extends Set{
 
 	}
 	
-	public void arrangeSuit(int first, int second, int third, int fourth){
-		for(Card c : super.set){
-			if(c.suit == first){
-				c.suitVal = 4;
-			}else if(c.suit== second){
-				c.suitVal = 3;
-			}else if(c.suit == third){
-				c.suitVal = 2;
-			} else{
-				c.suitVal = 1;
-			}
-			
-		}
-	}
+	
 	
 
 	
