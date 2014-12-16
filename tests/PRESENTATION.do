@@ -2,8 +2,10 @@ configure numberOfPlayers: 2
 
 new Number testNum : 3
 
+Player has Number called score
+
 setup:
-        Player has Number called score     
+             
 round:
         do increaseMyScore with player1
         do output with "The score of player1 before: " + player1.score
