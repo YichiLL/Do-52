@@ -1,7 +1,7 @@
 // war in do
 configure numberOfPlayers: 2 
-configure highestCard: Ace
-configure ascend: true
+configure highestCard: ace
+configure ascendingOrder: true
 
 Player has Set called table // makes player.table available
 
@@ -21,13 +21,13 @@ round:
 	do evaluate
 	
 turn with Player player:
-	do output with player + "'s turn."
+	do output with player.desc + "'s turn."
 	if player.hand.size = 0:
 		if player = player1:
-			do output with player + " has lost. Player2 wins!"
+			do output with player.desc + " has lost. Player2 wins!"
 			do quit 
 		else:
-			do output with player + " has lost. Player1 wins!"
+			do output with player.desc + " has lost. Player1 wins!"
 			do quit
 
 	do output with "Play card?" 
@@ -37,7 +37,7 @@ turn with Player player:
 	if in = "y":
 		player.hand t> player.table
 	else:
-		do output with player + " has decided not to play anymore."
+		do output with player.desc + " has decided not to play anymore."
 		do quit
 		
 evaluate:
