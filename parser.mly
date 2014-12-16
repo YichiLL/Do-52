@@ -105,6 +105,7 @@ formal:
 
 block:
     | INDENT stmt_list DEDENT               { List.rev $2 }
+    | INDENT stmt_list EOF                  { List.rev $2 }
 
 stmt_list:
     | /* nothing */                         { [] }
