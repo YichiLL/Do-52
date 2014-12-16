@@ -172,7 +172,7 @@ let rec check_expr env = function
         in let _, _type =
             checked_expr
         in begin match _type with
-        | BooleanType | NumberType -> Sast.Unop(op, checked_expr), _type
+        | BooleanType -> Sast.Unop(op, checked_expr), _type
         | _ -> raise (WrongType(string_of_type _type ^ " cannot be used with" ^
                       " the \"" ^ string_of_op op ^ "\" operator.")) end
     | Ast.Binop(expr1, op, expr2) ->
