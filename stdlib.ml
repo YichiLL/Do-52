@@ -71,17 +71,16 @@ let vars = [
 ]
 
 (* A list of config_decls that correspond to configurable environment variables
- * in our runtime environment. Here config_value matters and is given a
- * default value. *)
+ * in our runtime environment. Here config_value also doesn't matter. *)
 let configs = [
     { config_id = "numberOfPlayers";
-      config_value = (Sast.Number(4), NumberType);
+      config_value = (Sast.Number(0), NumberType);
       config_type = NumberType; };
     { config_id = "highestCard";
-      config_value = (Sast.Number(12), NumberType);
+      config_value = (Sast.Number(0), NumberType);
       config_type = NumberType; };
     { config_id = "ascendingOrder";
-      config_value = (Sast.Boolean(true), BooleanType);
+      config_value = (Sast.Boolean(false), BooleanType);
       config_type = BooleanType; }
 ]
 
